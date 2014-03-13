@@ -100,19 +100,19 @@ class PointDipoleListTest(unittest.TestCase):
         y = 0
         z = 0
         r_5 = (x*x + y*y + z*z)**2.5
-        T02 = self.pdl.dipole_tensor()[1, 2]
-        T02xx =  (2*x*x - y*y - z*z) / r_5
-        self.assertAlmostEqual(T02xx, T02[0,0])
-        T02xy =  0.0
-        self.assertAlmostEqual(T02xy, T02[0,1])
-        T02xz =  3*x*z  / r_5
-        self.assertAlmostEqual(T02xz, T02[0,2])
-        T02yy = (2*y*y - x*x - z*z) / r_5
-        self.assertAlmostEqual(T02yy, T02[1,1])
-        T02yz =  0.0
-        self.assertAlmostEqual(T02yz, T02[1,2])
-        T02zz = (2*z*z - x*x - y*y) / r_5
-        self.assertAlmostEqual(T02zz, T02[2,2])
+        T12 = self.pdl.dipole_tensor()[1, 2]
+        T12xx =  (2*x*x - y*y - z*z) / r_5
+        self.assertAlmostEqual(T12xx, T12[0,0])
+        T12xy =  0.0
+        self.assertAlmostEqual(T12xy, T12[0,1])
+        T12xz =  3*x*z  / r_5
+        self.assertAlmostEqual(T12xz, T12[0,2])
+        T12yy = (2*y*y - x*x - z*z) / r_5
+        self.assertAlmostEqual(T12yy, T12[1,1])
+        T12yz =  0.0
+        self.assertAlmostEqual(T12yz, T12[1,2])
+        T12zz = (2*z*z - x*x - y*y) / r_5
+        self.assertAlmostEqual(T12zz, T12[2,2])
 
                         
         

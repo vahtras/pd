@@ -134,7 +134,7 @@ class PointDipoleListTest(unittest.TestCase):
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2.alpha_iso(), alpha_iso_H2)
+        self.assertAlmostEqual(h2.alpha_iso(), alpha_iso_H2, places=1)
 
     def test_H2_par(self):
         r_e = .7413 * Angstrom
@@ -155,7 +155,7 @@ class PointDipoleListTest(unittest.TestCase):
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2_alpha_par, alpha_par_H2)
+        self.assertAlmostEqual(h2_alpha_par, alpha_par_H2, places=1)
 
     def test_H2_ort(self):
         r_e = .7413 * Angstrom
@@ -176,7 +176,7 @@ class PointDipoleListTest(unittest.TestCase):
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2_alpha_ort, alpha_ort_H2)
+        self.assertAlmostEqual(h2_alpha_ort, alpha_ort_H2, places=1)
         
 
                         

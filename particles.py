@@ -1,6 +1,6 @@
-"""Module defining particle class"""
-import numpy as np
-from numpy.linalg import norm
+"""Module defining polarizable point dipole class""" 
+import numpy as np 
+from numpy.linalg import norm 
 from numpy import outer, dot, array, zeros
 
 I_3 = np.identity(3)
@@ -13,7 +13,7 @@ class PointDipole(object):
         self.r = array([x, y, z])
         self.q = q
         self.p = array([px, py, pz])
-        self.a = a
+        self.a = a*I_3
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -26,18 +26,13 @@ class PointDipoleList(list):
     def __init__(self, pf):
         with open(pf) as _pf:
             units = _pf.next()
-            print "units", units
             n, maxl, ipol, _ = map(int, _pf.next().split())
-            print n, maxl, ipol
             for line in _pf:
                 args = tuple(map(float, line.split())[1:])
                 self.append(PointDipole(*args))
 
     def charge(self):
         return sum([p.q for p in self])
-
-    def alpha(self):
-        return sum([p.a for p in self])
 
     def dipole_tensor(self):
         n = len(self)
@@ -56,6 +51,27 @@ class PointDipoleList(list):
     def __str__(self):
         for p in self:
             print p
+
+    def alpha(self):
+        # Solve the response equaitons
+        #import pdb; pdb.set_trace()
+        n = len(self)
+        aT = self.dipole_tensor().reshape((n, 3, 3*n))
+        # evaluate alphai*Tij
+        alphas = [pd.a for pd in self]
+        for i, a in enumerate(alphas):
+            aT[i, :, :] = dot(a, aT[i, :, :])
+        #matrix (1 - alpha*T)
+        L = np.identity(3*n) - aT.reshape((3*n, 3*n))
+        #right-hand-side
+        dE = array(alphas).reshape((3*n, 3))
+        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
+        _alpha = dpdE.sum(axis=0)
+        return _alpha
+
+    def alpha_iso(self):
+        return np.trace(self.alpha())/3
+
 
             
 if __name__ == "__main__":

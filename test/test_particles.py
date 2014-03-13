@@ -2,6 +2,9 @@ import unittest
 import numpy as np
 from ..particles import PointDipole, PointDipoleList
 
+Angstrom = 1.88971616463 #Bohr
+Angstrom3 = 1/1.48184712e-1 # a.u.
+
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -18,7 +21,7 @@ class PointDipoleTest(unittest.TestCase):
         np.allclose(self.particle.p, (0.1, 0.2, 0.3))
 
     def test_alpha(self):
-        self.assertEqual(self.particle.a, 0.05)
+        self.assertEqual(self.particle.a[0,0], 0.05)
 
     def test_str(self):
         self.particle.fmt = "%5.2f"
@@ -45,9 +48,6 @@ class PointDipoleListTest(unittest.TestCase):
         #round-off error in this example
         self.assertAlmostEqual(self.pdl.charge(), .001) 
 
-    def test_alpha(self):
-        self.assertAlmostEqual(self.pdl.alpha(), 4.23+2*1.089)
-    
     def test_dipole_tensor_zero(self):
         Tij = self.pdl.dipole_tensor()
         zeromat = np.zeros((3,3))
@@ -115,7 +115,72 @@ class PointDipoleListTest(unittest.TestCase):
         T12zz = (2*z*z - x*x - y*y) / r_5
         self.assertAlmostEqual(T12zz, T12[2,2])
 
+    def test_H2_iso(self):
+        r_e = .7413 * Angstrom
+        alpha_H = 0.168 * Angstrom3
+        alpha_iso_H2 = 0.80 * Angstrom3
+        alpha_par_H2 = 1.92 * Angstrom3
+        alpha_ort_H2 = 0.24 * Angstrom3
+        pottext = """AU
+2 1 0 1
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+""" % (0, alpha_H, r_e, alpha_H)
+        with open('/tmp/h2.pot', 'w') as potfile:
+            potfile.write(pottext)
+        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2_alpha = h2.alpha()
+        h2_alpha_par = h2_alpha[2, 2]
+        h2_alpha_ort = h2_alpha[0, 0]
+        
+        self.assertAlmostEqual(h2.alpha_iso(), alpha_iso_H2)
+
+    def test_H2_par(self):
+        r_e = .7413 * Angstrom
+        alpha_H = 0.168 * Angstrom3
+        alpha_iso_H2 = 0.80 * Angstrom3
+        alpha_par_H2 = 1.92 * Angstrom3
+        alpha_ort_H2 = 0.24 * Angstrom3
+        pottext = """AU
+2 1 0 1
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+""" % (0, alpha_H, r_e, alpha_H)
+        with open('/tmp/h2.pot', 'w') as potfile:
+            potfile.write(pottext)
+        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2_alpha = h2.alpha()
+        h2_alpha_par = h2_alpha[2, 2]
+        h2_alpha_ort = h2_alpha[0, 0]
+        
+        self.assertAlmostEqual(h2_alpha_par, alpha_par_H2)
+
+    def test_H2_ort(self):
+        r_e = .7413 * Angstrom
+        alpha_H = 0.168 * Angstrom3
+        alpha_iso_H2 = 0.80 * Angstrom3
+        alpha_par_H2 = 1.92 * Angstrom3
+        alpha_ort_H2 = 0.24 * Angstrom3
+        pottext = """AU
+2 1 0 1
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+""" % (0, alpha_H, r_e, alpha_H)
+        with open('/tmp/h2.pot', 'w') as potfile:
+            potfile.write(pottext)
+        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2_alpha = h2.alpha()
+        h2_alpha_par = h2_alpha[2, 2]
+        h2_alpha_ort = h2_alpha[0, 0]
+        
+        self.assertAlmostEqual(h2_alpha_ort, alpha_ort_H2)
+        
+
                         
         
 if __name__ == "__main__":
     unittest.main()
+

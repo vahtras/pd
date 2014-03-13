@@ -41,7 +41,7 @@ class PointDipoleList(list):
 
     def dipole_tensor(self):
         n = len(self)
-        _T = zeros((n, n, 3,  3))
+        _T = zeros((n, 3, n,  3))
         for i in range(n):
             ri = self[i].r
             for j in range(i):
@@ -49,8 +49,8 @@ class PointDipoleList(list):
                 rij = ri - rj
                 rij2 = dot(rij, rij)
                 Tij = (3*outer(rij, rij) - rij2*I_3)/rij2**2.5
-                _T[i, j, :, :] = Tij
-                _T[j, i, :, :] = Tij
+                _T[i, :, j, :] = Tij
+                _T[j, :, i, :] = Tij
         return _T
 
     def __str__(self):

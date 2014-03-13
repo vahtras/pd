@@ -34,11 +34,12 @@ class PointDipoleListTest(unittest.TestCase):
 1  0.000  0.000  0.698 -0.703 -0.000 0.000 -0.284 4.230
 1 -1.481  0.000 -0.349  0.352  0.153 0.000  0.127 1.089
 1  1.481  0.000 -0.349  0.352 -0.153 0.000  0.127 1.089
+2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000
 """)
         self.pdl = PointDipoleList('/tmp/pdltest.pot')
 
     def test_number(self):
-        self.assertEqual(len(self.pdl), 3)
+        self.assertEqual(len(self.pdl), 4)
 
     def test_charge(self):
         #round-off error in this example
@@ -50,19 +51,19 @@ class PointDipoleListTest(unittest.TestCase):
     def test_dipole_tensor_zero(self):
         Tij = self.pdl.dipole_tensor()
         zeromat = np.zeros((3,3))
-        self.assertTrue(np.allclose(Tij[0,0,:,:], zeromat))
-        self.assertTrue(np.allclose(Tij[1,1,:,:], zeromat))
-        self.assertTrue(np.allclose(Tij[2,2,:,:], zeromat))
-        self.assertFalse(np.allclose(Tij[0,1,:,:], zeromat))
-        self.assertFalse(np.allclose(Tij[0,2,:,:], zeromat))
-        self.assertFalse(np.allclose(Tij[1,2,:,:], zeromat))
+        self.assertTrue (np.allclose(Tij[0, :, 0, :], zeromat))
+        self.assertTrue (np.allclose(Tij[1, :, 1, :], zeromat))
+        self.assertTrue (np.allclose(Tij[2, :, 2, :], zeromat))
+        self.assertFalse(np.allclose(Tij[0, :, 1, :], zeromat))
+        self.assertFalse(np.allclose(Tij[0, :, 2, :], zeromat))
+        self.assertFalse(np.allclose(Tij[1, :, 2, :], zeromat))
 
     def test_dipole_tensor_values_01(self):
         x = 1.481
         y = 0
         z = 0.698 + 0.349
         r_5 = (x*x + y*y + z*z)**2.5
-        T01 = self.pdl.dipole_tensor()[0, 1]
+        T01 = self.pdl.dipole_tensor()[0, :, 1, :]
         T01xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T01xx, T01[0,0])
         T01xy =  0.0
@@ -81,7 +82,7 @@ class PointDipoleListTest(unittest.TestCase):
         y = 0
         z = 0.698 + 0.349
         r_5 = (x*x + y*y + z*z)**2.5
-        T02 = self.pdl.dipole_tensor()[0, 2]
+        T02 = self.pdl.dipole_tensor()[0, :, 2, :]
         T02xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T02xx, T02[0,0])
         T02xy =  0.0
@@ -100,7 +101,7 @@ class PointDipoleListTest(unittest.TestCase):
         y = 0
         z = 0
         r_5 = (x*x + y*y + z*z)**2.5
-        T12 = self.pdl.dipole_tensor()[1, 2]
+        T12 = self.pdl.dipole_tensor()[1, :, 2, :]
         T12xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T12xx, T12[0,0])
         T12xy =  0.0

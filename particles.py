@@ -1,14 +1,18 @@
 """Module defining particle class"""
 import numpy as np
+from numpy.linalg import norm
+from numpy import outer, dot, array, zeros
+
+I_3 = np.identity(3)
 
 class PointDipole(object):
     """ A point dipole object 
     """
     def __init__(self, *args, **kwargs):
         x, y, z, q, px, py, pz, a = args
-        self.r = np.array([x, y, z])
+        self.r = array([x, y, z])
         self.q = q
-        self.p = np.array([px, py, pz])
+        self.p = array([px, py, pz])
         self.a = a
         self.args = args
 
@@ -34,6 +38,20 @@ class PointDipoleList(list):
 
     def alpha(self):
         return sum([p.a for p in self])
+
+    def dipole_tensor(self):
+        n = len(self)
+        _T = zeros((n, n, 3,  3))
+        for i in range(n):
+            ri = self[i].r
+            for j in range(i):
+                rj = self[j].r
+                rij = ri - rj
+                rij2 = dot(rij, rij)
+                Tij = (3*outer(rij, rij) - rij2*I_3)/rij2**2.5
+                _T[i, j, :, :] = Tij
+                _T[j, i, :, :] = Tij
+        return _T
 
     def __str__(self):
         for p in self:

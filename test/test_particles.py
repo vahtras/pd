@@ -31,6 +31,24 @@ N2 = {
     }
 N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
 
+O2 = {
+    "R": 1.2074 * ANGSTROM,
+    "ALPHA_O": 0.562 * ANGSTROM3,
+    "ALPHA_ISO": 1.60 * ANGSTROM3,
+    "ALPHA_PAR": 3.11 * ANGSTROM3,
+    "ALPHA_ORT": 0.85 * ANGSTROM3,
+    }
+O2["POTFILE"] = DIATOMIC % (0, O2["ALPHA_O"], O2["R"], O2["ALPHA_O"])
+
+Cl2 = {
+    "R": 1.2074 * ANGSTROM,
+    "ALPHA_Cl": 0.562 * ANGSTROM3,
+    "ALPHA_ISO": 1.60 * ANGSTROM3,
+    "ALPHA_PAR": 3.11 * ANGSTROM3,
+    "ALPHA_ORT": 0.85 * ANGSTROM3,
+    }
+Cl2["POTFILE"] = DIATOMIC % (0, Cl2["ALPHA_Cl"], Cl2["R"], Cl2["ALPHA_Cl"])
+
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -144,28 +162,20 @@ class PointDipoleListTest(unittest.TestCase):
 
         h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
 
-        h2_alpha = h2.alpha()
-        h2_alpha_par = h2_alpha[2, 2]
-        h2_alpha_ort = h2_alpha[0, 0]
-        
         self.assertAlmostEqual(h2.alpha_iso(), H2["ALPHA_ISO"], places=DECIMALS)
 
     def test_H2_par(self):
 
         h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
-
         h2_alpha = h2.alpha()
         h2_alpha_par = h2_alpha[2, 2]
-        h2_alpha_ort = h2_alpha[0, 0]
         
         self.assertAlmostEqual(h2_alpha_par, H2["ALPHA_PAR"], places=DECIMALS)
 
     def test_H2_ort(self):
 
         h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
-
         h2_alpha = h2.alpha()
-        h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
         self.assertAlmostEqual(h2_alpha_ort, H2["ALPHA_ORT"], places=DECIMALS)
@@ -174,31 +184,67 @@ class PointDipoleListTest(unittest.TestCase):
 
         n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
 
-        n2_alpha = n2.alpha()
-        n2_alpha_par = n2_alpha[2, 2]
-        n2_alpha_ort = n2_alpha[0, 0]
-        
         self.assertAlmostEqual(n2.alpha_iso(), N2["ALPHA_ISO"], places=DECIMALS)
 
     def test_N2_par(self):
 
         n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
-
         n2_alpha = n2.alpha()
         n2_alpha_par = n2_alpha[2, 2]
-        n2_alpha_ort = n2_alpha[0, 0]
         
         self.assertAlmostEqual(n2_alpha_par, N2["ALPHA_PAR"], places=DECIMALS)
 
     def test_N2_ort(self):
 
         n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
-
         n2_alpha = n2.alpha()
-        n2_alpha_par = n2_alpha[2, 2]
         n2_alpha_ort = n2_alpha[0, 0]
         
         self.assertAlmostEqual(n2_alpha_ort, N2["ALPHA_ORT"], places=DECIMALS)
+
+    def test_O2_iso(self):
+
+        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+
+        self.assertAlmostEqual(o2.alpha_iso(), O2["ALPHA_ISO"], places=DECIMALS)
+
+    def test_O2_par(self):
+
+        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+        o2_alpha = o2.alpha()
+        o2_alpha_par = o2_alpha[2, 2]
+        
+        self.assertAlmostEqual(o2_alpha_par, O2["ALPHA_PAR"], places=DECIMALS)
+
+    def test_O2_ort(self):
+
+        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+        o2_alpha = o2.alpha()
+        o2_alpha_ort = o2_alpha[0, 0]
+        
+        self.assertAlmostEqual(o2_alpha_ort, O2["ALPHA_ORT"], places=DECIMALS)
+
+    def test_Cl2_iso(self):
+
+        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+
+        self.assertAlmostEqual(cl2.alpha_iso(), Cl2["ALPHA_ISO"], places=DECIMALS)
+
+    def test_Cl2_par(self):
+
+        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+        cl2_alpha = cl2.alpha()
+        cl2_alpha_par = cl2_alpha[2, 2]
+        
+        self.assertAlmostEqual(cl2_alpha_par, Cl2["ALPHA_PAR"], places=DECIMALS)
+
+    def test_Cl2_ort(self):
+
+        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+        cl2_alpha = cl2.alpha()
+        cl2_alpha_ort = cl2_alpha[0, 0]
+        
+        self.assertAlmostEqual(cl2_alpha_ort, Cl2["ALPHA_ORT"], places=DECIMALS)
 
 
                         

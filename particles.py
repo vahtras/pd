@@ -24,12 +24,14 @@ class PointDipole(object):
 class PointDipoleList(list):
     """A list of dipole objects"""
     def __init__(self, pf):
-        with open(pf) as _pf:
-            units = _pf.next()
-            n, maxl, ipol, _ = map(int, _pf.next().split())
-            for line in _pf:
-                args = tuple(map(float, line.split())[1:])
-                self.append(PointDipole(*args))
+        """Class constructor 
+        pf: potential file object (or iterator)
+        """
+        units = pf.next()
+        n, maxl, ipol, _ = map(int, pf.next().split())
+        for line in pf:
+            args = tuple(map(float, line.split())[1:])
+            self.append(PointDipole(*args))
 
     def charge(self):
         return sum([p.q for p in self])

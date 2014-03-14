@@ -2,8 +2,34 @@ import unittest
 import numpy as np
 from ..particles import PointDipole, PointDipoleList
 
-Angstrom = 1.88971616463 #Bohr
-Angstrom3 = 1/1.48184712e-1 # a.u.
+DECIMALS = 1
+ANGSTROM = 1.88971616463 #Bohr
+ANGSTROM3 = 1/1.48184712e-1 # a.u.
+DIATOMIC = """AU
+2 1 0 1
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
+"""
+
+# Appelquist data
+
+H2 = {
+    "R": .7413 * ANGSTROM,
+    "ALPHA_H": 0.168 * ANGSTROM3,
+    "ALPHA_ISO": 0.80 * ANGSTROM3,
+    "ALPHA_PAR": 1.92 * ANGSTROM3,
+    "ALPHA_ORT": 0.24 * ANGSTROM3,
+    }
+H2["POTFILE"] = DIATOMIC % (0, H2["ALPHA_H"], H2["R"], H2["ALPHA_H"])
+
+N2 = {
+    "R": 1.0976 * ANGSTROM,
+    "ALPHA_N": 0.492 * ANGSTROM3,
+    "ALPHA_ISO": 1.76 * ANGSTROM3,
+    "ALPHA_PAR": 3.84 * ANGSTROM3,
+    "ALPHA_ORT": 0.72 * ANGSTROM3,
+    }
+N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
 
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
@@ -31,15 +57,14 @@ class PointDipoleTest(unittest.TestCase):
         
 class PointDipoleListTest(unittest.TestCase):
     def setUp(self):
-        with open('/tmp/pdltest.pot', 'w') as pf:
-            pf.write("""AU
+        # mimic file object
+        pf = iter("""AU
 3 1 0 1
 1  0.000  0.000  0.698 -0.703 -0.000 0.000 -0.284 4.230
 1 -1.481  0.000 -0.349  0.352  0.153 0.000  0.127 1.089
 1  1.481  0.000 -0.349  0.352 -0.153 0.000  0.127 1.089
-2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000
-""")
-        self.pdl = PointDipoleList('/tmp/pdltest.pot')
+2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000""".split("\n"))
+        self.pdl = PointDipoleList(pf)
 
     def test_number(self):
         self.assertEqual(len(self.pdl), 4)
@@ -116,68 +141,65 @@ class PointDipoleListTest(unittest.TestCase):
         self.assertAlmostEqual(T12zz, T12[2,2])
 
     def test_H2_iso(self):
-        r_e = .7413 * Angstrom
-        alpha_H = 0.168 * Angstrom3
-        alpha_iso_H2 = 0.80 * Angstrom3
-        alpha_par_H2 = 1.92 * Angstrom3
-        alpha_ort_H2 = 0.24 * Angstrom3
-        pottext = """AU
-2 1 0 1
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-""" % (0, alpha_H, r_e, alpha_H)
-        with open('/tmp/h2.pot', 'w') as potfile:
-            potfile.write(pottext)
-        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
 
         h2_alpha = h2.alpha()
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2.alpha_iso(), alpha_iso_H2, places=1)
+        self.assertAlmostEqual(h2.alpha_iso(), H2["ALPHA_ISO"], places=DECIMALS)
 
     def test_H2_par(self):
-        r_e = .7413 * Angstrom
-        alpha_H = 0.168 * Angstrom3
-        alpha_iso_H2 = 0.80 * Angstrom3
-        alpha_par_H2 = 1.92 * Angstrom3
-        alpha_ort_H2 = 0.24 * Angstrom3
-        pottext = """AU
-2 1 0 1
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-""" % (0, alpha_H, r_e, alpha_H)
-        with open('/tmp/h2.pot', 'w') as potfile:
-            potfile.write(pottext)
-        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
 
         h2_alpha = h2.alpha()
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2_alpha_par, alpha_par_H2, places=1)
+        self.assertAlmostEqual(h2_alpha_par, H2["ALPHA_PAR"], places=DECIMALS)
 
     def test_H2_ort(self):
-        r_e = .7413 * Angstrom
-        alpha_H = 0.168 * Angstrom3
-        alpha_iso_H2 = 0.80 * Angstrom3
-        alpha_par_H2 = 1.92 * Angstrom3
-        alpha_ort_H2 = 0.24 * Angstrom3
-        pottext = """AU
-2 1 0 1
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-1  0.000  0.000  %f 0.000 0.000 0.000 0.000 %f
-""" % (0, alpha_H, r_e, alpha_H)
-        with open('/tmp/h2.pot', 'w') as potfile:
-            potfile.write(pottext)
-        h2 = PointDipoleList('/tmp/h2.pot')
+
+        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
 
         h2_alpha = h2.alpha()
         h2_alpha_par = h2_alpha[2, 2]
         h2_alpha_ort = h2_alpha[0, 0]
         
-        self.assertAlmostEqual(h2_alpha_ort, alpha_ort_H2, places=1)
+        self.assertAlmostEqual(h2_alpha_ort, H2["ALPHA_ORT"], places=DECIMALS)
+
+    def test_N2_iso(self):
+
+        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+
+        n2_alpha = n2.alpha()
+        n2_alpha_par = n2_alpha[2, 2]
+        n2_alpha_ort = n2_alpha[0, 0]
         
+        self.assertAlmostEqual(n2.alpha_iso(), N2["ALPHA_ISO"], places=DECIMALS)
+
+    def test_N2_par(self):
+
+        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+
+        n2_alpha = n2.alpha()
+        n2_alpha_par = n2_alpha[2, 2]
+        n2_alpha_ort = n2_alpha[0, 0]
+        
+        self.assertAlmostEqual(n2_alpha_par, N2["ALPHA_PAR"], places=DECIMALS)
+
+    def test_N2_ort(self):
+
+        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+
+        n2_alpha = n2.alpha()
+        n2_alpha_par = n2_alpha[2, 2]
+        n2_alpha_ort = n2_alpha[0, 0]
+        
+        self.assertAlmostEqual(n2_alpha_ort, N2["ALPHA_ORT"], places=DECIMALS)
+
 
                         
         

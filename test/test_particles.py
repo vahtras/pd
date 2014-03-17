@@ -14,80 +14,122 @@ DIATOMIC = """AU
 # Appelquist data
 
 H2 = {
-    "R": .7413 * ANGSTROM,
-    "ALPHA_H": 0.168 * ANGSTROM3,
-    "ALPHA_ISO": 0.80 * ANGSTROM3,
-    "ALPHA_PAR": 1.92 * ANGSTROM3,
-    "ALPHA_ORT": 0.24 * ANGSTROM3,
+    "R": .7413,
+    "ALPHA_H": 0.168,
+    "ALPHA_ISO": 0.80,
+    "ALPHA_PAR": 1.92,
+    "ALPHA_ORT": 0.24,
     }
 H2["POTFILE"] = DIATOMIC % (0, H2["ALPHA_H"], H2["R"], H2["ALPHA_H"])
 
 N2 = {
-    "R": 1.0976 * ANGSTROM,
-    "ALPHA_N": 0.492 * ANGSTROM3,
-    "ALPHA_ISO": 1.76 * ANGSTROM3,
-    "ALPHA_PAR": 3.84 * ANGSTROM3,
-    "ALPHA_ORT": 0.72 * ANGSTROM3,
+    "R": 1.0976,
+    "ALPHA_N": 0.492,
+    "ALPHA_ISO": 1.76,
+    "ALPHA_PAR": 3.84,
+    "ALPHA_ORT": 0.72,
     }
 N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
 
 O2 = {
-    "R": 1.2074 * ANGSTROM,
-    "ALPHA_O": 0.562 * ANGSTROM3,
-    "ALPHA_ISO": 1.60 * ANGSTROM3,
-    "ALPHA_PAR": 3.11 * ANGSTROM3,
-    "ALPHA_ORT": 0.85 * ANGSTROM3,
+    "R": 1.2074,
+    "ALPHA_O": 0.562,
+    "ALPHA_ISO": 1.60,
+    "ALPHA_PAR": 3.11,
+    "ALPHA_ORT": 0.85,
     }
 O2["POTFILE"] = DIATOMIC % (0, O2["ALPHA_O"], O2["R"], O2["ALPHA_O"])
 
 Cl2 = {
-    "R": 1.2074 * ANGSTROM,
-    "ALPHA_Cl": 0.562 * ANGSTROM3,
-    "ALPHA_ISO": 1.60 * ANGSTROM3,
-    "ALPHA_PAR": 3.11 * ANGSTROM3,
-    "ALPHA_ORT": 0.85 * ANGSTROM3,
+    "R": 1.2074,
+    "ALPHA_Cl": 0.562,
+    "ALPHA_ISO": 1.60,
+    "ALPHA_PAR": 3.11,
+    "ALPHA_ORT": 0.85,
     }
 Cl2["POTFILE"] = DIATOMIC % (0, Cl2["ALPHA_Cl"], Cl2["R"], Cl2["ALPHA_Cl"])
 
 HCl = {
-    "R": 1.2745 * ANGSTROM,
-    "ALPHA_H": 2.39 * ANGSTROM3,
-    "ALPHA_Cl": 0.059 * ANGSTROM3,
-    "ALPHA_ISO": 2.63 * ANGSTROM3,
-    "ALPHA_PAR": 3.13 * ANGSTROM3,
-    "ALPHA_ORT": 2.39 * ANGSTROM3,
+    "R": 1.2745,
+    "ALPHA_H": 2.39,
+    "ALPHA_Cl": 0.059,
+    "ALPHA_ISO": 2.63,
+    "ALPHA_PAR": 3.13,
+    "ALPHA_ORT": 2.39,
     }
 HCl["POTFILE"] = DIATOMIC % (0, HCl["ALPHA_H"], HCl["R"], HCl["ALPHA_Cl"])
 
 HBr = {
-    "R": 1.408 * ANGSTROM,
-    "ALPHA_H": 3.31 * ANGSTROM3,
-    "ALPHA_Br": 0.071 * ANGSTROM3,
-    "ALPHA_ISO": 3.61 * ANGSTROM3,
-    "ALPHA_PAR": 4.22 * ANGSTROM3,
-    "ALPHA_ORT": 3.31 * ANGSTROM3,
+    "R": 1.408,
+    "ALPHA_H": 3.31,
+    "ALPHA_Br": 0.071,
+    "ALPHA_ISO": 3.61,
+    "ALPHA_PAR": 4.22,
+    "ALPHA_ORT": 3.31,
     }
 HBr["POTFILE"] = DIATOMIC % (0, HBr["ALPHA_H"], HBr["R"], HBr["ALPHA_Br"])
 
 HI = {
-    "R": 1.609 * ANGSTROM,
-    "ALPHA_H": 4.89 * ANGSTROM3,
-    "ALPHA_I": 0.129 * ANGSTROM3,
-    "ALPHA_ISO": 5.45 * ANGSTROM3,
-    "ALPHA_PAR": 6.58 * ANGSTROM3,
-    "ALPHA_ORT": 4.89 * ANGSTROM3,
+    "R": 1.609,
+    "ALPHA_H": 4.89,
+    "ALPHA_I": 0.129,
+    "ALPHA_ISO": 5.45,
+    "ALPHA_PAR": 6.58,
+    "ALPHA_ORT": 4.89,
     }
 HI["POTFILE"] = DIATOMIC % (0, HI["ALPHA_H"], HI["R"], HI["ALPHA_I"])
 
 CO = {
-    "R": 1.1282 * ANGSTROM,
-    "ALPHA_C": 1.624 * ANGSTROM3,
-    "ALPHA_O": 0.071 * ANGSTROM3,
-    "ALPHA_ISO": 1.95 * ANGSTROM3,
-    "ALPHA_PAR": 2.60 * ANGSTROM3,
-    "ALPHA_ORT": 1.625 * ANGSTROM3,
+    "R": 1.1282,
+    "ALPHA_C": 1.624,
+    "ALPHA_O": 0.071,
+    "ALPHA_ISO": 1.95,
+    "ALPHA_PAR": 2.60,
+    "ALPHA_ORT": 1.625,
     }
 CO["POTFILE"] = DIATOMIC % (0, CO["ALPHA_C"], CO["R"], CO["ALPHA_O"])
+
+CH4 = {
+    "R": 1.095,
+    "A": 109.4712206,
+    "ALPHA_C": 0.878,
+    "ALPHA_H": 0.135,
+    "ALPHA_ISO": 2.58,
+    }
+CH4["POTFILE"] = """AA
+5 1 0 1
+1  1.095  0.000000  0.000000 0 0 0 0 %f
+1 -0.365  1.032380  0.000000 0 0 0 0 %f
+1 -0.365 -0.516188 -0.894064 0 0 0 0 %f
+1 -0.365 -0.516188  0.894064 0 0 0 0 %f
+1  0.000  0.000000  0.000000 0 0 0 0 %f
+""" % (
+    CH4["ALPHA_H"], CH4["ALPHA_H"], CH4["ALPHA_H"], CH4["ALPHA_H"], 
+    CH4["ALPHA_C"]
+    )
+
+C2H6 = {
+    "RCH": 1.095,
+    "RCC": 1.54,
+    "A": 109.4712206,
+    "ALPHA_C": 0.878,
+    "ALPHA_H": 0.135,
+    "ALPHA_ISO": 4.47,
+    }
+C2H6["POTFILE"] = """AU
+8 1 0 1
+1  -0.394766   1.012783   0.000000 0 0 0 0 %f
+1  -0.394766  -0.506391  -0.877096 0 0 0 0 %f
+1  -0.394766  -0.506391   0.877096 0 0 0 0 %f
+1   1.916766   0.506391   0.877096 0 0 0 0 %f
+1   1.916766  -1.012783   0.000000 0 0 0 0 %f
+1   1.916766   0.506391  -0.877096 0 0 0 0 %f
+1   0.000000   0.000000   0.000000 0 0 0 0 %f
+1   1.522000   0.000000   0.000000 0 0 0 0 %f
+""" % (
+    C2H6["ALPHA_H"], C2H6["ALPHA_H"], C2H6["ALPHA_H"], C2H6["ALPHA_H"], C2H6["ALPHA_H"], C2H6["ALPHA_H"],  
+    C2H6["ALPHA_C"], C2H6["ALPHA_C"],
+    )
 
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
@@ -374,6 +416,15 @@ class PointDipoleListTest(unittest.TestCase):
         
         self.assertAlmostEqual(co_alpha_ort, CO["ALPHA_ORT"], places=DECIMALS)
 
+    def test_CH4_iso(self):
+
+        ch4 = PointDipoleList(iter(CH4["POTFILE"].strip().split('\n')))
+        self.assertAlmostEqual(ch4.alpha_iso(), CH4["ALPHA_ISO"], places=DECIMALS)
+
+    def test_C2H6_iso(self):
+
+        c2h6 = PointDipoleList(iter(C2H6["POTFILE"].strip().split('\n')))
+        self.assertAlmostEqual(c2h6.alpha_iso(), C2H6["ALPHA_ISO"], places=DECIMALS)
 
                         
         

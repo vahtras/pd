@@ -77,5 +77,10 @@ class PointDipoleList(list):
 
             
 if __name__ == "__main__":
-    a = PointDipole(0,0,0,1,2,3,4,5, fmt="%5.1f")
-    print a
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('potfile')
+    args = parser.parse_args()
+    pdl = PointDipoleList(open(args.potfile))
+    print pdl.alpha()
+    print pdl.alpha_iso()

@@ -212,6 +212,20 @@ NP["POTFILE"] = """AA
 1  -0.513333  -0.725963   1.257405  0 0 0 0 0.878
 """
 
+DME = { "ALPHA_ISO": 5.22}
+DME["POTFILE"] = """AA
+9 1 0 1
+1  1.1668 -0.2480 0.0000 0 0 0 0 0.878
+1 -1.1668 -0.2480 0.0000 0 0 0 0 0.878
+1  0.0000  0.5431 0.0000 0 0 0 0 0.465
+1  2.019   0.433  0.000  0 0 0 0 0.135
+1 -2.019   0.433  0.000  0 0 0 0 0.135
+1  1.206  -0.888  0.8944 0 0 0 0 0.135
+1  1.206  -0.888 -0.8944 0 0 0 0 0.135
+1 -1.206  -0.888  0.8944 0 0 0 0 0.135
+1 -1.206  -0.888 -0.8944 0 0 0 0 0.135
+"""                     
+
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -526,6 +540,11 @@ class PointDipoleListTest(unittest.TestCase):
 
         np = PointDipoleList(iter(NP["POTFILE"].strip().split('\n')))
         self.assertAlmostEqual(np.alpha_iso(), NP["ALPHA_ISO"], places=DECIMALS)
+
+    def test_DME_iso(self):
+
+        dme = PointDipoleList(iter(DME["POTFILE"].strip().split('\n')))
+        self.assertAlmostEqual(dme.alpha_iso(), DME["ALPHA_ISO"], places=DECIMALS)
                         
         
 if __name__ == "__main__":

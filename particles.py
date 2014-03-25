@@ -29,7 +29,8 @@ class PointDipoleList(list):
         """
         units = pf.next()
         n, maxl, ipol, _ = map(int, pf.next().split())
-        for line in pf:
+        for i, line in enumerate(pf):
+            if i == n: break
             args = tuple(map(float, line.split())[1:])
             self.append(PointDipole(*args))
 

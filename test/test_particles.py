@@ -262,7 +262,7 @@ class PointDipoleListTest(unittest.TestCase):
         self.pdl = PointDipoleList(pf)
 
     def test_number(self):
-        self.assertEqual(len(self.pdl), 4)
+        self.assertEqual(len(self.pdl), 3)
 
     def test_charge(self):
         #round-off error in this example

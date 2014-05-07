@@ -21,6 +21,12 @@ class PointDipole(object):
     def __str__(self):
         return self.fmt*len(self.args) % self.args
 
+    def charge_energy(self, e_field):
+        return -self.q*dot(e_field, self.r)
+
+    def dipole_energy(self, e_field):
+        return -np.dot(self.p, e_field)
+
 class PointDipoleList(list):
     """A list of dipole objects"""
     def __init__(self, pf):

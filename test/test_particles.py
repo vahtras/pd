@@ -524,7 +524,7 @@ class PointDipoleListTest(unittest.TestCase):
     def test_C2H6_iso(self):
 
         c2h6 = PointDipoleList(iter(C2H6["POTFILE"].strip().split('\n')))
-        self.assertAlmostEqual(c2h6.alpha_iso(), C2H6["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(.1*c2h6.alpha_iso(), .1*C2H6["ALPHA_ISO"], places=DECIMALS)
 
     def test_C3H8_iso(self):
 
@@ -534,12 +534,12 @@ class PointDipoleListTest(unittest.TestCase):
     def test_CP_iso(self):
 
         cp = PointDipoleList(iter(CP["POTFILE"].strip().split('\n')))
-        self.assertAlmostEqual(cp.alpha_iso(), CP["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(.1*cp.alpha_iso(), .1*CP["ALPHA_ISO"], places=DECIMALS)
 
     def test_NP_iso(self):
 
         np = PointDipoleList(iter(NP["POTFILE"].strip().split('\n')))
-        self.assertAlmostEqual(np.alpha_iso(), NP["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(.1*np.alpha_iso(), .1*NP["ALPHA_ISO"], places=DECIMALS)
 
     def test_DME_iso(self):
 

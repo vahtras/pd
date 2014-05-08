@@ -27,6 +27,16 @@ class PointDipole(object):
     def dipole_energy(self, e_field):
         return -np.dot(self.p, e_field)
 
+    def induced_dipole_energy(self, e_field):
+        return -0.5*np.dot(e_field, np.dot(self.a, e_field))
+
+    def total_field_energy(self, e_field):
+        return \
+            self.charge_energy(e_field) + \
+            self.dipole_energy(e_field) + \
+            self.induced_dipole_energy(e_field)
+
+
 class PointDipoleList(list):
     """A list of dipole objects"""
     def __init__(self, pf):

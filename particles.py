@@ -14,6 +14,7 @@ class PointDipole(object):
         self.q = q
         self.p = array([px, py, pz])
         self.a = a*I_3
+        self.b = np.zeros((3, 3, 3))
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -27,17 +28,21 @@ class PointDipole(object):
     def dipole_energy(self, e_field):
         return -dot(self.p, e_field)
 
-    def induced_dipole_energy(self, e_field):
+    def alpha_induced_dipole_energy(self, e_field):
         return -0.5*dot(e_field, dot(self.a, e_field))
+
+    def beta_induced_dipole_energy(self, e_field):
+        return -dot(e_field, dot(dot(self.b, e_field), e_field))/6
 
     def total_field_energy(self, e_field):
         return \
             self.charge_energy(e_field) + \
             self.dipole_energy(e_field) + \
-            self.induced_dipole_energy(e_field)
+            self.alpha_induced_dipole_energy(e_field) + \
+            self.beta_induced_dipole_energy(e_field)
 
     def dipole_induced(self, e_field):
-        return dot(self.a, e_field)
+        return dot(self.a, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
 
 
 class PointDipoleList(list):

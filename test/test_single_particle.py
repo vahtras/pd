@@ -52,10 +52,10 @@ class PointDipoleTest(unittest.TestCase):
         self.particle.r = np.array([1., 1., 1.])
         self.assertEqual(self.particle.charge_energy(self.e_field), -6.0)
 
-    def test_dipole_energy(self):
+    def test_permanent_dipole_energy(self):
         reference_dipole_energy = -1.4
         self.assertEqual(
-            self.particle.dipole_energy(self.e_field), 
+            self.particle.permanent_dipole_energy(self.e_field), 
             reference_dipole_energy
             )
 

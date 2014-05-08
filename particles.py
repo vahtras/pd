@@ -25,7 +25,7 @@ class PointDipole(object):
     def charge_energy(self, e_field):
         return -self.q*dot(e_field, self.r)
 
-    def dipole_energy(self, e_field):
+    def permanent_dipole_energy(self, e_field):
         return -dot(self.p, e_field)
 
     def alpha_induced_dipole_energy(self, e_field):
@@ -37,7 +37,7 @@ class PointDipole(object):
     def total_field_energy(self, e_field):
         return \
             self.charge_energy(e_field) + \
-            self.dipole_energy(e_field) + \
+            self.permanent_dipole_energy(e_field) + \
             self.alpha_induced_dipole_energy(e_field) + \
             self.beta_induced_dipole_energy(e_field)
 

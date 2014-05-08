@@ -36,6 +36,9 @@ class PointDipole(object):
             self.dipole_energy(e_field) + \
             self.induced_dipole_energy(e_field)
 
+    def dipole_induced(self, e_field):
+        return dot(self.a, e_field)
+
 
 class PointDipoleList(list):
     """A list of dipole objects"""
@@ -73,7 +76,6 @@ class PointDipoleList(list):
 
     def alpha(self):
         # Solve the response equaitons
-        #import pdb; pdb.set_trace()
         n = len(self)
         aT = self.dipole_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij

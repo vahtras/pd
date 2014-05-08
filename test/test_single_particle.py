@@ -2,6 +2,24 @@ import unittest
 import numpy as np
 from ..particles import PointDipole
 
+EPSILON = 0.001
+
+def grad(f, r):
+    return np.array([gradx(f, r), grady(f, r), gradz(f, r)])
+
+def gradx(f, r):
+    ex = np.array([EPSILON/2, 0, 0])
+    return (f(r + ex) - f(r - ex))/EPSILON
+
+def grady(f, r):
+    ey = np.array([0, EPSILON/2, 0])
+    return (f(r + ey) - f(r - ey))/EPSILON
+
+def gradz(f, r):
+    ez = np.array([0, 0, EPSILON/2])
+    return (f(r + ez) - f(r - ez))/EPSILON
+
+
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -33,10 +51,22 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_dipole_energy(self):
         reference_dipole_energy = -1.4
-        self.assertEqual(self.particle.dipole_energy(self.e_field), reference_dipole_energy)
+        self.assertEqual(
+            self.particle.dipole_energy(self.e_field), 
+            reference_dipole_energy
+            )
 
     def test_induced_dipole_energy(self):
-        self.assertAlmostEqual(self.particle.induced_dipole_energy(self.e_field), -0.35)
+        self.assertAlmostEqual(
+            self.particle.induced_dipole_energy(self.e_field), -0.35
+            )
 
     def test_total_field_energy(self):
         self.assertEqual(self.particle.total_field_energy(self.e_field), -1.75)
+
+    def test_finite_difference_energy(self):
+
+        gradE = grad(self.particle.total_field_energy, self.e_field)
+        dipole = self.particle.p + self.particle.dipole_induced(self.e_field)
+
+        np.testing.assert_almost_equal(-gradE, dipole)

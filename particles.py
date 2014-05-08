@@ -25,10 +25,10 @@ class PointDipole(object):
         return -self.q*dot(e_field, self.r)
 
     def dipole_energy(self, e_field):
-        return -np.dot(self.p, e_field)
+        return -dot(self.p, e_field)
 
     def induced_dipole_energy(self, e_field):
-        return -0.5*np.dot(e_field, np.dot(self.a, e_field))
+        return -0.5*dot(e_field, dot(self.a, e_field))
 
     def total_field_energy(self, e_field):
         return \

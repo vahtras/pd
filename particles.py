@@ -18,31 +18,43 @@ class PointDipole(object):
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
+        self.__local_field = kwargs.get('local_field', 0.0)
 
     def __str__(self):
         return self.fmt*len(self.args) % self.args
 
-    def charge_energy(self, e_field):
-        return -self.q*dot(e_field, self.r)
+    def charge_energy(self):
+        return -self.q*dot(self.local_field, self.r)
 
-    def permanent_dipole_energy(self, e_field):
-        return -dot(self.p, e_field)
+    def permanent_dipole_energy(self):
+        return -dot(self.p, self.local_field)
 
-    def alpha_induced_dipole_energy(self, e_field):
-        return -0.5*dot(e_field, dot(self.a, e_field))
+    def alpha_induced_dipole_energy(self):
+        return -0.5*dot(self.__local_field, dot(self.a, self.__local_field))
 
-    def beta_induced_dipole_energy(self, e_field):
+    def beta_induced_dipole_energy(self):
+        e_field = self.local_field
         return -dot(e_field, dot(dot(self.b, e_field), e_field))/6
 
-    def total_field_energy(self, e_field):
+    def total_field_energy(self):
         return \
-            self.charge_energy(e_field) + \
-            self.permanent_dipole_energy(e_field) + \
-            self.alpha_induced_dipole_energy(e_field) + \
-            self.beta_induced_dipole_energy(e_field)
+            self.charge_energy() + \
+            self.permanent_dipole_energy() + \
+            self.alpha_induced_dipole_energy() + \
+            self.beta_induced_dipole_energy()
 
-    def dipole_induced(self, e_field):
+    def dipole_induced(self):
+        e_field = self.local_field
         return dot(self.a, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
+
+    @property
+    def local_field(self):
+        return self.__local_field
+    @local_field.setter
+    def local_field(self, value):
+        if not isinstance(value, np.ndarray):
+            raise TypeError("Must be array")
+        self.__local_field = value
 
 
 class PointDipoleList(list):

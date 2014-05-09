@@ -3,35 +3,19 @@ import numpy as np
 from ..particles import PointDipole
 
 EPSILON = 0.001
+ex = np.array([EPSILON/2, 0, 0])
+ey = np.array([0, EPSILON/2, 0])
+ez = np.array([0, 0, EPSILON/2])
 
 def grad(f):
-    return np.array([gradx(f), grady(f), gradz(f)])
+    return np.array([gradx(f, ex), gradx(f, ey), gradx(f, ez)])
 
-def gradx(f):
-    ex = np.array([EPSILON/2, 0, 0])
-    f.__self__.local_field += ex
+def gradx(f, eps):
+    f.__self__.local_field += eps
     f1 = f()
-    f.__self__.local_field -= 2*ex
+    f.__self__.local_field -= 2*eps
     f2 = f()
-    f.__self__.local_field += ex
-    return (f1 - f2)/EPSILON
-
-def grady(f):
-    ey = np.array([0, EPSILON/2, 0])
-    f.__self__.local_field += ey
-    f1 = f()
-    f.__self__.local_field -= 2*ey
-    f2 = f()
-    f.__self__.local_field += ey
-    return (f1 - f2)/EPSILON
-
-def gradz(f):
-    ez = np.array([0, 0, EPSILON/2])
-    f.__self__.local_field += ez
-    f1 = f()
-    f.__self__.local_field -= 2*ez
-    f2 = f()
-    f.__self__.local_field += ez
+    f.__self__.local_field += eps
     return (f1 - f2)/EPSILON
 
 

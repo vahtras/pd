@@ -50,7 +50,7 @@ class PointDipoleTest(unittest.TestCase):
     def test_str(self):
         self.particle.fmt = "%5.2f"
         self.assertEqual(str(self.particle),
-            " 0.00 0.00 0.00 1.00 0.10 0.20 0.30 0.05"
+            "1 0.00 0.00 0.00 1.00 0.10 0.20 0.30 0.05"
             )
 
     def test_charge_energy(self):
@@ -171,19 +171,19 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_line_to_dict_charges(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 0}
-        pot_line = "0 0 0 1.5"
+        pot_line = "1 0 0 0 1.5"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['charge'], 1.5)
 
     def test_line_to_dict_dipole(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 1}
-        pot_line = "0 0 0 1.5 1 2 3"
+        pot_line = "1 0 0 0 1.5 1 2 3"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['dipole'], [1.0, 2.0, 3.0])
 
     def test_line_to_dict_quadrupole(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 2}
-        pot_line = "0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
+        pot_line = "1 0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['quadrupole'], [.1, .2, .3, .4, .5, .6])
         

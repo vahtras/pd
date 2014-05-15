@@ -29,7 +29,7 @@ def line_to_dict(header_dict, line):
     """Transfer line data to dictonary"""
 
 
-    line_data = map(float, line.split())
+    line_data = map(float, line.split()[1:])
     line_dict = {}
 
     line_dict['coordinates'] = line_data[:3]
@@ -90,7 +90,7 @@ class PointDipole(object):
     def __str__(self):
         #for isotropic alpha
         value_line = list(self.r) + [self.q] + list(self.p) + [self.a[0, 0]]
-        return self.fmt*len(value_line) % tuple(value_line)
+        return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
         return -self.q*dot(self.local_field, self.r)
@@ -157,8 +157,7 @@ class PointDipoleList(list):
         return _T
 
     def __str__(self):
-        for p in self:
-            print p
+        return "\n\n".join([str(p) for p in self])
 
     def alpha(self):
         # Solve the response equaitons

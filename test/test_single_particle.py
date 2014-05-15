@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from ..particles import PointDipole
+from ..particles import PointDipole, line_to_dict, header_to_dict
 
 EPSILON = 0.001
 ex = np.array([EPSILON/2, 0, 0])
@@ -89,3 +89,95 @@ class PointDipoleTest(unittest.TestCase):
         self.particle.local_field = reference_field
         local_field = self.particle.local_field
         np.testing.assert_equal(reference_field, local_field)
+
+    def test_header_number_of_atoms(self):
+        header = "2 0 0"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["#atoms"], 2)
+
+    def test_header_max_ang_mom(self):
+        header = "2 1 0"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["max_angmom"], 1)
+
+    def test_header_nopol_isotropic_polarizability_false(self):
+        header = "2 1"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["iso_pol"], False)
+
+    def test_header_0_isotropic_polarizability_false(self):
+        header = "2 1 0"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["iso_pol"], False)
+
+    def test_header_1_isotropic_polarizability_1_true(self):
+        header = "2 1 1"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["iso_pol"], True)
+
+    def test_header_2_isotropic_polarizability_1_false(self):
+        header = "2 1 2"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["iso_pol"], False)
+
+    def test_header_nopol_full_polarizability_false(self):
+        header = "2 1"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["full_pol"], False)
+
+    def test_header_0_full_polarizability_false(self):
+        header = "2 1 0"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["full_pol"], False)
+
+    def test_header_1_full_polarizability_1_false(self):
+        header = "2 1 1"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["full_pol"], False)
+
+    def test_header_2_full_polarizability_1_true(self):
+        header = "2 1 2"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["full_pol"], True)
+
+
+    def test_header_0_hyperpolarizability_false(self):
+        header = "2 1 1 0"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["hyp_pol"], False)
+
+    def test_header_1_hyperpolarizability_true(self):
+        header = "2 1 1 1"
+        header_data = map(int, header.split())
+        header_dict = header_to_dict(header)
+        self.assertEqual(header_dict["hyp_pol"], True)
+
+    def test_line_to_dict_charges(self):
+        header_dict = {"#atoms:2": 2, "max_angmom": 0}
+        pot_line = "0 0 0 1.5"
+        line_dict = line_to_dict(header_dict, pot_line)
+        self.assertEqual(line_dict['charge'], 1.5)
+
+    def test_line_to_dict_dipole(self):
+        header_dict = {"#atoms:2": 2, "max_angmom": 1}
+        pot_line = "0 0 0 1.5 1 2 3"
+        line_dict = line_to_dict(header_dict, pot_line)
+        self.assertEqual(line_dict['dipole'], [1.0, 2.0, 3.0])
+
+    def test_line_to_dict_quadrupole(self):
+        header_dict = {"#atoms:2": 2, "max_angmom": 2}
+        pot_line = "0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
+        line_dict = line_to_dict(header_dict, pot_line)
+        self.assertEqual(line_dict['quadrupole'], [.1, .2, .3, .4, .5, .6])
+        

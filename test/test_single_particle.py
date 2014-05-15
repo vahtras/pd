@@ -23,7 +23,13 @@ class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
     def setUp(self):
-        self.particle = PointDipole(0.,0.,0.,1.0,0.1,0.2, 0.3,0.05)
+        self.particle = PointDipole(
+            coordinates=[0.,0.,0.],
+            charge=1.0,
+            dipole=[0.1, 0.2, 0.3],
+            iso_alpha=0.05,
+            beta=np.zeros((3, 3, 3))
+            )
         self.particle.b[0, 0, 0] = 0.01
         self.particle.b[1, 1, 1] = 0.01
         self.particle.b[2, 2, 2] = 0.01

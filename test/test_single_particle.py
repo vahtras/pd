@@ -53,6 +53,13 @@ class PointDipoleTest(unittest.TestCase):
             "1 0.00 0.00 0.00 1.00 0.10 0.20 0.30 0.05"
             )
 
+    def test_str_with_no_dipole(self):
+        self.particle.fmt = "%5.2f"
+        self.particle.p = None
+        self.assertEqual(str(self.particle),
+            "1 0.00 0.00 0.00 1.00 0.05"
+            )
+
     def test_charge_energy(self):
         self.particle.r = np.array([1., 1., 1.])
         self.assertEqual(self.particle.charge_energy(), -6.0)

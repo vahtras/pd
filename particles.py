@@ -90,7 +90,11 @@ class PointDipole(object):
 
     def __str__(self):
         #for isotropic alpha
-        value_line = list(self.r) + [self.q] + list(self.p) + [self.a[0, 0]]
+        value_line = list(self.r) + [self.q]
+        if self.p is not None:
+            value_line += list(self.p)
+        if self.a is not None:
+            value_line +=  [self.a[0, 0]]
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):

@@ -33,6 +33,7 @@ def line_to_dict(header_dict, line):
     line_dict = {}
 
     line_dict['coordinates'] = line_data[:3]
+    line_dict['dipole'] = None
     nextstart = 3
 
     max_angmom = header_dict.get('max_angmom', 0)

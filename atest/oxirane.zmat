@@ -1,0 +1,14 @@
+X
+C 1 halfcc
+O 1 ox 1 90
+C 1 halfcc 3 90 2 180
+H 2 ch 1 hcc 3 hcco
+H 2 ch 1 hcc 3 -hcco
+H 4 ch 1 hcc 3 hcco
+H 4 ch 1 hcc 3 -hcco
+Variables:
+halfcc=0.735000
+ox=1.232477
+ch=1.083000
+hcc=119.428206
+hcco=103.174597

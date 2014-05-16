@@ -1,0 +1,7 @@
+#!/bin/bash
+xyz=$(basename $1 .zmat).xyz
+pot=$(basename $1 .zmat).pot
+python -m zmat.molconvert $1 $xyz && \
+jmol $xyz  && \
+python -m zmat.molconvert $1 $pot && \
+python -m pd.particles $pot

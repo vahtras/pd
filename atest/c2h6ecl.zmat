@@ -1,0 +1,12 @@
+C 
+C 1 RCC  
+H 1 RCH  2 A
+H 2 RCH  1 A  3 0
+H 1 RCH  2 A  4  120.0
+H 1 RCH  2 A  4 -120.0
+H 2 RCH  1 A  3  120.0
+H 2 RCH  1 A  3 -120.0
+ Variables:
+RCC=1.54
+RCH=1.095
+A=109.4712206

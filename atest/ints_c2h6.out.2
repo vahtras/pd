@@ -1,0 +1,595 @@
+
+
+     ************************************************************************
+     *************** Dalton - An Electronic Structure Program ***************
+     ************************************************************************
+
+    This is output from DALTON 2013.1
+   ----------------------------------------------------------------------------
+    NOTE:
+     
+    Dalton is an experimental code for the evaluation of molecular
+    properties using (MC)SCF, DFT, CI, and CC wave functions.
+    The authors accept no responsibility for the performance of
+    the code or for the correctness of the results.
+     
+    The code (in whole or part) is provided under a licence and
+    is not to be reproduced for further distribution without
+    the written permission of the authors or their representatives.
+     
+    See the home page "http://daltonprogram.org" for further information.
+     
+    If results obtained with this code are published,
+    the appropriate citations would be both of:
+     
+       K. Aidas, C. Angeli, K. L. Bak, V. Bakken, R. Bast,
+       L. Boman, O. Christiansen, R. Cimiraglia, S. Coriani,
+       P. Dahle, E. K. Dalskov, U. Ekstroem, T. Enevoldsen,
+       J. J. Eriksen, P. Ettenhuber, B. Fernandez, L. Ferrighi,
+       H. Fliegl, L. Frediani, K. Hald, A. Halkier, C. Haettig,
+       H. Heiberg, T. Helgaker, A. C. Hennum, H. Hettema,
+       E. Hjertenaes, S. Hoest, I.-M. Hoeyvik, M. F. Iozzi,
+       B. Jansik, H. J. Aa. Jensen, D. Jonsson, P. Joergensen,
+       J. Kauczor, S. Kirpekar, T. Kjaergaard, W. Klopper,
+       S. Knecht, R. Kobayashi, H. Koch, J. Kongsted, A. Krapp,
+       K. Kristensen, A. Ligabue, O. B. Lutnaes, J. I. Melo,
+       K. V. Mikkelsen, R. H. Myhre, C. Neiss, C. B. Nielsen,
+       P. Norman, J. Olsen, J. M. H. Olsen, A. Osted,
+       M. J. Packer, F. Pawlowski, T. B. Pedersen, P. F. Provasi,
+       S. Reine, Z. Rinkevicius, T. A. Ruden, K. Ruud, V. Rybkin,
+       P. Salek, C. C. M. Samson, A. Sanchez de Meras, T. Saue,
+       S. P. A. Sauer, B. Schimmelpfennig, K. Sneskov,
+       A. H. Steindal, K. O. Sylvester-Hvid, P. R. Taylor,
+       A. M. Teale, E. I. Tellgren, D. P. Tew, A. J. Thorvaldsen,
+       L. Thoegersen, O. Vahtras, M. A. Watson, D. J. D. Wilson,
+       M. Ziolkowski and H. Aagren,
+       "The Dalton quantum chemistry program system",
+       WIREs Comput. Mol. Sci. 2013. (doi: 10.1002/wcms.1172)
+    
+    and
+    
+       Dalton, a Molecular Electronic Structure Program,
+       Release DALTON2013.1 (2013), see http://daltonprogram.org
+   ----------------------------------------------------------------------------
+
+    Authors in alphabetical order (major contribution(s) in parenthesis):
+
+  Kestutis Aidas,           Vilnius University,           Lithuania   (QM/MM)
+  Celestino Angeli,         University of Ferrara,        Italy       (NEVPT2)
+  Keld L. Bak,              UNI-C,                        Denmark     (AOSOPPA, non-adiabatic coupling, magnetic properties)
+  Vebjoern Bakken,          University of Oslo,           Norway      (DALTON; geometry optimizer, symmetry detection)
+  Radovan Bast,             KTH Stockholm,                Sweden      (DALTON installation and execution frameworks)
+  Linus Boman,              NTNU,                         Norway      (Cholesky decomposition and subsystems)
+  Ove Christiansen,         Aarhus University,            Denmark     (CC module)
+  Renzo Cimiraglia,         University of Ferrara,        Italy       (NEVPT2)
+  Sonia Coriani,            University of Trieste,        Italy       (CC module, MCD in RESPONS)
+  Paal Dahle,               University of Oslo,           Norway      (Parallelization)
+  Erik K. Dalskov,          UNI-C,                        Denmark     (SOPPA)
+  Thomas Enevoldsen,        Univ. of Southern Denmark,    Denmark     (SOPPA)
+  Janus J. Eriksen,         Aarhus University,            Denmark     (PE-MP2/SOPPA, TDA)
+  Berta Fernandez,          U. of Santiago de Compostela, Spain       (doublet spin, ESR in RESPONS)
+  Lara Ferrighi,            Aarhus University,            Denmark     (PCM Cubic response)
+  Heike Fliegl,             University of Oslo,           Norway      (CCSD(R12))
+  Luca Frediani,            UiT The Arctic U. of Norway,  Norway      (PCM)
+  Bin Gao,                  UiT The Arctic U. of Norway,  Norway      (Gen1Int library)
+  Christof Haettig,         Ruhr-University Bochum,       Germany     (CC module)
+  Kasper Hald,              Aarhus University,            Denmark     (CC module)
+  Asger Halkier,            Aarhus University,            Denmark     (CC module)
+  Hanne Heiberg,            University of Oslo,           Norway      (geometry analysis, selected one-electron integrals)
+  Trygve Helgaker,          University of Oslo,           Norway      (DALTON; ABACUS, ERI, DFT modules, London, and much more)
+  Alf Christian Hennum,     University of Oslo,           Norway      (Parity violation)
+  Hinne Hettema,            University of Auckland,       New Zealand (quadratic response in RESPONS; SIRIUS supersymmetry)
+  Eirik Hjertenaes,         NTNU,                         Norway      (Cholesky decomposition)
+  Maria Francesca Iozzi,    University of Oslo,           Norway      (RPA)
+  Brano Jansik              Technical Univ. of Ostrava    Czech Rep.  (DFT cubic response)
+  Hans Joergen Aa. Jensen,  Univ. of Southern Denmark,    Denmark     (DALTON; SIRIUS, RESPONS, ABACUS modules, London, and much more)
+  Dan Jonsson,              UiT The Arctic U. of Norway,  Norway      (cubic response in RESPONS module)
+  Poul Joergensen,          Aarhus University,            Denmark     (RESPONS, ABACUS, and CC modules)
+  Joanna Kauczor,           Linkoeping University,        Sweden      (Complex polarization propagator (CPP) module)
+  Sheela Kirpekar,          Univ. of Southern Denmark,    Denmark     (Mass-velocity & Darwin integrals)
+  Wim Klopper,              KIT Karlsruhe,                Germany     (R12 code in CC, SIRIUS, and ABACUS modules)
+  Stefan Knecht,            ETH Zurich,                   Switzerland (Parallel CI and MCSCF)
+  Rika Kobayashi,           Australian National Univ.,    Australia   (DIIS in CC, London in MCSCF)
+  Henrik Koch,              NTNU,                         Norway      (CC module, Cholesky decomposition)
+  Jacob Kongsted,           Univ. of Southern Denmark,    Denmark     (Polarizable embedding, QM/MM)
+  Andrea Ligabue,           University of Modena,         Italy       (CTOCD, AOSOPPA)
+  Ola B. Lutnaes,           University of Oslo,           Norway      (DFT Hessian)
+  Juan I. Melo,             University of Buenos Aires,   Argentina   (LRESC, Relativistic Effects on NMR Shieldings)
+  Kurt V. Mikkelsen,        University of Copenhagen,     Denmark     (MC-SCRF and QM/MM)
+  Rolf H. Myhre,            NTNU,                         Norway      (Cholesky, subsystems and ECC2)
+  Christian Neiss,          Univ. Erlangen-Nuernberg,     Germany     (CCSD(R12))
+  Christian B. Nielsen,     University of Copenhagen,     Denmark     (QM/MM)
+  Patrick Norman,           Linkoeping University,        Sweden      (Cubic response and complex response in RESPONS)
+  Jeppe Olsen,              Aarhus University,            Denmark     (SIRIUS CI/density modules)
+  Jogvan Magnus H. Olsen,   Univ. of Southern Denmark,    Denmark     (Polarizable embedding, PE library, QM/MM)
+  Anders Osted,             Copenhagen University,        Denmark     (QM/MM)
+  Martin J. Packer,         University of Sheffield,      UK          (SOPPA)
+  Filip Pawlowski,          Kazimierz Wielki University,  Poland      (CC3)
+  Thomas B. Pedersen,       University of Oslo,           Norway      (Cholesky decomposition)
+  Patricio F. Provasi,      University of Northeastern,   Argentina   (Analysis of coupling constants in localized orbitals)
+  Zilvinas Rinkevicius,     KTH Stockholm,                Sweden      (open-shell DFT, ESR)
+  Elias Rudberg,            KTH Stockholm,                Sweden      (DFT grid and basis info)
+  Torgeir A. Ruden,         University of Oslo,           Norway      (Numerical derivatives in ABACUS)
+  Kenneth Ruud,             UiT The Arctic U. of Norway,  Norway      (DALTON; ABACUS magnetic properties and  much more)
+  Pawel Salek,              KTH Stockholm,                Sweden      (DALTON; DFT code)
+  Claire C. M. Samson       University of Karlsruhe       Germany     (Boys localization, r12 integrals in ERI)
+  Alfredo Sanchez de Meras, University of Valencia,       Spain       (CC module, Cholesky decomposition)
+  Trond Saue,               Paul Sabatier University,     France      (direct Fock matrix construction)
+  Stephan P. A. Sauer,      University of Copenhagen,     Denmark     (SOPPA(CCSD), SOPPA prop., AOSOPPA, vibrational g-factors)
+  Bernd Schimmelpfennig,    Forschungszentrum Karlsruhe,  Germany     (AMFI module)
+  Kristian Sneskov,         Aarhus University,            Denmark     (QM/MM, PE-CC)
+  Arnfinn H. Steindal,      UiT The Arctic U. of Norway,  Norway      (parallel QM/MM)
+  K. O. Sylvester-Hvid,     University of Copenhagen,     Denmark     (MC-SCRF)
+  Peter R. Taylor,          VLSCI/Univ. of Melbourne,     Australia   (Symmetry handling ABACUS, integral transformation)
+  Andrew M. Teale,          University of Nottingham,     England     (DFT-AC, DFT-D)
+  David P. Tew,             University of Bristol,        England     (CCSD(R12))
+  Olav Vahtras,             KTH Stockholm,                Sweden      (triplet response, spin-orbit, ESR, TDDFT, open-shell DFT)
+  David J. Wilson,          La Trobe University,          Australia   (DFT Hessian and DFT magnetizabilities)
+  Hans Agren,               KTH Stockholm,                Sweden      (SIRIUS module, RESPONS, MC-SCRF solvation model)
+ --------------------------------------------------------------------------------
+
+     Date and time (Linux)  : Mon Mar 17 15:19:17 2014
+     Host name              : ubuntu                                  
+
+ * Work memory size             :    64000000 =  488.28 megabytes.
+
+ * Directories for basis set searches:
+   1) /home/olav/dev/py/pytools/pd/test
+   2) /home/olav/dev/dalton/git/build/master/basis
+
+
+Compilation information
+-----------------------
+
+ Who compiled             | olav
+ Host                     | ubuntu
+ System                   | Linux-3.8.0-35-generic
+ CMake generator          | Unix Makefiles
+ Processor                | x86_64
+ 64-bit integers          | OFF
+ MPI                      | ON
+ Fortran compiler         | /usr/bin/mpif90
+ Fortran compiler version | GNU Fortran (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
+ C compiler               | /usr/bin/mpicc
+ C compiler version       | gcc (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
+ C++ compiler             | /usr/bin/g++
+ C++ compiler version     | g++ (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
+ BLAS                     | /usr/lib/libblas.so
+ LAPACK                   | /usr/lib/liblapack.so
+ Static linking           | OFF
+ Last Git revision        | f8a4810d02a93739e185582edba8ffb419cefd99
+ Git branch               | master
+ Configuration time       | 2014-01-29 10:12:49.314883
+
+ * Sequential calculation using 1 CPU
+
+
+   Content of the .dal input file
+ ----------------------------------
+
+**DALTON                                          
+**END OF INPUT                                    
+
+
+   Content of the .mol file
+ ----------------------------
+
+BASIS                                                                          
+STO-3G                                                                         
+                                                                               
+                                                                               
+Atomtypes=2                                                                    
+Charge=1.0 Atoms=6                                                             
+H  -0.365000   1.032376   0.000000                                             
+H  -0.365000  -0.516188  -0.894064                                             
+H  -0.365000  -0.516188   0.894064                                             
+H   1.905000   0.516188   0.894064                                             
+H   1.905000  -1.032376   0.000000                                             
+H   1.905000   0.516188  -0.894064                                             
+Charge=6.0 Atoms=2                                                             
+C   0.000000   0.000000   0.000000                                             
+C   1.540000   0.000000   0.000000                                             
+
+
+       *******************************************************************
+       *********** Output from DALTON general input processing ***********
+       *******************************************************************
+
+ --------------------------------------------------------------------------------
+   Overall default print level:    0
+   Print level for DALTON.STAT:    1
+
+    "Old" integral transformation used (limited to max 255 basis functions)
+ --------------------------------------------------------------------------------
+
+
+   ****************************************************************************
+   *************** Output of molecule and basis set information ***************
+   ****************************************************************************
+
+
+    The two title cards from your ".mol" input:
+    ------------------------------------------------------------------------
+ 1:                                                                         
+ 2:                                                                         
+    ------------------------------------------------------------------------
+
+  Atomic type no.    1
+  --------------------
+  Nuclear charge:   1.00000
+  Number of symmetry independent centers:    6
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   1 :
+     "/home/olav/dev/dalton/git/build/master/basis/STO-3G"
+
+  Atomic type no.    2
+  --------------------
+  Nuclear charge:   6.00000
+  Number of symmetry independent centers:    2
+  Number of basis sets to read;    2
+  Basis set file used for this atomic type with Z =   6 :
+     "/home/olav/dev/dalton/git/build/master/basis/STO-3G"
+
+
+                      SYMADD: Requested addition of symmetry
+                      --------------------------------------
+
+ Symmetry test threshold:  5.00E-06
+
+ - molecule centered at center of mass and rotated so
+   principal axes of inertia are along coordinate axes.
+
+ Symmetry class found: D(3d)          
+
+ Symmetry Independent Centres             
+ ----------------------------
+       6 :      0.00000000     0.00000000     0.77000000  Isotope  1
+       1 :      0.89406386    -0.51618797     1.13500000  Isotope  1
+       1 :      0.00000000     1.03237614     1.13500000  Isotope  1
+
+ The following elements were found:   X  YZ    
+
+
+                         SYMGRP: Point group information
+                         -------------------------------
+
+Full point group is: D(3d)          
+Represented as:      C2h
+
+   * The point group was generated by:
+
+      Reflection in the yz-plane
+      Rotation about the x-axis
+
+   * Group multiplication table
+
+        |  E   C2x   i   Oyz
+   -----+--------------------
+     E  |  E   C2x   i   Oyz
+    C2x | C2x   E   Oyz   i 
+     i  |  i   Oyz   E   C2x
+    Oyz | Oyz   i   C2x   E 
+
+   * Character table
+
+        |  E   C2x   i   Oyz
+   -----+--------------------
+    Ag  |   1    1    1    1
+    Au  |   1    1   -1   -1
+    Bu  |   1   -1   -1    1
+    Bg  |   1   -1    1   -1
+
+   * Direct product table
+
+        | Ag   Au   Bu   Bg 
+   -----+--------------------
+    Ag  | Ag   Au   Bu   Bg 
+    Au  | Au   Ag   Bg   Bu 
+    Bu  | Bu   Bg   Ag   Au 
+    Bg  | Bg   Bu   Au   Ag 
+
+
+                                 Isotopic Masses
+                                 ---------------
+
+                           H   _1      1.007825
+                           H   _2      1.007825
+                           H   _3      1.007825
+                           H   _4      1.007825
+                           H   _1      1.007825
+                           H   _2      1.007825
+                           C   _1     12.000000
+                           C   _2     12.000000
+
+                       Total mass:    30.046950 amu
+                       Natural abundance:  97.724 %
+
+ Center-of-mass coordinates (a.u.):    0.000000    0.000000    0.000000
+
+
+  Atoms and basis sets
+  --------------------
+
+  Number of atom types :    2
+  Total number of atoms:    8
+
+  Basis set used is "STO-3G" from the basis set library.
+
+  label    atoms   charge   prim   cont     basis
+  ----------------------------------------------------------------------
+  H           6    1.0000     3     1      [3s|1s]                                            
+  C           2    6.0000    15     5      [6s3p|2s1p]                                        
+  ----------------------------------------------------------------------
+  total:      8   18.0000    48    16
+  ----------------------------------------------------------------------
+
+  Threshold for neglecting AO integrals:  1.00D-12
+
+
+  Cartesian Coordinates (a.u.)
+  ----------------------------
+
+  Total number of coordinates:   24
+  H   / 1 :     1  x   0.8940638620    2  y  -0.5161879658    3  z   1.1350000000
+  H   / 2 :     4  x  -0.8940638620    5  y  -0.5161879658    6  z   1.1350000000
+  H   / 3 :     7  x   0.8940638620    8  y   0.5161879658    9  z  -1.1350000000
+  H   / 4 :    10  x  -0.8940638620   11  y   0.5161879658   12  z  -1.1350000000
+  H   / 1 :    13  x   0.0000000000   14  y   1.0323761366   15  z   1.1350000000
+  H   / 2 :    16  x   0.0000000000   17  y  -1.0323761366   18  z  -1.1350000000
+  C   / 1 :    19  x   0.0000000000   20  y   0.0000000000   21  z   0.7700000000
+  C   / 2 :    22  x   0.0000000000   23  y  -0.0000000000   24  z  -0.7700000000
+
+
+  Symmetry Coordinates
+  --------------------
+
+  Number of coordinates in each symmetry:     7    5    7    5
+
+  Symmetry  Ag  ( 1)
+
+    1   H     x    [  1  -    4  +    7  -   10 ]/4
+    2   H     y    [  2  +    5  -    8  -   11 ]/4
+    3   H     z    [  3  +    6  -    9  -   12 ]/4
+    4   H     y    [ 14  -   17 ]/2
+    5   H     z    [ 15  -   18 ]/2
+    6   C     y    [ 20  -   23 ]/2
+    7   C     z    [ 21  -   24 ]/2
+
+  Symmetry  Au  ( 2)
+
+    8   H     x    [  1  +    4  +    7  +   10 ]/4
+    9   H     y    [  2  -    5  -    8  +   11 ]/4
+   10   H     z    [  3  -    6  -    9  +   12 ]/4
+   11   H     x    [ 13  +   16 ]/2
+   12   C     x    [ 19  +   22 ]/2
+
+  Symmetry  Bu  ( 3)
+
+   13   H     x    [  1  -    4  -    7  +   10 ]/4
+   14   H     y    [  2  +    5  +    8  +   11 ]/4
+   15   H     z    [  3  +    6  +    9  +   12 ]/4
+   16   H     y    [ 14  +   17 ]/2
+   17   H     z    [ 15  +   18 ]/2
+   18   C     y    [ 20  +   23 ]/2
+   19   C     z    [ 21  +   24 ]/2
+
+  Symmetry  Bg  ( 4)
+
+   20   H     x    [  1  +    4  -    7  -   10 ]/4
+   21   H     y    [  2  -    5  +    8  -   11 ]/4
+   22   H     z    [  3  -    6  +    9  -   12 ]/4
+   23   H     x    [ 13  -   16 ]/2
+   24   C     x    [ 19  -   22 ]/2
+
+
+   Interatomic separations (in Angstrom):
+   --------------------------------------
+
+            H   _1      H   _2      H   _3      H   _4      H   _1      H   _2
+            ------      ------      ------      ------      ------      ------
+ H   _1:    0.000000
+ H   _2:    0.946236    0.000000
+ H   _3:    1.319626    1.623816    0.000000
+ H   _4:    1.623816    1.319626    0.946236    0.000000
+ H   _1:    0.946236    0.946236    1.319626    1.319626    0.000000
+ H   _2:    1.319626    1.319626    0.946236    0.946236    1.623816    0.000000
+ C   _1:    0.579449    0.579449    1.146597    1.146597    0.579449    1.146597
+ C   _2:    1.146597    1.146597    0.579449    0.579449    1.146597    0.579449
+
+            C   _1      C   _2
+            ------      ------
+ C   _1:    0.000000
+ C   _2:    0.814933    0.000000
+
+
+  Max    interatomic separation is    1.6238 Angstrom (    3.0686 Bohr)
+  between atoms    6 and    5, "H   _2" and "H   _1".
+
+  Min HX interatomic separation is    0.5794 Angstrom (    1.0950 Bohr)
+
+  Min YX interatomic separation is    0.8149 Angstrom (    1.5400 Bohr)
+
+WARNING: Number of short HX and YX bond lengths:    6    1
+WARNING: If not intentional, maybe your coordinates were in Angstrom,
+WARNING: but "Angstrom" was not specified in .mol file
+
+
+  Bond distances (Angstrom):
+  --------------------------
+
+                  atom 1     atom 2       distance
+                  ------     ------       --------
+  bond distance:  H   _2     H   _1       0.946236
+  bond distance:  H   _4     H   _3       0.946236
+  bond distance:  H   _1     H   _1       0.946236
+  bond distance:  H   _1     H   _2       0.946236
+  bond distance:  H   _2     H   _3       0.946236
+  bond distance:  H   _2     H   _4       0.946236
+  bond distance:  C   _1     H   _1       0.579449
+  bond distance:  C   _1     H   _2       0.579449
+  bond distance:  C   _1     H   _3       1.146597
+  bond distance:  C   _1     H   _4       1.146597
+  bond distance:  C   _1     H   _1       0.579449
+  bond distance:  C   _1     H   _2       1.146597
+  bond distance:  C   _2     H   _1       1.146597
+  bond distance:  C   _2     H   _2       1.146597
+  bond distance:  C   _2     H   _3       0.579449
+  bond distance:  C   _2     H   _4       0.579449
+  bond distance:  C   _2     H   _1       1.146597
+  bond distance:  C   _2     H   _2       0.579449
+  bond distance:  C   _2     C   _1       0.814933
+
+
+  Bond angles (degrees):
+  ----------------------
+
+                  atom 1     atom 2     atom 3         angle
+                  ------     ------     ------         -----
+  bond angle:     H   _2     H   _1     H   _1        60.000
+  bond angle:     H   _2     H   _1     C   _1        35.264
+  bond angle:     H   _2     H   _1     C   _2        65.630
+  bond angle:     H   _1     H   _1     C   _1        35.264
+  bond angle:     H   _1     H   _1     C   _2        65.630
+  bond angle:     C   _1     H   _1     C   _2        42.074
+  bond angle:     H   _1     H   _2     H   _1        60.000
+  bond angle:     H   _1     H   _2     C   _1        35.264
+  bond angle:     H   _1     H   _2     C   _2        65.630
+  bond angle:     H   _1     H   _2     C   _1        35.264
+  bond angle:     H   _1     H   _2     C   _2        65.630
+  bond angle:     C   _1     H   _2     C   _2        42.074
+  bond angle:     H   _4     H   _3     H   _2        60.000
+  bond angle:     H   _4     H   _3     C   _1        65.630
+  bond angle:     H   _4     H   _3     C   _2        35.264
+  bond angle:     H   _2     H   _3     C   _1        65.630
+  bond angle:     H   _2     H   _3     C   _2        35.264
+  bond angle:     C   _1     H   _3     C   _2        42.074
+  bond angle:     H   _3     H   _4     H   _2        60.000
+  bond angle:     H   _3     H   _4     C   _1        65.630
+  bond angle:     H   _3     H   _4     C   _2        35.264
+  bond angle:     H   _2     H   _4     C   _1        65.630
+  bond angle:     H   _2     H   _4     C   _2        35.264
+  bond angle:     C   _1     H   _4     C   _2        42.074
+  bond angle:     H   _1     H   _1     H   _2        60.000
+  bond angle:     H   _1     H   _1     C   _1        35.264
+  bond angle:     H   _1     H   _1     C   _2        65.630
+  bond angle:     H   _2     H   _1     C   _1        35.264
+  bond angle:     H   _2     H   _1     C   _2        65.630
+  bond angle:     C   _1     H   _1     C   _2        42.074
+  bond angle:     H   _3     H   _2     H   _4        60.000
+  bond angle:     H   _3     H   _2     C   _1        65.630
+  bond angle:     H   _3     H   _2     C   _2        35.264
+  bond angle:     H   _4     H   _2     C   _1        65.630
+  bond angle:     H   _4     H   _2     C   _2        35.264
+  bond angle:     C   _1     H   _2     C   _2        42.074
+  bond angle:     H   _1     C   _1     H   _2       109.471
+  bond angle:     H   _1     C   _1     H   _3        93.925
+  bond angle:     H   _1     C   _1     H   _4       137.926
+  bond angle:     H   _1     C   _1     H   _1       109.471
+  bond angle:     H   _1     C   _1     H   _2        93.925
+  bond angle:     H   _1     C   _1     C   _2       109.471
+  bond angle:     H   _2     C   _1     H   _3       137.926
+  bond angle:     H   _2     C   _1     H   _4        93.925
+  bond angle:     H   _2     C   _1     H   _1       109.471
+  bond angle:     H   _2     C   _1     H   _2        93.925
+  bond angle:     H   _2     C   _1     C   _2       109.471
+  bond angle:     H   _3     C   _1     H   _4        48.740
+  bond angle:     H   _3     C   _1     H   _1        93.925
+  bond angle:     H   _3     C   _1     H   _2        48.740
+  bond angle:     H   _3     C   _1     C   _2        28.455
+  bond angle:     H   _4     C   _1     H   _1        93.925
+  bond angle:     H   _4     C   _1     H   _2        48.740
+  bond angle:     H   _4     C   _1     C   _2        28.455
+  bond angle:     H   _1     C   _1     H   _2       137.926
+  bond angle:     H   _1     C   _1     C   _2       109.471
+  bond angle:     H   _2     C   _1     C   _2        28.455
+  bond angle:     H   _1     C   _2     H   _2        48.740
+  bond angle:     H   _1     C   _2     H   _3        93.925
+  bond angle:     H   _1     C   _2     H   _4       137.926
+  bond angle:     H   _1     C   _2     H   _1        48.740
+  bond angle:     H   _1     C   _2     H   _2        93.925
+  bond angle:     H   _1     C   _2     C   _1        28.455
+  bond angle:     H   _2     C   _2     H   _3       137.926
+  bond angle:     H   _2     C   _2     H   _4        93.925
+  bond angle:     H   _2     C   _2     H   _1        48.740
+  bond angle:     H   _2     C   _2     H   _2        93.925
+  bond angle:     H   _2     C   _2     C   _1        28.455
+  bond angle:     H   _3     C   _2     H   _4       109.471
+  bond angle:     H   _3     C   _2     H   _1        93.925
+  bond angle:     H   _3     C   _2     H   _2       109.471
+  bond angle:     H   _3     C   _2     C   _1       109.471
+  bond angle:     H   _4     C   _2     H   _1        93.925
+  bond angle:     H   _4     C   _2     H   _2       109.471
+  bond angle:     H   _4     C   _2     C   _1       109.471
+  bond angle:     H   _1     C   _2     H   _2       137.926
+  bond angle:     H   _1     C   _2     C   _1        28.455
+  bond angle:     H   _2     C   _2     C   _1       109.471
+
+
+
+
+ Principal moments of inertia (u*A**2) and principal axes
+ --------------------------------------------------------
+
+   IA       1.804739          0.000000    0.000000    1.000000
+   IB       7.068439          0.000000    1.000000   -0.000000
+   IC       7.068439          1.000000    0.000000    0.000000
+
+
+ Rotational constants
+ --------------------
+
+               A                   B                   C
+
+         280028.8105          71497.9690          71497.9682 MHz
+            9.340756            2.384916            2.384916 cm-1
+
+
+@  Nuclear repulsion energy :   79.607194560305 Hartree
+
+
+  Symmetry Orbitals
+  -----------------
+
+  Number of orbitals in each symmetry:           6    2    6    2
+
+
+  Symmetry  Ag ( 1)
+
+    1     H        1s         1 +    2 +    3 +    4
+    2     H        1s         5 +    6
+    3     C        1s         7 +    8
+    4     C        1s         9 +   10
+    5     C        2py       13 -   14
+    6     C        2pz       15 -   16
+
+
+  Symmetry  Au ( 2)
+
+    7     H        1s         1 -    2 +    3 -    4
+    8     C        2px       11 +   12
+
+
+  Symmetry  Bu ( 3)
+
+    9     H        1s         1 +    2 -    3 -    4
+   10     H        1s         5 -    6
+   11     C        1s         7 -    8
+   12     C        1s         9 -   10
+   13     C        2py       13 +   14
+   14     C        2pz       15 +   16
+
+
+  Symmetry  Bg ( 4)
+
+   15     H        1s         1 -    2 -    3 +    4
+   16     C        2px       11 -   12
+
+  Symmetries of electric field:  Au (2)  Bu (3)  Bu (3)
+
+  Symmetries of magnetic field:  Ag (1)  Bg (4)  Bg (4)
+ >>>> Total CPU  time used in DALTON:   0.00 seconds
+ >>>> Total wall time used in DALTON:   0.00 seconds
+
+ 
+     Date and time (Linux)  : Mon Mar 17 15:19:17 2014
+     Host name              : ubuntu                                  

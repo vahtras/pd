@@ -42,7 +42,7 @@ class PointDipoleTest(unittest.TestCase):
         self.assertEqual(self.particle.q, 1.0)
 
     def test_dipole(self):
-        np.allclose(self.particle.p, (0.1, 0.2, 0.3))
+        np.allclose(self.particle.p0, (0.1, 0.2, 0.3))
 
     def test_alpha(self):
         self.assertEqual(self.particle.a[0,0], 0.05)
@@ -55,7 +55,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_str_with_no_dipole(self):
         self.particle.fmt = "%5.2f"
-        self.particle.p = None
+        self.particle.p0 = None
         self.assertEqual(str(self.particle),
             "1 0.00 0.00 0.00 1.00 0.05"
             )
@@ -87,7 +87,7 @@ class PointDipoleTest(unittest.TestCase):
     def test_finite_difference_energy(self):
 
         gradE = grad(self.particle.total_field_energy)
-        dipole = self.particle.p + \
+        dipole = self.particle.p0 + \
            self.particle.dipole_induced()
 
         np.testing.assert_almost_equal(-gradE, dipole)

@@ -61,12 +61,13 @@ class PointDipole(object):
     """ A point dipole object 
     """
     def __init__(self, *args, **kwargs):
+        # fixed quantities
         self.r = array(kwargs['coordinates'])
         self.q = kwargs['charge']
         if "dipole" in kwargs:
-            self.p = array(kwargs["dipole"])
+            self.p0 = array(kwargs["dipole"])
         else:
-            self.p = None
+            self.p0 = None
         self.a = kwargs["iso_alpha"]*I_3
         self.b = array(kwargs["beta"])
         self.args = args
@@ -75,10 +76,11 @@ class PointDipole(object):
         self.__local_field = kwargs.get('local_field', 0.0)
 
     def __str__(self):
+        """The output simulate the line of a potential input file"""
         #for isotropic alpha
         value_line = list(self.r) + [self.q]
-        if self.p is not None:
-            value_line += list(self.p)
+        if self.p0 is not None:
+            value_line += list(self.p0)
         if self.a is not None:
             value_line +=  [self.a[0, 0]]
         return "1" + self.fmt*len(value_line) % tuple(value_line)
@@ -87,7 +89,7 @@ class PointDipole(object):
         return -self.q*dot(self.local_field, self.r)
 
     def permanent_dipole_energy(self):
-        return -dot(self.p, self.local_field)
+        return -dot(self.p0, self.local_field)
 
     def alpha_induced_dipole_energy(self):
         return -0.5*dot(self.__local_field, dot(self.a, self.__local_field))

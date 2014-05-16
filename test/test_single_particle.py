@@ -41,8 +41,11 @@ class PointDipoleTest(unittest.TestCase):
     def test_charge(self):
         self.assertEqual(self.particle.q, 1.0)
 
-    def test_dipole(self):
+    def test_permanent_dipole(self):
         np.allclose(self.particle.p0, (0.1, 0.2, 0.3))
+
+    def test_induced_dipole(self):
+        np.allclose(self.particle.dp, (0.055, 0.12, 195))
 
     def test_alpha(self):
         self.assertEqual(self.particle.a[0,0], 0.05)

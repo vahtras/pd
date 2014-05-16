@@ -61,7 +61,19 @@ class PointDipole(object):
     """ A point dipole object 
     """
     def __init__(self, *args, **kwargs):
-        # fixed quantities
+        #
+        # fixed quantities: 
+        #    r: coordinates
+        #    q: charge
+        #    p0: permanent dipole
+        #     a: polarizability tensor
+        #     b: hyperpolarizability tensor
+        #
+        # derived quantities 
+        #
+        #    dp: induced dipole moment
+        #    p:  total dipole moment
+        #
         self.r = array(kwargs['coordinates'])
         self.q = kwargs['charge']
         if "dipole" in kwargs:
@@ -74,6 +86,10 @@ class PointDipole(object):
 
         self.fmt = kwargs.get('fmt', "%10.5f")
         self.local_field = kwargs.get('local_field', 0.0)
+
+    @property
+    def dp(self):
+        return self.dipole_induced()
 
     def __str__(self):
         """The output simulate the line of a potential input file"""

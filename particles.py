@@ -33,7 +33,6 @@ def line_to_dict(header_dict, line):
     line_dict = {}
 
     line_dict['coordinates'] = line_data[:3]
-    line_dict['dipole'] = None
     nextstart = 3
 
     max_angmom = header_dict.get('max_angmom', 0)
@@ -80,7 +79,10 @@ class PointDipole(object):
     def __init__(self, *args, **kwargs):
         self.r = array(kwargs['coordinates'])
         self.q = kwargs['charge']
-        self.p = array(kwargs["dipole"])
+        if "dipole" in kwargs:
+            self.p = array(kwargs["dipole"])
+        else:
+            self.p = None
         self.a = kwargs["iso_alpha"]*I_3
         self.b = array(kwargs["beta"])
         self.args = args

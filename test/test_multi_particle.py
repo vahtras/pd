@@ -1,6 +1,8 @@
 import unittest
 import numpy as np
 from ..particles import PointDipole, PointDipoleList
+from .test_particles import H2
+from .util import iterize
 
 class MultiDipoleTest(unittest.TestCase):
 
@@ -12,8 +14,16 @@ class MultiDipoleTest(unittest.TestCase):
 """.split("\n")))
         pass
 
+        self
+
     def test_he2(self):
-       alpha_he2 = self.He2.alpha()
-       alpha_he = self.He2[0].a
-       np.allclose(2*alpha_he, alpha_he2)
+        alpha_he2 = self.He2.alpha()
+        ref_alpha = np.diag(
+            [1.285972432811e+00, 1.285972432811e+00,1.285975043401e+00]
+            )
+        np.allclose(alpha_he2, ref_alpha)
+
+    def test_verify_solver(self):
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        pass
 

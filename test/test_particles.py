@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from ..particles import PointDipole, PointDipoleList
+from .util import iterize
 
 DECIMALS = 1
 ANGSTROM = 1.88971616463 #Bohr
@@ -229,12 +230,13 @@ DME["POTFILE"] = """AA
 class PointDipoleListTest(unittest.TestCase):
     def setUp(self):
         # mimic file object
-        pf = iter("""AU
+        pf = iterize("""AU
 3 1 0 1
 1  0.000  0.000  0.698 -0.703 -0.000 0.000 -0.284 4.230
 1 -1.481  0.000 -0.349  0.352  0.153 0.000  0.127 1.089
 1  1.481  0.000 -0.349  0.352 -0.153 0.000  0.127 1.089
-2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000""".split("\n"))
+2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000"""
+        )
         self.pdl = PointDipoleList(pf)
 
     def test_number(self):
@@ -313,13 +315,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_H2_iso(self):
 
-        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
 
         self.assertAlmostEqual(h2.alpha_iso(), H2["ALPHA_ISO"], places=DECIMALS)
 
     def test_H2_par(self):
 
-        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
         h2_alpha = h2.alpha()
         h2_alpha_par = h2_alpha[2, 2]
         
@@ -327,7 +329,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_H2_ort(self):
 
-        h2 = PointDipoleList(iter(H2["POTFILE"].strip().split('\n')))
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
         h2_alpha = h2.alpha()
         h2_alpha_ort = h2_alpha[0, 0]
         
@@ -335,13 +337,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_N2_iso(self):
 
-        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+        n2 = PointDipoleList(iterize(N2["POTFILE"]))
 
         self.assertAlmostEqual(n2.alpha_iso(), N2["ALPHA_ISO"], places=DECIMALS)
 
     def test_N2_par(self):
 
-        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+        n2 = PointDipoleList(iterize(N2["POTFILE"]))
         n2_alpha = n2.alpha()
         n2_alpha_par = n2_alpha[2, 2]
         
@@ -349,7 +351,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_N2_ort(self):
 
-        n2 = PointDipoleList(iter(N2["POTFILE"].strip().split('\n')))
+        n2 = PointDipoleList(iterize(N2["POTFILE"]))
         n2_alpha = n2.alpha()
         n2_alpha_ort = n2_alpha[0, 0]
         
@@ -357,13 +359,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_O2_iso(self):
 
-        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+        o2 = PointDipoleList(iterize(O2["POTFILE"]))
 
         self.assertAlmostEqual(o2.alpha_iso(), O2["ALPHA_ISO"], places=DECIMALS)
 
     def test_O2_par(self):
 
-        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+        o2 = PointDipoleList(iterize(O2["POTFILE"]))
         o2_alpha = o2.alpha()
         o2_alpha_par = o2_alpha[2, 2]
         
@@ -371,7 +373,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_O2_ort(self):
 
-        o2 = PointDipoleList(iter(O2["POTFILE"].strip().split('\n')))
+        o2 = PointDipoleList(iterize(O2["POTFILE"]))
         o2_alpha = o2.alpha()
         o2_alpha_ort = o2_alpha[0, 0]
         
@@ -379,13 +381,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_Cl2_iso(self):
 
-        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+        cl2 = PointDipoleList(iterize(Cl2["POTFILE"]))
 
         self.assertAlmostEqual(cl2.alpha_iso(), Cl2["ALPHA_ISO"], places=DECIMALS)
 
     def test_Cl2_par(self):
 
-        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+        cl2 = PointDipoleList(iterize(Cl2["POTFILE"]))
         cl2_alpha = cl2.alpha()
         cl2_alpha_par = cl2_alpha[2, 2]
         
@@ -393,7 +395,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_Cl2_ort(self):
 
-        cl2 = PointDipoleList(iter(Cl2["POTFILE"].strip().split('\n')))
+        cl2 = PointDipoleList(iterize(Cl2["POTFILE"]))
         cl2_alpha = cl2.alpha()
         cl2_alpha_ort = cl2_alpha[0, 0]
         
@@ -401,13 +403,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HCl_iso(self):
 
-        hcl = PointDipoleList(iter(HCl["POTFILE"].strip().split('\n')))
+        hcl = PointDipoleList(iterize(HCl["POTFILE"]))
 
         self.assertAlmostEqual(hcl.alpha_iso(), HCl["ALPHA_ISO"], places=DECIMALS)
 
     def test_HCl_par(self):
 
-        hcl = PointDipoleList(iter(HCl["POTFILE"].strip().split('\n')))
+        hcl = PointDipoleList(iterize(HCl["POTFILE"]))
         hcl_alpha = hcl.alpha()
         hcl_alpha_par = hcl_alpha[2, 2]
         
@@ -415,7 +417,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HCl_ort(self):
 
-        hcl = PointDipoleList(iter(HCl["POTFILE"].strip().split('\n')))
+        hcl = PointDipoleList(iterize(HCl["POTFILE"]))
         hcl_alpha = hcl.alpha()
         hcl_alpha_ort = hcl_alpha[0, 0]
         
@@ -423,13 +425,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HBr_iso(self):
 
-        hbr = PointDipoleList(iter(HBr["POTFILE"].strip().split('\n')))
+        hbr = PointDipoleList(iterize(HBr["POTFILE"]))
 
         self.assertAlmostEqual(hbr.alpha_iso(), HBr["ALPHA_ISO"], places=DECIMALS)
 
     def test_HBr_par(self):
 
-        hbr = PointDipoleList(iter(HBr["POTFILE"].strip().split('\n')))
+        hbr = PointDipoleList(iterize(HBr["POTFILE"]))
         hbr_alpha = hbr.alpha()
         hbr_alpha_par = hbr_alpha[2, 2]
         
@@ -437,7 +439,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HBr_ort(self):
 
-        hbr = PointDipoleList(iter(HBr["POTFILE"].strip().split('\n')))
+        hbr = PointDipoleList(iterize(HBr["POTFILE"]))
         hbr_alpha = hbr.alpha()
         hbr_alpha_ort = hbr_alpha[0, 0]
         
@@ -445,13 +447,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HI_iso(self):
 
-        hi = PointDipoleList(iter(HI["POTFILE"].strip().split('\n')))
+        hi = PointDipoleList(iterize(HI["POTFILE"]))
 
         self.assertAlmostEqual(hi.alpha_iso(), HI["ALPHA_ISO"], places=DECIMALS)
 
     def test_HI_par(self):
 
-        hi = PointDipoleList(iter(HI["POTFILE"].strip().split('\n')))
+        hi = PointDipoleList(iterize(HI["POTFILE"]))
         hi_alpha = hi.alpha()
         hi_alpha_par = hi_alpha[2, 2]
         
@@ -459,7 +461,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_HI_ort(self):
 
-        hi = PointDipoleList(iter(HI["POTFILE"].strip().split('\n')))
+        hi = PointDipoleList(iterize(HI["POTFILE"]))
         hi_alpha = hi.alpha()
         hi_alpha_ort = hi_alpha[0, 0]
         
@@ -467,13 +469,13 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_CO_iso(self):
 
-        co = PointDipoleList(iter(CO["POTFILE"].strip().split('\n')))
+        co = PointDipoleList(iterize(CO["POTFILE"]))
 
         self.assertAlmostEqual(co.alpha_iso(), CO["ALPHA_ISO"], places=DECIMALS)
 
     def test_CO_par(self):
 
-        co = PointDipoleList(iter(CO["POTFILE"].strip().split('\n')))
+        co = PointDipoleList(iterize(CO["POTFILE"]))
         co_alpha = co.alpha()
         co_alpha_par = co_alpha[2, 2]
         
@@ -481,7 +483,7 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_CO_ort(self):
 
-        co = PointDipoleList(iter(CO["POTFILE"].strip().split('\n')))
+        co = PointDipoleList(iterize(CO["POTFILE"]))
         co_alpha = co.alpha()
         co_alpha_ort = co_alpha[0, 0]
         
@@ -489,37 +491,37 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_CH4_iso(self):
 
-        ch4 = PointDipoleList(iter(CH4["POTFILE"].strip().split('\n')))
+        ch4 = PointDipoleList(iterize(CH4["POTFILE"]))
         self.assertAlmostEqual(ch4.alpha_iso(), CH4["ALPHA_ISO"], places=DECIMALS)
 
     def test_CH3OH_iso(self):
 
-        ch3oh = PointDipoleList(iter(CH3OH["POTFILE"].strip().split('\n')))
+        ch3oh = PointDipoleList(iterize(CH3OH["POTFILE"]))
         self.assertAlmostEqual(ch3oh.alpha_iso(), CH3OH["ALPHA_ISO"], places=DECIMALS)
 
     def test_C2H6_iso(self):
 
-        c2h6 = PointDipoleList(iter(C2H6["POTFILE"].strip().split('\n')))
+        c2h6 = PointDipoleList(iterize(C2H6["POTFILE"]))
         self.assertAlmostEqual(.1*c2h6.alpha_iso(), .1*C2H6["ALPHA_ISO"], places=DECIMALS)
 
     def test_C3H8_iso(self):
 
-        c3h8 = PointDipoleList(iter(C3H8["POTFILE"].strip().split('\n')))
+        c3h8 = PointDipoleList(iterize(C3H8["POTFILE"]))
         self.assertAlmostEqual(c3h8.alpha_iso(), C3H8["ALPHA_ISO"], places=DECIMALS)
 
     def test_CP_iso(self):
 
-        cp = PointDipoleList(iter(CP["POTFILE"].strip().split('\n')))
+        cp = PointDipoleList(iterize(CP["POTFILE"]))
         self.assertAlmostEqual(.1*cp.alpha_iso(), .1*CP["ALPHA_ISO"], places=DECIMALS)
 
     def test_NP_iso(self):
 
-        np = PointDipoleList(iter(NP["POTFILE"].strip().split('\n')))
+        np = PointDipoleList(iterize(NP["POTFILE"]))
         self.assertAlmostEqual(.1*np.alpha_iso(), .1*NP["ALPHA_ISO"], places=DECIMALS)
 
     def test_DME_iso(self):
 
-        dme = PointDipoleList(iter(DME["POTFILE"].strip().split('\n')))
+        dme = PointDipoleList(iterize(DME["POTFILE"]))
         self.assertAlmostEqual(dme.alpha_iso(), DME["ALPHA_ISO"], places=DECIMALS)
                         
         

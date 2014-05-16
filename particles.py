@@ -73,7 +73,7 @@ class PointDipole(object):
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
-        self.__local_field = kwargs.get('local_field', 0.0)
+        self.local_field = kwargs.get('local_field', 0.0)
 
     def __str__(self):
         """The output simulate the line of a potential input file"""
@@ -92,7 +92,7 @@ class PointDipole(object):
         return -dot(self.p0, self.local_field)
 
     def alpha_induced_dipole_energy(self):
-        return -0.5*dot(self.__local_field, dot(self.a, self.__local_field))
+        return -0.5*dot(self.local_field, dot(self.a, self.local_field))
 
     def beta_induced_dipole_energy(self):
         e_field = self.local_field
@@ -108,15 +108,6 @@ class PointDipole(object):
     def dipole_induced(self):
         e_field = self.local_field
         return dot(self.a, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
-
-    @property
-    def local_field(self):
-        return self.__local_field
-    @local_field.setter
-    def local_field(self, value):
-        if not isinstance(value, np.ndarray):
-            raise TypeError("Must be array")
-        self.__local_field = value
 
 
 

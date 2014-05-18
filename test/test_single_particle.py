@@ -1,23 +1,7 @@
 import unittest
 import numpy as np
 from ..particles import PointDipole, line_to_dict, header_to_dict
-
-EPSILON = 0.001
-ex = np.array([EPSILON/2, 0, 0])
-ey = np.array([0, EPSILON/2, 0])
-ez = np.array([0, 0, EPSILON/2])
-
-def grad(f):
-    return np.array([gradx(f, ex), gradx(f, ey), gradx(f, ez)])
-
-def gradx(f, eps):
-    f.__self__.local_field += eps
-    f1 = f()
-    f.__self__.local_field -= 2*eps
-    f2 = f()
-    f.__self__.local_field += eps
-    return (f1 - f2)/EPSILON
-
+from util import field_gradient
 
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
@@ -89,7 +73,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_finite_difference_energy(self):
 
-        gradE = grad(self.particle.total_field_energy)
+        gradE = field_gradient(self.particle.total_field_energy)
         dipole = self.particle.p0 + \
            self.particle.dipole_induced()
 

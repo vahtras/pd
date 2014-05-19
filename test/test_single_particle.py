@@ -160,7 +160,7 @@ class PointDipoleTest(unittest.TestCase):
         self.assertEqual(header_dict["hyp_pol"], False)
 
     def test_header_1_hyperpolarizability_true(self):
-        header = "2 1 1 1"
+        header = "2 1 1 1 1"
         header_data = map(int, header.split())
         header_dict = header_to_dict(header)
         self.assertEqual(header_dict["hyp_pol"], True)
@@ -230,3 +230,4 @@ class PointDipoleTest(unittest.TestCase):
         np.testing.assert_equal(default_atom.b, BETA_ZERO)
             
 
+    #def test_H2_verify_default_hyperbol

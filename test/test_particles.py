@@ -3,6 +3,10 @@ import numpy as np
 from ..particles import PointDipole, PointDipoleList
 from .util import iterize
 
+I_3 = np.identity(3)
+ORIGO = np.zeros(3)
+BETA_ZERO = np.zeros((3, 3, 3))
+
 DECIMALS = 1
 ANGSTROM = 1.88971616463 #Bohr
 ANGSTROM3 = 1/1.48184712e-1 # a.u.
@@ -252,6 +256,13 @@ class PointDipoleListTest(unittest.TestCase):
         h2_alpha_ort = h2_alpha[0, 0]
         
         self.assertAlmostEqual(h2_alpha_ort, H2["ALPHA_ORT"], places=DECIMALS)
+
+    def test_H2_individual_beta(self):
+
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        ha, hb = h2
+        
+        np.testing.assert_array_equal(ha.b, BETA_ZERO)
 
     def test_N2_iso(self):
 

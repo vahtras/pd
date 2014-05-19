@@ -173,7 +173,8 @@ def header_to_dict(header):
     header_dict["max_angmom"] = header_data[1]
     header_dict["iso_pol"] = len(header_data) > 2 and header_data[2] == 1
     header_dict["full_pol"] = len(header_data) > 2 and header_data[2] == 2
-    header_dict["hyp_pol"] = len(header_data) > 3 and header_data[3] == 1
+    header_dict["hyp_pol"] = len(header_data) > 4 and header_data[3] == 1
+    print "header_dict", header_dict
 
     return header_dict
 

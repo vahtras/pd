@@ -3,6 +3,8 @@ import numpy as np
 from ..particles import PointDipole, line_to_dict, header_to_dict
 from util import field_gradient
 
+from ..particles import I_3, ORIGO, BETA_ZERO
+
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -217,10 +219,14 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_verify_default_dipole(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.p0, None)
+        np.testing.assert_equal(default_atom.p0, ORIGO)
 
     def test_verify_default_isopol(self):
         default_atom = PointDipole()
         np.testing.assert_equal(default_atom.a.diagonal(), np.zeros(3))
+
+    def test_verify_default_hyperpol(self):
+        default_atom = PointDipole()
+        np.testing.assert_equal(default_atom.b, BETA_ZERO)
             
 

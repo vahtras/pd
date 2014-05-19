@@ -4,6 +4,8 @@ from numpy.linalg import norm
 from numpy import outer, dot, array, zeros
 
 I_3 = np.identity(3)
+ORIGO = np.zeros(3)
+BETA_ZERO = np.zeros((3, 3, 3))
 
 class PointDipoleList(list):
     """A list of dipole objects"""
@@ -74,10 +76,11 @@ class PointDipole(object):
         #    dp: induced dipole moment
         #    p:  total dipole moment
         #
-        if 'coordinates' in kwargs:
-            self.r = array(kwargs['coordinates'])
-        else:
-            self.r = np.zeros(3)
+        #if 'coordinates' in kwargs:
+            #self.r = array(kwargs['coordinates'])
+        #else:
+            #self.r = np.zeros(3)
+        self.r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:
             self.q = kwargs['charge']
@@ -87,13 +90,13 @@ class PointDipole(object):
         if "dipole" in kwargs:
             self.p0 = array(kwargs["dipole"])
         else:
-            self.p0 = None
+            self.p0 = ORIGO
         self.a = kwargs.get("iso_alpha", 0)*I_3
-        self.b = array(kwargs.get("beta", 0))
+        self.b = array(kwargs.get("beta", BETA_ZERO))
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
-        self.local_field = kwargs.get('local_field', 0.0)
+        self.local_field = kwargs.get('local_field', np.zeros(3))
 
     @property
     def dp(self):

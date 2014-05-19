@@ -135,9 +135,13 @@ class PointDipole(object):
         return self.q*dr/dr2**1.5
 
     def dipole_field_at(self, r):
+        if self.p0 is not None:
+            p = self.p0 + self.dp
+        else:
+            p = self.dp
         dr = r - self.r
         dr2 = dot(dr, dr)
-        return (3*dr*dot(dr, self.p) - dr2*self.p)/dr2**2.5
+        return (3*dr*dot(dr, p) - dr2*p)/dr2**2.5
 
     def field_at(self, r):
         return self.monopole_field_at(r) + self.dipole_field_at(r)

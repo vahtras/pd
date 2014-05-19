@@ -140,7 +140,7 @@ class PointDipole(object):
         return (3*dr*dot(dr, self.p) - dr2*self.p)/dr2**2.5
 
     def field_at(self, r):
-        return self.monopole_field() + self.dipole_field()
+        return self.monopole_field_at(r) + self.dipole_field_at(r)
 
 
 def header_to_dict(header):

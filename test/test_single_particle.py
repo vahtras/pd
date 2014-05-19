@@ -197,6 +197,17 @@ class PointDipoleTest(unittest.TestCase):
             self.particle.dipole_field_at(field_point),
             ref
             )
+
+    def test_total_field_at(self):
+        field_point = np.array([0., 3., 4.])
+        self.particle.local_field = np.zeros(3)
+        self.particle.p0 = np.ones(3)
+        ref = (3*field_point*7 - 25*np.ones(3))/5**5 +\
+            1.0*field_point/5**3
+        np.testing.assert_almost_equal(
+            self.particle.field_at(field_point),
+            ref
+            )
             
 
     def notest_generated_field_at_point(self):

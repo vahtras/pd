@@ -218,5 +218,9 @@ class PointDipoleTest(unittest.TestCase):
     def test_verify_default_dipole(self):
         default_atom = PointDipole()
         np.testing.assert_equal(default_atom.p0, None)
+
+    def test_verify_default_isopol(self):
+        default_atom = PointDipole()
+        np.testing.assert_equal(default_atom.a.diagonal(), np.zeros(3))
             
 

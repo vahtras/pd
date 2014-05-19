@@ -92,7 +92,7 @@ class PointDipole(object):
         else:
             self.p0 = ORIGO
         self.a = kwargs.get("iso_alpha", 0)*I_3
-        self.b = array(kwargs.get("beta", BETA_ZERO))
+        self.b = kwargs.get("beta", BETA_ZERO)
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -221,7 +221,8 @@ def line_to_dict(header_dict, line):
         nextend = nextstart + 18
         line_dict['beta'] = line_data[nextstart: nextend]
     else:
-        line_dict['beta'] = np.zeros(27)
+        #line_dict['beta'] = np.zeros(27)
+        pass
     
     return line_dict
 

@@ -74,14 +74,22 @@ class PointDipole(object):
         #    dp: induced dipole moment
         #    p:  total dipole moment
         #
-        self.r = array(kwargs['coordinates'])
-        self.q = kwargs['charge']
+        if 'coordinates' in kwargs:
+            self.r = array(kwargs['coordinates'])
+        else:
+            self.r = np.zeros(3)
+
+        if 'charge' in kwargs:
+            self.q = kwargs['charge']
+        else:
+            self.q = 0
+
         if "dipole" in kwargs:
             self.p0 = array(kwargs["dipole"])
         else:
             self.p0 = None
-        self.a = kwargs["iso_alpha"]*I_3
-        self.b = array(kwargs["beta"])
+        self.a = kwargs.get("iso_alpha", 0)*I_3
+        self.b = array(kwargs.get("beta", 0))
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -93,7 +101,10 @@ class PointDipole(object):
 
     @property
     def p(self):
-        return self.p0 + self.dp
+        if self.p0 is None:
+            return self.dp
+        else:
+            return self.p0 + self.dp
 
     def __str__(self):
         """The output simulate the line of a potential input file"""
@@ -135,13 +146,9 @@ class PointDipole(object):
         return self.q*dr/dr2**1.5
 
     def dipole_field_at(self, r):
-        if self.p0 is not None:
-            p = self.p0 + self.dp
-        else:
-            p = self.dp
         dr = r - self.r
         dr2 = dot(dr, dr)
-        return (3*dr*dot(dr, p) - dr2*p)/dr2**2.5
+        return (3*dr*dot(dr, self.p) - dr2*self.p)/dr2**2.5
 
     def field_at(self, r):
         return self.monopole_field_at(r) + self.dipole_field_at(r)

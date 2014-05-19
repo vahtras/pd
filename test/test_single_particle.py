@@ -208,8 +208,11 @@ class PointDipoleTest(unittest.TestCase):
             self.particle.field_at(field_point),
             ref
             )
+
+    # More constructor tests
+
+    def test_verify_deffault(self):
+        default_atom = PointDipole()
+        np.testing.assert_equal(default_atom.r, np.zeros(3))
             
 
-    def notest_generated_field_at_point(self):
-        #
-        np.testing.assert_equal(self.particle.field_at((1,1,1)),(1, 1, 1))

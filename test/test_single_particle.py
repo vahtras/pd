@@ -211,8 +211,12 @@ class PointDipoleTest(unittest.TestCase):
 
     # More constructor tests
 
-    def test_verify_deffault(self):
+    def test_verify_default_origin(self):
         default_atom = PointDipole()
         np.testing.assert_equal(default_atom.r, np.zeros(3))
+
+    def test_verify_default_dipole(self):
+        default_atom = PointDipole()
+        np.testing.assert_equal(default_atom.p0, None)
             
 

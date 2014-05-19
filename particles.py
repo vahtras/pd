@@ -91,6 +91,10 @@ class PointDipole(object):
     def dp(self):
         return self.dipole_induced()
 
+    @property
+    def p(self):
+        return self.p0 + self.dp
+
     def __str__(self):
         """The output simulate the line of a potential input file"""
         #for isotropic alpha
@@ -125,6 +129,18 @@ class PointDipole(object):
         e_field = self.local_field
         return dot(self.a, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
 
+    def monopole_field_at(self, r):
+        dr = r - self.r
+        dr2 = dot(dr, dr)
+        return self.q*dr/dr2**1.5
+
+    def dipole_field_at(self, r):
+        dr = r - self.r
+        dr2 = dot(dr, dr)
+        return (3*dr*dot(dr, self.p) - dr2*self.p)/dr2**2.5
+
+    def field_at(self, r):
+        return self.monopole_field() + self.dipole_field()
 
 
 def header_to_dict(header):

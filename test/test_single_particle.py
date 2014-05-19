@@ -180,4 +180,25 @@ class PointDipoleTest(unittest.TestCase):
         pot_line = "1 0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['quadrupole'], [.1, .2, .3, .4, .5, .6])
-        
+
+    def test_monopole_field_at(self):
+        field_point = np.array([0., 3., 4.])
+        np.testing.assert_almost_equal(
+            self.particle.monopole_field_at(field_point),
+            1.0*field_point/5**3
+            )
+
+    def test_dipole_field_at(self):
+        field_point = np.array([0., 3., 4.])
+        self.particle.local_field = np.zeros(3)
+        self.particle.p0 = np.ones(3)
+        ref = (3*field_point*7 - 25*np.ones(3))/5**5
+        np.testing.assert_almost_equal(
+            self.particle.dipole_field_at(field_point),
+            ref
+            )
+            
+
+    def notest_generated_field_at_point(self):
+        #
+        np.testing.assert_equal(self.particle.field_at((1,1,1)),(1, 1, 1))

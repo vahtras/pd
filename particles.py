@@ -41,13 +41,16 @@ class PointDipoleList(list):
         return "\n\n".join([str(p) for p in self])
 
     def alpha(self):
+        dpdE = self.solve_Applequist_equation()
+        return dpdE.sum(axis=0)
+
+    def solve_Applequist_equation(self):
         # Solve the response equaitons
         n = len(self)
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
-        _alpha = dpdE.sum(axis=0)
-        return _alpha
+        return dpdE
 
     def form_Applequist_rhs(self):
         n = len(self)

@@ -482,6 +482,21 @@ class PointDipoleListTest(unittest.TestCase):
         L_h2 = h2.form_Applequist_coefficient_matrix()
         np.testing.assert_array_almost_equal(L_h2, L_h2_ref)
 
+    def test_solve_Applequist_equation(self):
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        alphas = h2.solve_Applequist_equation()
+        alphas_ref =  np.array([[
+            [0.11894578, 0., 0.],
+            [0., 0.11894578,  0.],
+            [0., 0., 0.95899377]
+            ], [
+            [0.11894578, 0., 0.],
+            [0., 0.11894578,  0.],
+            [0., 0., 0.95899377]
+            ]])
+        np.testing.assert_almost_equal(alphas, alphas_ref)
+
+
                         
         
 if __name__ == "__main__":

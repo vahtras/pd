@@ -40,6 +40,9 @@ class PointDipoleList(list):
     def __str__(self):
         return "\n\n".join([str(p) for p in self])
 
+    def alpha_iso(self):
+        return np.trace(self.alpha())/3
+
     def alpha(self):
         dpdE = self.solve_Applequist_equation()
         return dpdE.sum(axis=0)
@@ -68,10 +71,7 @@ class PointDipoleList(list):
         #matrix (1 - alpha*T)
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
-        
 
-    def alpha_iso(self):
-        return np.trace(self.alpha())/3
 
 class PointDipole(object):
     """ A point dipole object 

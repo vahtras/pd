@@ -72,6 +72,24 @@ class PointDipoleList(list):
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
 
+    def solve_scf_for_external(self, E, max_it=100, threshold=1e-6):
+        Ep0 = np.zeros((len(self), 3))
+        for i in range(max_it):
+            E_at_p =  [
+                E + array(
+                    [o.field_at(p.r) for o in self if o is not p]
+                    ).sum(axis=0) 
+                for p in self
+                ]
+            for p, Ep in zip(self, E_at_p):
+                p.local_field = Ep
+            residual = norm(Ep0 - E_at_p)
+            if residual < threshold:
+                return i, residual
+            Ep0[:, :] = E_at_p
+        #raise Exception("SCF not converged")
+            
+
 
 class PointDipole(object):
     """ A point dipole object 

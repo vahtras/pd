@@ -43,6 +43,20 @@ class PointDipoleList(list):
     def alpha(self):
         # Solve the response equaitons
         n = len(self)
+        dE = self.form_Applequist_rhs()
+        L = self.form_Applequist_coefficient_matrix()
+        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
+        _alpha = dpdE.sum(axis=0)
+        return _alpha
+
+    def form_Applequist_rhs(self):
+        n = len(self)
+        alphas = [pd.a for pd in self]
+        dE = array(alphas).reshape((n*3, 3))
+        return dE
+
+    def form_Applequist_coefficient_matrix(self):
+        n = len(self)
         aT = self.dipole_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij
         alphas = [pd.a for pd in self]
@@ -50,11 +64,8 @@ class PointDipoleList(list):
             aT[i, :, :] = dot(a, aT[i, :, :])
         #matrix (1 - alpha*T)
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
-        #right-hand-side
-        dE = array(alphas).reshape((3*n, 3))
-        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
-        _alpha = dpdE.sum(axis=0)
-        return _alpha
+        return L
+        
 
     def alpha_iso(self):
         return np.trace(self.alpha())/3
@@ -174,7 +185,6 @@ def header_to_dict(header):
     header_dict["iso_pol"] = len(header_data) > 2 and header_data[2] == 1
     header_dict["full_pol"] = len(header_data) > 2 and header_data[2] == 2
     header_dict["hyp_pol"] = len(header_data) > 4 and header_data[3] == 1
-    print "header_dict", header_dict
 
     return header_dict
 

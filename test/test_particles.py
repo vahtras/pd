@@ -452,6 +452,36 @@ class PointDipoleListTest(unittest.TestCase):
 
         dme = PointDipoleList(iterize(DME["POTFILE"]))
         self.assertAlmostEqual(dme.alpha_iso(), DME["ALPHA_ISO"], places=DECIMALS)
+
+#
+# Some refactoirng tests
+#
+    def test_form_Applequist_rhs(self):
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        h2_rhs = h2.form_Applequist_rhs()
+        h2_rhs_ref = np.array([
+            [0.168, 0, 0], 
+            [0., 0.168, 0.], 
+            [0., 0., 0.168],
+            [0.168, 0, 0], 
+            [0., 0.168, 0.], 
+            [0., 0., 0.168]
+            ])
+        np.testing.assert_array_equal(h2_rhs, h2_rhs_ref)
+
+    def test_form_Applequist_coefficient_matrix(self):
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        L_h2_ref = np.array([
+            [1., 0., 0., 0.41240819, 0., 0.],
+            [0., 1., 0., 0., 0.41240819, 0.],
+            [0., 0., 1., 0., 0.,-0.82481638],
+            [0.41240819, 0., 0., 1., 0., 0.],
+            [0., 0.41240819, 0., 0., 1., 0.],
+            [0., 0.,-0.82481638, 0., 0., 1.]
+            ])
+        L_h2 = h2.form_Applequist_coefficient_matrix()
+        np.testing.assert_array_almost_equal(L_h2, L_h2_ref)
+
                         
         
 if __name__ == "__main__":

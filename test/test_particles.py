@@ -496,16 +496,20 @@ class PointDipoleListTest(unittest.TestCase):
             ]])
         np.testing.assert_almost_equal(alphas, alphas_ref)
 
-    def test_induced_dipole_on_one_atom(self):
+    def test_induced_parallel_dipole_on_one_atom(self):
         h2 = PointDipoleList(iterize(H2["POTFILE"]))
         E_external = np.array([0., 0., 1.,])
         p_ind_ref =  np.array([0., 0., 0.95899377])
         h2.solve_scf_for_external(E_external, max_it = 100)
         np.testing.assert_almost_equal(h2[0].p, p_ind_ref, decimal=6)
-        
 
+    def test_induced_orthogonal_dipole_on_one_atom(self):
+        h2 = PointDipoleList(iterize(H2["POTFILE"]))
+        E_external = np.array([1., 0., 0.,])
+        p_ind_ref =  np.array([0.11894578, 0., 0.])
+        h2.solve_scf_for_external(E_external, max_it = 100)
+        np.testing.assert_almost_equal(h2[0].p, p_ind_ref, decimal=6)
 
-                        
         
 if __name__ == "__main__":
     unittest.main()

@@ -61,7 +61,7 @@ class PointDipoleList(list):
 
     def form_Applequist_rhs(self):
         n = len(self)
-        alphas = [pd.a for pd in self]
+        alphas = [pd.a0 for pd in self]
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
@@ -69,7 +69,7 @@ class PointDipoleList(list):
         n = len(self)
         aT = self.dipole_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij
-        alphas = [pd.a for pd in self]
+        alphas = [pd.a0 for pd in self]
         for i, a in enumerate(alphas):
             aT[i, :, :] = dot(a, aT[i, :, :])
         #matrix (1 - alpha*T)
@@ -111,7 +111,7 @@ class PointDipole(object):
         #    r: coordinates
         #    q: charge
         #    p0: permanent dipole
-        #     a: polarizability tensor
+        #     a0: polarizability tensor
         #     b: hyperpolarizability tensor
         #
         # derived quantities 
@@ -134,7 +134,7 @@ class PointDipole(object):
             self.p0 = array(kwargs["dipole"])
         else:
             self.p0 = ORIGO
-        self.a = kwargs.get("iso_alpha", 0)*I_3
+        self.a0 = kwargs.get("iso_alpha", 0)*I_3
         self.b = kwargs.get("beta", BETA_ZERO)
         self.args = args
 
@@ -158,8 +158,8 @@ class PointDipole(object):
         value_line = list(self.r) + [self.q]
         if self.p0 is not None:
             value_line += list(self.p0)
-        if self.a is not None:
-            value_line +=  [self.a[0, 0]]
+        if self.a0 is not None:
+            value_line +=  [self.a0[0, 0]]
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
@@ -169,7 +169,7 @@ class PointDipole(object):
         return -dot(self.p0, self.local_field)
 
     def alpha_induced_dipole_energy(self):
-        return -0.5*dot(self.local_field, dot(self.a, self.local_field))
+        return -0.5*dot(self.local_field, dot(self.a0, self.local_field))
 
     def beta_induced_dipole_energy(self):
         e_field = self.local_field
@@ -184,7 +184,7 @@ class PointDipole(object):
 
     def dipole_induced(self):
         e_field = self.local_field
-        return dot(self.a, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
+        return dot(self.a0, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
 
     def monopole_field_at(self, r):
         dr = r - self.r

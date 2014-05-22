@@ -34,7 +34,7 @@ class PointDipoleTest(unittest.TestCase):
         np.allclose(self.particle.dp, (0.055, 0.12, 195))
 
     def test_alpha(self):
-        self.assertEqual(self.particle.a[0,0], 0.05)
+        self.assertEqual(self.particle.a0[0,0], 0.05)
 
     def test_str(self):
         self.particle.fmt = "%5.2f"
@@ -223,7 +223,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_verify_default_isopol(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.a.diagonal(), np.zeros(3))
+        np.testing.assert_equal(default_atom.a0.diagonal(), np.zeros(3))
 
     def test_verify_default_hyperpol(self):
         default_atom = PointDipole()

@@ -230,6 +230,14 @@ DME["POTFILE"] = """AA
 1 -1.206  -0.888  0.8944 0 0.135
 1 -1.206  -0.888 -0.8944 0 0.135
 """                     
+
+# Other model systems
+
+H2O_DIMER = """AU
+2 1 1 0
+1 0.00000  0.00000  0.48861 0.0 0.00000 -0.00000 -0.76539  6.61822
+1 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
+"""
         
 class PointDipoleListTest(unittest.TestCase):
 
@@ -453,6 +461,20 @@ class PointDipoleListTest(unittest.TestCase):
         dme = PointDipoleList.from_string(DME["POTFILE"])
         self.assertAlmostEqual(dme.alpha_iso(), DME["ALPHA_ISO"], places=DECIMALS)
 
+    def test_h2o_dimer_finite_field_p(self):
+
+        h2o_dimer = PointDipoleList.from_string(H2O_DIMER)
+        alphas = h2o_dimer.solve_Applequist_equation()
+
+        h2o_dimer.solve_scf_for_external([0, 0, .005])
+        p1 = h2o_dimer[0].dp
+        h2o_dimer.solve_scf_for_external([0, 0, -.005])
+        p2 = h2o_dimer[0].dp
+        dPdE = (p1 - p2)/0.01
+
+        np.allclose(alphas[0][:,2], dPdE)
+        
+
 #
 # Some refactoring tests
 #
@@ -520,7 +542,7 @@ class PointDipoleListTest(unittest.TestCase):
         h2 = PointDipoleList(iterize(H2["POTFILE"]))
         E_external = np.array([0., 0., 1.,])
         E_local = h2.evaluate_field_at_atoms(external=E_external)
-        np.testing.assert_almost_equal(E_local, [[0, 0, 1], [0, 0, 1]])
+        np.testing.assert_array_almost_equal(E_local, [[0, 0, 1], [0, 0, 1]])
         
 
         

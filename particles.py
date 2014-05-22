@@ -75,19 +75,26 @@ class PointDipoleList(list):
     def solve_scf_for_external(self, E, max_it=100, threshold=1e-6):
         Ep0 = np.zeros((len(self), 3))
         for i in range(max_it):
-            E_at_p =  [
-                E + array(
-                    [o.field_at(p.r) for o in self if o is not p]
-                    ).sum(axis=0) 
-                for p in self
-                ]
+            E_at_p =  self.evaluate_field_at_atoms(external=E)
             for p, Ep in zip(self, E_at_p):
                 p.local_field = Ep
             residual = norm(Ep0 - E_at_p)
             if residual < threshold:
                 return i, residual
             Ep0[:, :] = E_at_p
-        #raise Exception("SCF not converged")
+        raise Exception("SCF not converged")
+
+    def evaluate_field_at_atoms(self, external=None):
+        E_at_p =  [
+            array(
+                [o.field_at(p.r) for o in self if o is not p]
+                ).sum(axis=0) 
+            for p in self
+            ]
+        if external is not None:
+            E_at_p = [external + p for p in E_at_p]
+
+        return E_at_p
             
 
 

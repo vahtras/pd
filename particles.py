@@ -20,6 +20,10 @@ class PointDipoleList(list):
             line_dict = line_to_dict(header_dict, line)
             self.append(PointDipole(**line_dict))
 
+    @staticmethod
+    def from_string(potential):
+        return PointDipoleList(iter(potential.split("\n")))
+        
     def charge(self):
         return sum([p.q for p in self])
 

@@ -472,7 +472,7 @@ class PointDipoleListTest(unittest.TestCase):
         p2 = h2o_dimer[0].dp
         dPdE = (p1 - p2)/0.01
 
-        np.allclose(alphas[0][:,2], dPdE)
+        np.testing.assert_allclose(alphas[0][:,2], dPdE, rtol=.001)
         
 
 #

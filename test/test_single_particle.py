@@ -22,16 +22,16 @@ class PointDipoleTest(unittest.TestCase):
         self.particle.local_field = np.array([1., 2., 3.])
 
     def test_coor(self):
-        np.allclose(self.particle.r, (0., 0., 0.))
+        np.testing.assert_allclose(self.particle.r, (0., 0., 0.))
 
     def test_charge(self):
         self.assertEqual(self.particle.q, 1.0)
 
     def test_permanent_dipole(self):
-        np.allclose(self.particle.p0, (0.1, 0.2, 0.3))
+        np.testing.assert_allclose(self.particle.p0, (0.1, 0.2, 0.3))
 
     def test_induced_dipole(self):
-        np.allclose(self.particle.dp, (0.055, 0.12, 195))
+        np.testing.assert_allclose(self.particle.dp, (0.055, 0.12, 0.195))
 
     def test_alpha(self):
         self.assertEqual(self.particle.a0[0,0], 0.05)

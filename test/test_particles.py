@@ -17,17 +17,17 @@ class PointDipoleListTest(unittest.TestCase):
 
     def setUp(self):
         self.h2 = PointDipoleList.from_string(H2["POTFILE"])
+        self.h2o_dimer = PointDipoleList.from_string(H2O_DIMER)
         pass
 
     def test_h2o_dimer_finite_field_p(self):
 
-        h2o_dimer = PointDipoleList.from_string(H2O_DIMER)
-        alphas = h2o_dimer.solve_Applequist_equation()
+        alphas = self.h2o_dimer.solve_Applequist_equation()
 
-        h2o_dimer.solve_scf_for_external([0, 0, .005])
-        p1 = h2o_dimer[0].dp
-        h2o_dimer.solve_scf_for_external([0, 0, -.005])
-        p2 = h2o_dimer[0].dp
+        self.h2o_dimer.solve_scf_for_external([0, 0, .005])
+        p1 = self.h2o_dimer[0].dp
+        self.h2o_dimer.solve_scf_for_external([0, 0, -.005])
+        p2 = self.h2o_dimer[0].dp
         dPdE = (p1 - p2)/0.01
 
         np.testing.assert_allclose(alphas[0][:,2], dPdE, rtol=.001)

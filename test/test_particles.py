@@ -16,6 +16,7 @@ H2O_DIMER = """AU
 class PointDipoleListTest(unittest.TestCase):
 
     def setUp(self):
+        self.h2 = PointDipoleList.from_string(H2["POTFILE"])
         pass
 
     def test_h2o_dimer_finite_field_p(self):
@@ -35,8 +36,7 @@ class PointDipoleListTest(unittest.TestCase):
 # Some refactoring tests
 #
     def test_form_Applequist_rhs(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
-        h2_rhs = h2.form_Applequist_rhs()
+        h2_rhs = self.h2.form_Applequist_rhs()
         h2_rhs_ref = np.array([
             [0.168, 0, 0], 
             [0., 0.168, 0.], 
@@ -48,7 +48,6 @@ class PointDipoleListTest(unittest.TestCase):
         np.testing.assert_array_equal(h2_rhs, h2_rhs_ref)
 
     def test_form_Applequist_coefficient_matrix(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
         L_h2_ref = np.array([
             [1., 0., 0., 0.41240819, 0., 0.],
             [0., 1., 0., 0., 0.41240819, 0.],
@@ -57,12 +56,11 @@ class PointDipoleListTest(unittest.TestCase):
             [0., 0.41240819, 0., 0., 1., 0.],
             [0., 0.,-0.82481638, 0., 0., 1.]
             ])
-        L_h2 = h2.form_Applequist_coefficient_matrix()
+        L_h2 = self.h2.form_Applequist_coefficient_matrix()
         np.testing.assert_array_almost_equal(L_h2, L_h2_ref)
 
     def test_solve_Applequist_equation(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
-        alphas = h2.solve_Applequist_equation()
+        alphas = self.h2.solve_Applequist_equation()
         alphas_ref =  np.array([[
             [0.11894578, 0., 0.],
             [0., 0.11894578,  0.],
@@ -75,29 +73,25 @@ class PointDipoleListTest(unittest.TestCase):
         np.testing.assert_almost_equal(alphas, alphas_ref)
 
     def test_induced_parallel_dipole_on_one_atom(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
         E_external = np.array([0., 0., 1.,])
         p_ind_ref =  np.array([0., 0., 0.95899377])
-        h2.solve_scf_for_external(E_external, max_it = 100)
-        np.testing.assert_almost_equal(h2[0].p, p_ind_ref, decimal=6)
+        self.h2.solve_scf_for_external(E_external, max_it = 100)
+        np.testing.assert_almost_equal(self.h2[0].p, p_ind_ref, decimal=6)
 
     def test_induced_orthogonal_dipole_on_one_atom(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
         E_external = np.array([1., 0., 0.,])
         p_ind_ref =  np.array([0.11894578, 0., 0.])
-        h2.solve_scf_for_external(E_external, max_it = 100)
-        np.testing.assert_almost_equal(h2[0].p, p_ind_ref, decimal=6)
+        self.h2.solve_scf_for_external(E_external, max_it = 100)
+        np.testing.assert_almost_equal(self.h2[0].p, p_ind_ref, decimal=6)
         
     def test_evaluate_local_field_at_atoms(self):
-        h2 = PointDipoleList.from_string(H2["POTFILE"])
         E_external = np.array([0., 0., 1.,])
-        E_local = h2.evaluate_field_at_atoms()
+        E_local = self.h2.evaluate_field_at_atoms()
         np.testing.assert_almost_equal(E_local, [[0, 0, 0], [0, 0, 0]])
 
     def test_evaluate_total_field_at_atoms(self):
-        h2 = PointDipoleList(iterize(H2["POTFILE"]))
         E_external = np.array([0., 0., 1.,])
-        E_local = h2.evaluate_field_at_atoms(external=E_external)
+        E_local = self.h2.evaluate_field_at_atoms(external=E_external)
         np.testing.assert_array_almost_equal(E_local, [[0, 0, 1], [0, 0, 1]])
         
 

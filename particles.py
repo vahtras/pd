@@ -99,6 +99,21 @@ class PointDipoleList(list):
             E_at_p = [external + p for p in E_at_p]
 
         return E_at_p
+
+    def _intermediate_product_TB(self):
+        """sum(jk)T[i,:, j, :]B[j, :, k, :]"""
+        n = len(self)
+        T = self.dipole_tensor().reshape(n, 3, n*3)
+        B = self.solve_Applequist_equation().reshape(n*3, 3)
+        TB = dot(T, B)
+        return TB
+
+    def _intermediate_C(self):
+        """sum(jk)T[i,:, j, :]B[j, :, k, :]"""
+        n = len(self)
+        TB = self._intermediate_product_TB()
+        C = np.array([I_3 + tb for tb in TB])
+        return C
             
 
 

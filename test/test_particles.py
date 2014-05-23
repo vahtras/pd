@@ -2,12 +2,8 @@ import unittest
 import numpy as np
 from ..particles import PointDipole, PointDipoleList
 from .util import iterize
+from const import *
 
-I_3 = np.identity(3)
-ORIGO = np.zeros(3)
-BETA_ZERO = np.zeros((3, 3, 3))
-
-DECIMALS = 1
 ANGSTROM = 1.88971616463 #Bohr
 ANGSTROM3 = 1/1.48184712e-1 # a.u.
 DIATOMIC = """AU

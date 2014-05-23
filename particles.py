@@ -152,6 +152,18 @@ class PointDipole(object):
         else:
             return self.p0 + self.dp
 
+    @property
+    def da(self):
+        return self.alpha_induced()
+
+    @property
+    def a(self):
+        return self.a0 + self.da
+
+    def alpha_induced(self):
+        return dot(self.b, self.local_field)
+            
+
     def __str__(self):
         """The output simulate the line of a potential input file"""
         #for isotropic alpha

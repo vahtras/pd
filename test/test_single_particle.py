@@ -36,6 +36,16 @@ class PointDipoleTest(unittest.TestCase):
     def test_alpha(self):
         self.assertEqual(self.particle.a0[0,0], 0.05)
 
+    def test_alpha_induced(self):
+        np.testing.assert_allclose(
+            self.particle.da, np.diag([0.01, 0.02, 0.03])
+            )
+
+    def test_total_alpha(self):
+        np.testing.assert_allclose(
+            self.particle.a,  np.diag([0.06, 0.07, 0.08])
+            )
+
     def test_str(self):
         self.particle.fmt = "%5.2f"
         self.assertEqual(str(self.particle),

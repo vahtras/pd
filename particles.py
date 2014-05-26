@@ -30,7 +30,7 @@ class PointDipoleList(list):
         
     def charge(self):
         """Returns sum of charges of particles in the list"""
-        return sum([p.q for p in self])
+        return sum([p.charge() for p in self])
 
     def dipole_tensor(self):
         """Calculates the dipole coupling, tensor, describing the
@@ -138,9 +138,12 @@ class PointDipoleList(list):
 
 
 class PointDipole(object):
-    """ A hyperpolarizable dipole object 
+    r""" 
+    A hyperpolarizable dipole object with dipole moment
 
-    
+    .. math::
+        \bar{p} = \bar{p}^0 + \bar{\bar\alpha}\cdot\bar{E} + \frac12 \bar{\bar\beta}:\bar{E}\bar{E}
+            
     """
     def __init__(self, *args, **kwargs):
         """
@@ -161,9 +164,9 @@ class PointDipole(object):
         self.r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:
-            self.q = kwargs['charge']
+            self._q = kwargs['charge']
         else:
-            self.q = 0
+            self._q = 0
 
         if "dipole" in kwargs:
             self.p0 = array(kwargs["dipole"])
@@ -175,6 +178,9 @@ class PointDipole(object):
 
         self.fmt = kwargs.get('fmt', "%10.5f")
         self.local_field = kwargs.get('local_field', np.zeros(3))
+
+    def charge(self):
+        return self._q
 
     @property
     def dp(self):
@@ -202,7 +208,7 @@ class PointDipole(object):
     def __str__(self):
         """The output simulate the line of a potential input file"""
         #for isotropic alpha
-        value_line = list(self.r) + [self.q]
+        value_line = list(self.r) + [self._q]
         if self.p0 is not None:
             value_line += list(self.p0)
         if self.a0 is not None:
@@ -210,7 +216,7 @@ class PointDipole(object):
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
-        return -self.q*dot(self.local_field, self.r)
+        return -self._q*dot(self.local_field, self.r)
 
     def permanent_dipole_energy(self):
         return -dot(self.p0, self.local_field)
@@ -236,7 +242,7 @@ class PointDipole(object):
     def monopole_field_at(self, r):
         dr = r - self.r
         dr2 = dot(dr, dr)
-        return self.q*dr/dr2**1.5
+        return self._q*dr/dr2**1.5
 
     def dipole_field_at(self, r):
         dr = r - self.r

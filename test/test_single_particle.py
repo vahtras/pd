@@ -28,10 +28,10 @@ class PointDipoleTest(unittest.TestCase):
         self.assertEqual(self.particle._q, 1.0)
 
     def test_permanent_dipole(self):
-        np.testing.assert_allclose(self.particle._p0, (0.1, 0.2, 0.3))
+        np.testing.assert_allclose(self.particle.permanent_dipole(), (0.1, 0.2, 0.3))
 
     def test_induced_dipole(self):
-        np.testing.assert_allclose(self.particle.dp, (0.055, 0.12, 0.195))
+        np.testing.assert_allclose(self.particle.induced_dipole(), (0.055, 0.12, 0.195))
 
     def test_alpha(self):
         self.assertEqual(self.particle._a0[0,0], 0.05)

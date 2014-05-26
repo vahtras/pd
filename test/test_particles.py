@@ -25,9 +25,9 @@ class PointDipoleListTest(unittest.TestCase):
         alphas = self.h2o_dimer.solve_Applequist_equation()
 
         self.h2o_dimer.solve_scf_for_external([0, 0, .005])
-        p1 = self.h2o_dimer[0].dp
+        p1 = self.h2o_dimer[0].induced_dipole()
         self.h2o_dimer.solve_scf_for_external([0, 0, -.005])
-        p2 = self.h2o_dimer[0].dp
+        p2 = self.h2o_dimer[0].induced_dipole()
         dPdE = (p1 - p2)/0.01
 
         np.testing.assert_allclose(alphas[0][:,2], dPdE, rtol=.001)
@@ -76,13 +76,13 @@ class PointDipoleListTest(unittest.TestCase):
         E_external = np.array([0., 0., 1.,])
         p_ind_ref =  np.array([0., 0., 0.95899377])
         self.h2.solve_scf_for_external(E_external, max_it = 100)
-        np.testing.assert_almost_equal(self.h2[0].p, p_ind_ref, decimal=6)
+        np.testing.assert_almost_equal(self.h2[0].dipole(), p_ind_ref, decimal=6)
 
     def test_induced_orthogonal_dipole_on_one_atom(self):
         E_external = np.array([1., 0., 0.,])
         p_ind_ref =  np.array([0.11894578, 0., 0.])
         self.h2.solve_scf_for_external(E_external, max_it = 100)
-        np.testing.assert_almost_equal(self.h2[0].p, p_ind_ref, decimal=6)
+        np.testing.assert_almost_equal(self.h2[0].dipole(), p_ind_ref, decimal=6)
         
     def test_evaluate_local_field_at_atoms(self):
         E_external = np.array([0., 0., 1.,])

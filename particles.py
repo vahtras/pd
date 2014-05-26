@@ -148,8 +148,8 @@ class PointDipole(object):
     def __init__(self, *args, **kwargs):
         """
         fixed quantities: 
-           r: coordinates
-           q: charge
+           _r: coordinates
+           _q: charge
            _p0: permanent dipole
             _a0: polarizability tensor
             b: hyperpolarizability tensor
@@ -173,7 +173,7 @@ class PointDipole(object):
         else:
             self._p0 = ORIGO
         self._a0 = kwargs.get("iso_alpha", 0)*I_3
-        self.b = kwargs.get("beta", BETA_ZERO)
+        self._b0 = kwargs.get("beta", BETA_ZERO)
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -206,7 +206,7 @@ class PointDipole(object):
         return self._a0 + self.da
 
     def alpha_induced(self):
-        return dot(self.b, self.local_field)
+        return dot(self._b0, self.local_field)
             
 
     def __str__(self):
@@ -230,7 +230,7 @@ class PointDipole(object):
 
     def beta_induced_dipole_energy(self):
         e_field = self.local_field
-        return -dot(e_field, dot(dot(self.b, e_field), e_field))/6
+        return -dot(e_field, dot(dot(self._b0, e_field), e_field))/6
 
     def total_field_energy(self):
         return \
@@ -241,7 +241,7 @@ class PointDipole(object):
 
     def dipole_induced(self):
         e_field = self.local_field
-        return dot(self._a0, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
+        return dot(self._a0, e_field) + 0.5*dot(dot(self._b0, e_field), e_field)
 
     def monopole_field_at(self, r):
         dr = r - self._r

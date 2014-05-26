@@ -16,9 +16,9 @@ class PointDipoleTest(unittest.TestCase):
             iso_alpha=0.05,
             beta=np.zeros((3, 3, 3))
             )
-        self.particle.b[0, 0, 0] = 0.01
-        self.particle.b[1, 1, 1] = 0.01
-        self.particle.b[2, 2, 2] = 0.01
+        self.particle._b0[0, 0, 0] = 0.01
+        self.particle._b0[1, 1, 1] = 0.01
+        self.particle._b0[2, 2, 2] = 0.01
         self.particle.local_field = np.array([1., 2., 3.])
 
     def test_coor(self):
@@ -238,7 +238,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_verify_default_hyperpol(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.b, BETA_ZERO)
+        np.testing.assert_equal(default_atom._b0, BETA_ZERO)
             
 
     #def test_H2_verify_default_hyperbol

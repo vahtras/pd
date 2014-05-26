@@ -37,7 +37,7 @@ class ApplequistTest(unittest.TestCase):
         h2 = PointDipoleList.from_string(H2["POTFILE"])
         ha, hb = h2
         
-        np.testing.assert_array_equal(ha.b, BETA_ZERO)
+        np.testing.assert_array_equal(ha._b0, BETA_ZERO)
 
     def test_N2_iso(self):
 

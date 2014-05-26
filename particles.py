@@ -8,7 +8,8 @@ ORIGO = np.zeros(3)
 BETA_ZERO = np.zeros((3, 3, 3))
 
 class PointDipoleList(list):
-    """A list of dipole objects"""
+    """A list class of ``PointDipole`` objects"""
+
     def __init__(self, pf):
         """Class constructor 
         pf: potential file object (or iterator)
@@ -22,12 +23,25 @@ class PointDipoleList(list):
 
     @staticmethod
     def from_string(potential):
+        """Used to build the ``PointDipoleList`` object when the
+           potential file is given as a triple quoted string with newlines
+        """
         return PointDipoleList(iter(potential.split("\n")))
         
     def charge(self):
+        """Returns sum of charges of particles in the list"""
         return sum([p.q for p in self])
 
     def dipole_tensor(self):
+        """Calculates the dipole coupling, tensor, describing the
+        electric field strength at a given particle due to
+        another electric dipole:
+
+        .. math::
+            \mathbf{T}_{ij} = (3\mathbf{r}_{ij}\mathbf{r}_{ij}-r_{ij}^2\mathbf{1})/r_{ij}^5
+
+        """
+
         n = len(self)
         _T = zeros((n, 3, n,  3))
         for i in range(n):
@@ -45,6 +59,12 @@ class PointDipoleList(list):
         return "\n\n".join([str(p) for p in self])
 
     def alpha_iso(self):
+        r"""Return the isotropic polarizability
+
+        .. math::
+            \alpha_{iso} = \sum_k \alpha_{kk}/3
+        """
+
         return np.trace(self.alpha())/3
 
     def alpha(self):
@@ -118,26 +138,26 @@ class PointDipoleList(list):
 
 
 class PointDipole(object):
-    """ A point dipole object 
+    """ A hyperpolarizable dipole object 
+
+    
     """
     def __init__(self, *args, **kwargs):
-        #
-        # fixed quantities: 
-        #    r: coordinates
-        #    q: charge
-        #    p0: permanent dipole
-        #     a0: polarizability tensor
-        #     b: hyperpolarizability tensor
-        #
-        # derived quantities 
-        #
-        #    dp: induced dipole moment
-        #    p:  total dipole moment
-        #
-        #if 'coordinates' in kwargs:
-            #self.r = array(kwargs['coordinates'])
-        #else:
-            #self.r = np.zeros(3)
+        """
+        fixed quantities: 
+           r: coordinates
+           q: charge
+           p0: permanent dipole
+            a0: polarizability tensor
+            b: hyperpolarizability tensor
+        
+        derived quantities 
+        
+           dp: induced dipole moment
+           p:  total dipole moment
+        
+        """
+
         self.r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:

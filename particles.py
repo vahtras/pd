@@ -45,9 +45,9 @@ class PointDipoleList(list):
         n = len(self)
         _T = zeros((n, 3, n,  3))
         for i in range(n):
-            ri = self[i].r
+            ri = self[i]._r
             for j in range(i):
-                rj = self[j].r
+                rj = self[j]._r
                 rij = ri - rj
                 rij2 = dot(rij, rij)
                 Tij = (3*outer(rij, rij) - rij2*I_3)/rij2**2.5
@@ -81,7 +81,7 @@ class PointDipoleList(list):
 
     def form_Applequist_rhs(self):
         n = len(self)
-        alphas = [pd.a0 for pd in self]
+        alphas = [pd._a0 for pd in self]
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
@@ -89,7 +89,7 @@ class PointDipoleList(list):
         n = len(self)
         aT = self.dipole_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij
-        alphas = [pd.a0 for pd in self]
+        alphas = [pd._a0 for pd in self]
         for i, a in enumerate(alphas):
             aT[i, :, :] = dot(a, aT[i, :, :])
         #matrix (1 - alpha*T)
@@ -97,21 +97,21 @@ class PointDipoleList(list):
         return L
 
     def solve_scf_for_external(self, E, max_it=100, threshold=1e-6):
-        Ep0 = np.zeros((len(self), 3))
+        E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
             E_at_p =  self.evaluate_field_at_atoms(external=E)
             for p, Ep in zip(self, E_at_p):
                 p.local_field = Ep
-            residual = norm(Ep0 - E_at_p)
+            residual = norm(E_p0 - E_at_p)
             if residual < threshold:
                 return i, residual
-            Ep0[:, :] = E_at_p
+            E_p0[:, :] = E_at_p
         raise Exception("SCF not converged")
 
     def evaluate_field_at_atoms(self, external=None):
         E_at_p =  [
             array(
-                [o.field_at(p.r) for o in self if o is not p]
+                [o.field_at(p._r) for o in self if o is not p]
                 ).sum(axis=0) 
             for p in self
             ]
@@ -150,8 +150,8 @@ class PointDipole(object):
         fixed quantities: 
            r: coordinates
            q: charge
-           p0: permanent dipole
-            a0: polarizability tensor
+           _p0: permanent dipole
+            _a0: polarizability tensor
             b: hyperpolarizability tensor
         
         derived quantities 
@@ -161,7 +161,7 @@ class PointDipole(object):
         
         """
 
-        self.r = array(kwargs.get('coordinates', np.zeros(3)))
+        self._r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:
             self._q = kwargs['charge']
@@ -169,10 +169,10 @@ class PointDipole(object):
             self._q = 0
 
         if "dipole" in kwargs:
-            self.p0 = array(kwargs["dipole"])
+            self._p0 = array(kwargs["dipole"])
         else:
-            self.p0 = ORIGO
-        self.a0 = kwargs.get("iso_alpha", 0)*I_3
+            self._p0 = ORIGO
+        self._a0 = kwargs.get("iso_alpha", 0)*I_3
         self.b = kwargs.get("beta", BETA_ZERO)
         self.args = args
 
@@ -187,11 +187,15 @@ class PointDipole(object):
         return self.dipole_induced()
 
     @property
+    def p0(self):
+        return self._p0
+
+    @property
     def p(self):
-        if self.p0 is None:
+        if self._p0 is None:
             return self.dp
         else:
-            return self.p0 + self.dp
+            return self._p0 + self.dp
 
     @property
     def da(self):
@@ -199,7 +203,7 @@ class PointDipole(object):
 
     @property
     def a(self):
-        return self.a0 + self.da
+        return self._a0 + self.da
 
     def alpha_induced(self):
         return dot(self.b, self.local_field)
@@ -208,21 +212,21 @@ class PointDipole(object):
     def __str__(self):
         """The output simulate the line of a potential input file"""
         #for isotropic alpha
-        value_line = list(self.r) + [self._q]
-        if self.p0 is not None:
-            value_line += list(self.p0)
-        if self.a0 is not None:
-            value_line +=  [self.a0[0, 0]]
+        value_line = list(self._r) + [self._q]
+        if self._p0 is not None:
+            value_line += list(self._p0)
+        if self._a0 is not None:
+            value_line +=  [self._a0[0, 0]]
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
-        return -self._q*dot(self.local_field, self.r)
+        return -self._q*dot(self.local_field, self._r)
 
     def permanent_dipole_energy(self):
-        return -dot(self.p0, self.local_field)
+        return -dot(self._p0, self.local_field)
 
     def alpha_induced_dipole_energy(self):
-        return -0.5*dot(self.local_field, dot(self.a0, self.local_field))
+        return -0.5*dot(self.local_field, dot(self._a0, self.local_field))
 
     def beta_induced_dipole_energy(self):
         e_field = self.local_field
@@ -237,15 +241,15 @@ class PointDipole(object):
 
     def dipole_induced(self):
         e_field = self.local_field
-        return dot(self.a0, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
+        return dot(self._a0, e_field) + 0.5*dot(dot(self.b, e_field), e_field)
 
     def monopole_field_at(self, r):
-        dr = r - self.r
+        dr = r - self._r
         dr2 = dot(dr, dr)
         return self._q*dr/dr2**1.5
 
     def dipole_field_at(self, r):
-        dr = r - self.r
+        dr = r - self._r
         dr2 = dot(dr, dr)
         return (3*dr*dot(dr, self.p) - dr2*self.p)/dr2**2.5
 

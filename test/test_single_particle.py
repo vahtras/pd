@@ -22,19 +22,19 @@ class PointDipoleTest(unittest.TestCase):
         self.particle.local_field = np.array([1., 2., 3.])
 
     def test_coor(self):
-        np.testing.assert_allclose(self.particle.r, (0., 0., 0.))
+        np.testing.assert_allclose(self.particle._r, (0., 0., 0.))
 
     def test_charge(self):
         self.assertEqual(self.particle._q, 1.0)
 
     def test_permanent_dipole(self):
-        np.testing.assert_allclose(self.particle.p0, (0.1, 0.2, 0.3))
+        np.testing.assert_allclose(self.particle._p0, (0.1, 0.2, 0.3))
 
     def test_induced_dipole(self):
         np.testing.assert_allclose(self.particle.dp, (0.055, 0.12, 0.195))
 
     def test_alpha(self):
-        self.assertEqual(self.particle.a0[0,0], 0.05)
+        self.assertEqual(self.particle._a0[0,0], 0.05)
 
     def test_alpha_induced(self):
         np.testing.assert_allclose(
@@ -54,13 +54,13 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_str_with_no_dipole(self):
         self.particle.fmt = "%5.2f"
-        self.particle.p0 = None
+        self.particle._p0 = None
         self.assertEqual(str(self.particle),
             "1 0.00 0.00 0.00 1.00 0.05"
             )
 
     def test_charge_energy(self):
-        self.particle.r = np.array([1., 1., 1.])
+        self.particle._r = np.array([1., 1., 1.])
         self.assertEqual(self.particle.charge_energy(), -6.0)
 
     def test_permanent_dipole_energy(self):
@@ -85,8 +85,9 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_finite_difference_energy(self):
 
+#XXX
         gradE = field_gradient(self.particle.total_field_energy)
-        dipole = self.particle.p0 + \
+        dipole = self.particle._p0 + \
            self.particle.dipole_induced()
 
         np.testing.assert_almost_equal(-gradE, dipole)
@@ -203,7 +204,7 @@ class PointDipoleTest(unittest.TestCase):
     def test_dipole_field_at(self):
         field_point = np.array([0., 3., 4.])
         self.particle.local_field = np.zeros(3)
-        self.particle.p0 = np.ones(3)
+        self.particle._p0 = np.ones(3)
         ref = (3*field_point*7 - 25*np.ones(3))/5**5
         np.testing.assert_almost_equal(
             self.particle.dipole_field_at(field_point),
@@ -213,7 +214,7 @@ class PointDipoleTest(unittest.TestCase):
     def test_total_field_at(self):
         field_point = np.array([0., 3., 4.])
         self.particle.local_field = np.zeros(3)
-        self.particle.p0 = np.ones(3)
+        self.particle._p0 = np.ones(3)
         ref = (3*field_point*7 - 25*np.ones(3))/5**5 +\
             1.0*field_point/5**3
         np.testing.assert_almost_equal(
@@ -225,15 +226,15 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_verify_default_origin(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.r, np.zeros(3))
+        np.testing.assert_equal(default_atom._r, np.zeros(3))
 
     def test_verify_default_dipole(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.p0, ORIGO)
+        np.testing.assert_equal(default_atom._p0, ORIGO)
 
     def test_verify_default_isopol(self):
         default_atom = PointDipole()
-        np.testing.assert_equal(default_atom.a0.diagonal(), np.zeros(3))
+        np.testing.assert_equal(default_atom._a0.diagonal(), np.zeros(3))
 
     def test_verify_default_hyperpol(self):
         default_atom = PointDipole()

@@ -192,7 +192,13 @@ class PointDipole(object):
         return self._p0
 
     def induced_dipole_moment(self):
-        return dot(self._a0, self.local_field) + 0.5*dot(dot(self._b0, self.local_field), self.local_field)
+        return self.alpha_induced_dipole_moment() + self.beta_induced_dipole_moment()
+
+    def alpha_induced_dipole_moment(self):
+        return dot(self._a0, self.local_field) 
+
+    def beta_induced_dipole_moment(self):
+        return 0.5*dot(dot(self._b0, self.local_field), self.local_field)
 
 
     @property

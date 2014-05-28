@@ -184,14 +184,16 @@ class PointDipole(object):
     def charge(self):
         return self._q
 
-    def permanent_dipole(self):
+
+    def dipole_moment(self):
+        return self.permanent_dipole_moment() + self.induced_dipole_moment()
+
+    def permanent_dipole_moment(self):
         return self._p0
 
-    def dipole(self):
-        return self._p0 + self.induced_dipole()
-
-    def induced_dipole(self):
+    def induced_dipole_moment(self):
         return dot(self._a0, self.local_field) + 0.5*dot(dot(self._b0, self.local_field), self.local_field)
+
 
     @property
     def da(self):
@@ -217,6 +219,10 @@ class PointDipole(object):
 
     def charge_energy(self):
         return -self._q*dot(self.local_field, self._r)
+
+    def dipole_energy(self):
+        return self.permanent_dipole_energy() + \
+            self.induced_dipole_energy()
 
     def permanent_dipole_energy(self):
         return -dot(self._p0, self.local_field)
@@ -247,7 +253,7 @@ class PointDipole(object):
     def dipole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
-        p = self.dipole()
+        p = self.dipole_moment()
         return (3*dr*dot(dr, p) - dr2*p)/dr2**2.5
 
     def field_at(self, r):

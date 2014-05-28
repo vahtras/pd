@@ -94,9 +94,9 @@ class PointDipoleListTest(unittest.TestCase):
         E_local = self.h2.evaluate_field_at_atoms(external=E_external)
         np.testing.assert_array_almost_equal(E_local, [[0, 0, 1], [0, 0, 1]])
         
-    def test_intermediate_TB(self):
-        TB = self.h2._intermediate_product_TB()
-        np.testing.assert_array_almost_equal(TB, [
+    def test_dEi_dF_indirect(self):
+        TR = self.h2._dEi_dF_indirect()
+        np.testing.assert_array_almost_equal(TR, [
             [[-2.45481065*(0.11894578), 0., 0.],
              [0, -2.45481065*(0.11894578), 0.],
              [0., 0., 4.90962131*0.95899377]],
@@ -105,8 +105,8 @@ class PointDipoleListTest(unittest.TestCase):
              [0., 0., 4.90962131*0.95899377]]
             ])
 
-    def test_intermediate_C(self):
-        C = self.h2._intermediate_C()
+    def test_dEi_dF(self):
+        C = self.h2._dEi_dF()
         np.testing.assert_array_almost_equal(C, [
             [[1-2.45481065*(0.11894578), 0., 0.],
              [0, 1-2.45481065*(0.11894578), 0.],
@@ -115,6 +115,7 @@ class PointDipoleListTest(unittest.TestCase):
              [0, 1-2.45481065*(0.11894578), 0.],
              [0., 0., 1+4.90962131*0.95899377]]
             ])
+
         
 
         

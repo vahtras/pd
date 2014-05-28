@@ -83,14 +83,6 @@ class PointDipoleTest(unittest.TestCase):
     def test_total_field_energy(self):
         self.assertEqual(self.particle.total_field_energy(), -1.81)
 
-    def test_finite_difference_energy(self):
-
-#XXX
-        gradE = field_gradient(self.particle.total_field_energy)
-        dipole = self.particle._p0 + \
-           self.particle.dipole_induced()
-
-        np.testing.assert_almost_equal(-gradE, dipole)
 
     def test_set_local_field_raises_typeerror(self):
         def wrapper(particle, setvalue):

@@ -120,21 +120,20 @@ class PointDipoleList(list):
 
         return E_at_p
 
-    def _intermediate_product_TB(self):
-        """sum(jk)T[i,:, j, :]B[j, :, k, :]"""
+
+    def _dEi_dF(self):
+        """Represents change of local field due to change in external"""
+        n = len(self)
+        TR = self._dEi_dF_indirect()
+        return np.array([I_3 + tr for tr in TR])
+            
+    def _dEi_dF_indirect(self):
+        """Change in local field due to change from other dipoles"""
         n = len(self)
         T = self.dipole_tensor().reshape(n, 3, n*3)
-        B = self.solve_Applequist_equation().reshape(n*3, 3)
-        TB = dot(T, B)
-        return TB
-
-    def _intermediate_C(self):
-        """sum(jk)T[i,:, j, :]B[j, :, k, :]"""
-        n = len(self)
-        TB = self._intermediate_product_TB()
-        C = np.array([I_3 + tb for tb in TB])
-        return C
-            
+        R = self.solve_Applequist_equation().reshape(n*3, 3)
+        TR = dot(T, R)
+        return TR
 
 
 class PointDipole(object):
@@ -153,6 +152,9 @@ class PointDipole(object):
            _p0: permanent dipole
             _a0: polarizability tensor
             b: hyperpolarizability tensor
+
+        variable:
+            local_field
         
         derived quantities 
         
@@ -219,6 +221,10 @@ class PointDipole(object):
     def permanent_dipole_energy(self):
         return -dot(self._p0, self.local_field)
 
+    def induced_dipole_energy(self):
+        return self.alpha_induced_dipole_energy() + \
+               self.beta_induced_dipole_energy()
+
     def alpha_induced_dipole_energy(self):
         return -0.5*dot(self.local_field, dot(self._a0, self.local_field))
 
@@ -232,10 +238,6 @@ class PointDipole(object):
             self.permanent_dipole_energy() + \
             self.alpha_induced_dipole_energy() + \
             self.beta_induced_dipole_energy()
-
-    def dipole_induced(self):
-        e_field = self.local_field
-        return dot(self._a0, e_field) + 0.5*dot(dot(self._b0, e_field), e_field)
 
     def monopole_field_at(self, r):
         dr = r - self._r

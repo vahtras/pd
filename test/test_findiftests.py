@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
-from ..particles import PointDipole, line_to_dict, header_to_dict
+from ..particles import *
 from util import field_gradient
 
-class FiniteFieldTests(unittest.TestCase):
+class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def setUp(self):
         self.particle = PointDipole()
@@ -26,6 +26,7 @@ class FiniteFieldTests(unittest.TestCase):
         self.particle._a0 = random_tensor()
         gradE = field_gradient(self.particle.alpha_induced_dipole_energy)
         np.testing.assert_almost_equal(-gradE, self.particle.alpha_induced_dipole_moment())
+
     def test_finite_difference_induced_dipole_energy(self):
         self.particle._a0 = random_tensor()
         gradE = field_gradient(self.particle.alpha_induced_dipole_energy)
@@ -60,6 +61,21 @@ class FiniteFieldTests(unittest.TestCase):
         gradp = field_gradient(self.particle.dipole_moment)
         np.testing.assert_almost_equal(gradp, self.particle._a0)
 
+
+class PointDipoleListFiniteFieldTests(unittest.TestCase):
+    
+    def setUp(self):
+        self.particlelist = PointDipoleList.from_string("""AU
+2 0 0
+1 0 0 0 0
+2 0 0 1.0 0
+"""
+)
+
+    def notest_neutral_zero_energy(self):
+        E = self.particlelist.total_energy()
+        self.assertEqual(E, 0.)
+
 def random_vector():
     return np.random.random(3)
 
@@ -73,11 +89,3 @@ def random_tensor2():
     b = b + b.transpose((1, 2, 0)) +  b.transpose((2, 0, 1)) +\
         b.transpose((1, 0, 2)) + b.transpose((2, 1, 0)) + b.transpose((0, 2, 1))
     return  b
-
-
-
-        
-
-        
-
-        

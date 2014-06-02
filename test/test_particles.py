@@ -7,6 +7,12 @@ from test_applequist import H2
 
 # Other model systems
 
+DIMER_TEMPLATE = """AU
+2 0 0 0
+1 0.00000  0.00000  0.00000 0
+1 0.00000  0.00000  1.00000 0
+"""
+
 H2O_DIMER = """AU
 2 1 1 0
 1 0.00000  0.00000  0.48861 0.0 0.00000 -0.00000 -0.76539  6.61822
@@ -18,6 +24,7 @@ class PointDipoleListTest(unittest.TestCase):
     def setUp(self):
         self.h2 = PointDipoleList.from_string(H2["POTFILE"])
         self.h2o_dimer = PointDipoleList.from_string(H2O_DIMER)
+        self.dimer_template = PointDipoleList.from_string(DIMER_TEMPLATE)
         pass
 
     def test_h2o_dimer_finite_field_p(self):
@@ -116,7 +123,15 @@ class PointDipoleListTest(unittest.TestCase):
              [0., 0., 1+4.90962131*0.95899377]]
             ])
 
-        
+    def test_neutral_zero_energy(self):
+        E = self.dimer_template.total_static_energy()
+        self.assertEqual(E, 0)
+
+    def test_local_field_from_charges(self):
+        charge_dimer = self.dimer_template
+        charge_dimer.set_charges([1.0, 1.0])
+        E = charge_dimer.evaluate_field_at_atoms()
+        np.testing.assert_almost_equal(E, [[0,0,-1], [0,0,1]])
 
         
 if __name__ == "__main__":

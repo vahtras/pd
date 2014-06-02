@@ -32,6 +32,10 @@ class PointDipoleList(list):
         """Returns sum of charges of particles in the list"""
         return sum([p.charge() for p in self])
 
+    def set_charges(self, charges):
+        for p, q in zip(self, charges):
+            p.set_charge(q)
+
     def dipole_tensor(self):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to
@@ -135,6 +139,17 @@ class PointDipoleList(list):
         TR = dot(T, R)
         return TR
 
+    def total_static_energy(self):
+        """Energy of induced/static dipoles in local field"""
+        _local_field = self.evaluate_field_at_atoms()
+        print "_local_field", _local_field
+        energy = 0
+        for p, e in zip(self, _local_field):
+            p.local_field = e
+            energy += p.total_field_energy()
+        energy *= 0.5
+        return energy
+
 
 class PointDipole(object):
     r""" 
@@ -180,9 +195,19 @@ class PointDipole(object):
 
         self.fmt = kwargs.get('fmt', "%10.5f")
         self.local_field = kwargs.get('local_field', np.zeros(3))
+        self.local_potential = kwargs.get('local_potential', 0)
+
+    def coordinates(self):
+        return self._r
+
+    def set_coordinates(self, r):
+        self._r = np.array(r)
 
     def charge(self):
         return self._q
+
+    def set_charge(self, q):
+        self._q = q
 
 
     def dipole_moment(self):
@@ -224,7 +249,7 @@ class PointDipole(object):
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
-        return -self._q*dot(self.local_field, self._r)
+        return self._q*self.local_potential
 
     def dipole_energy(self):
         return self.permanent_dipole_energy() + \
@@ -250,6 +275,10 @@ class PointDipole(object):
             self.permanent_dipole_energy() + \
             self.alpha_induced_dipole_energy() + \
             self.beta_induced_dipole_energy()
+
+    def monopole_potential_at(self, r):
+        dr = norm(r - self._r)
+        return self._q/dr
 
     def monopole_field_at(self, r):
         dr = r - self._r

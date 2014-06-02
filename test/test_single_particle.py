@@ -20,12 +20,28 @@ class PointDipoleTest(unittest.TestCase):
         self.particle._b0[1, 1, 1] = 0.01
         self.particle._b0[2, 2, 2] = 0.01
         self.particle.local_field = np.array([1., 2., 3.])
+        self.particle.local_potential = 0.4
+#
+# test instance attributes
+#
 
     def test_coor(self):
-        np.testing.assert_allclose(self.particle._r, (0., 0., 0.))
+        np.testing.assert_allclose(self.particle.coordinates(), (0., 0., 0.))
+
+    def test_set_coor_tuple(self):
+        self.particle.set_coordinates((1, 2, 3))
+        np.testing.assert_equal(self.particle.coordinates(), (1, 2, 3))
+
+    def test_set_coor_list(self):
+        self.particle.set_coordinates([1, 2, 3])
+        np.testing.assert_equal(self.particle.coordinates(), (1, 2, 3))
 
     def test_charge(self):
-        self.assertEqual(self.particle._q, 1.0)
+        self.assertEqual(self.particle.charge(), 1.0)
+
+    def test_set_charge(self):
+        self.particle.set_charge(1.7)
+        self.assertEqual(self.particle.charge(), 1.7)
 
     def test_permanent_dipole(self):
         np.testing.assert_allclose(self.particle.permanent_dipole_moment(), (0.1, 0.2, 0.3))
@@ -59,9 +75,6 @@ class PointDipoleTest(unittest.TestCase):
             "1 0.00 0.00 0.00 1.00 0.05"
             )
 
-    def test_charge_energy(self):
-        self.particle._r = np.array([1., 1., 1.])
-        self.assertEqual(self.particle.charge_energy(), -6.0)
 
     def test_permanent_dipole_energy(self):
         reference_dipole_energy = -1.4
@@ -81,7 +94,7 @@ class PointDipoleTest(unittest.TestCase):
             )
 
     def test_total_field_energy(self):
-        self.assertEqual(self.particle.total_field_energy(), -1.81)
+        self.assertEqual(self.particle.total_field_energy(), -1.41)
 
 
     def test_set_local_field_raises_typeerror(self):
@@ -185,6 +198,19 @@ class PointDipoleTest(unittest.TestCase):
         pot_line = "1 0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['quadrupole'], [.1, .2, .3, .4, .5, .6])
+
+    def test_monopole_potential_at(self):
+        field_point = np.array([0., 3., 4.])
+        np.testing.assert_almost_equal(
+            self.particle.monopole_potential_at(field_point),
+            1.0/5
+            )
+
+    def test_monopole_energy(self):
+        np.testing.assert_almost_equal(
+            self.particle.charge_energy(),
+            1.0*0.4
+            )
 
     def test_monopole_field_at(self):
         field_point = np.array([0., 3., 4.])

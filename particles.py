@@ -227,6 +227,10 @@ class PointDipole(object):
 
 
     @property
+    def p(self):
+        return self.dipole_moment()
+
+    @property
     def da(self):
         return self.alpha_induced()
 
@@ -284,6 +288,10 @@ class PointDipole(object):
         dr = r - self._r
         dr2 = dot(dr, dr)
         return self._q*dr/dr2**1.5
+
+    def dipole_potential_at(self, r):
+        dr = (r - self._r)
+        return dot(self.p, dr)/norm(dr)**3
 
     def dipole_field_at(self, r):
         dr = r - self._r

@@ -65,55 +65,64 @@ class PointDipoleTest(unittest.TestCase):
 #
 # Instance methods
 #
+    def test_monopole_energy(self):
+        charge_in_potential = PointDipole(charge=1.2, local_potential=0.12)
+        np.testing.assert_almost_equal(
+            charge_in_potential.charge_energy(),
+            0.144
+            )
+
+    def test_monopole_potential_at(self):
+        charge = PointDipole(charge=1.3)
+        field_point = np.array([0., 3., 4.])
+        np.testing.assert_almost_equal(
+            charge.monopole_potential_at(field_point),
+            1.3/5
+            )
+
+    def test_monopole_field_at(self):
+        charge = PointDipole(charge=1.3)
+        field_point = np.array([0., 3., 4.])
+        np.testing.assert_almost_equal(
+            charge.monopole_field_at(field_point),
+            1.3*field_point/125
+            )
+
     def test_permanent_dipole_energy(self):
-        reference_dipole_energy = -1.4
+        dipole = PointDipole(dipole=(.1, .2, .3), local_field=(1, 2, 3))
         self.assertEqual(
-            self.particle.permanent_dipole_energy(), 
-            reference_dipole_energy
+            dipole.permanent_dipole_energy(), 
+            -1.4
             )
 
     def test_alpha_induced_dipole_energy(self):
+        dipole = PointDipole(iso_alpha=0.05, local_field=(1, 2, 3))
         self.assertAlmostEqual(
-            self.particle.alpha_induced_dipole_energy(), -0.35
+            dipole.alpha_induced_dipole_energy(), -0.35
             )
 
     def test_beta_induced_dipole_energy(self):
+        dipole = PointDipole(iso_alpha=0.05, local_field=(1, 2, 3))
         self.assertAlmostEqual(
             self.particle.beta_induced_dipole_energy(), -0.06
             )
 
-    def test_total_field_energy(self):
-        self.assertEqual(self.particle.total_field_energy(), -1.41)
-
-    def test_monopole_potential_at(self):
+    def test_dipole_potential_at(self):
+        dipole = PointDipole(dipole=(.1, .2, .3))
         field_point = np.array([0., 3., 4.])
-        np.testing.assert_almost_equal(
-            self.particle.monopole_potential_at(field_point),
-            1.0/5
-            )
-
-    def test_monopole_energy(self):
-        np.testing.assert_almost_equal(
-            self.particle.charge_energy(),
-            1.0*0.4
-            )
-
-    def test_monopole_field_at(self):
-        field_point = np.array([0., 3., 4.])
-        np.testing.assert_almost_equal(
-            self.particle.monopole_field_at(field_point),
-            1.0*field_point/5**3
-            )
+        np.testing.assert_almost_equal(dipole.dipole_potential_at(field_point), 1.8/125)
 
     def test_dipole_field_at(self):
+        dipole = PointDipole(dipole=(1, 1, 1))
         field_point = np.array([0., 3., 4.])
-        self.particle.local_field = np.zeros(3)
-        self.particle._p0 = np.ones(3)
-        ref = (3*field_point*7 - 25*np.ones(3))/5**5
+        ref = (3*field_point*7 - 25*np.ones(3))/3125
         np.testing.assert_almost_equal(
-            self.particle.dipole_field_at(field_point),
+            dipole.dipole_field_at(field_point),
             ref
             )
+
+    def test_total_field_energy(self):
+        self.assertEqual(self.particle.total_field_energy(), -1.41)
 
     def test_total_field_at(self):
         field_point = np.array([0., 3., 4.])

@@ -126,6 +126,17 @@ class PointDipoleTest(unittest.TestCase):
             ref
             )
 
+    def test_set_local_field_raises_typeerror(self):
+        def wrapper(particle, setvalue):
+            particle.local_field = setvalue
+        self.assertRaises(TypeError, wrapper, 0.0)
+
+    def test_setget_local_field(self):
+        reference_field = np.random.random((3))
+        self.particle.local_field = reference_field
+        local_field = self.particle.local_field
+        np.testing.assert_equal(reference_field, local_field)
+
 # output methods
 
     def test_str(self):
@@ -143,16 +154,6 @@ class PointDipoleTest(unittest.TestCase):
 
 
 
-    def test_set_local_field_raises_typeerror(self):
-        def wrapper(particle, setvalue):
-            particle.local_field = setvalue
-        self.assertRaises(TypeError, wrapper, 0.0)
-
-    def test_setget_local_field(self):
-        reference_field = np.random.random((3))
-        self.particle.local_field = reference_field
-        local_field = self.particle.local_field
-        np.testing.assert_equal(reference_field, local_field)
 
     def test_header_number_of_atoms(self):
         header = "2 0 0"

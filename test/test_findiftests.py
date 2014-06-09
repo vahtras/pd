@@ -65,16 +65,12 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 class PointDipoleListFiniteFieldTests(unittest.TestCase):
     
     def setUp(self):
-        self.particlelist = PointDipoleList.from_string("""AU
+        self.charges = PointDipoleList.from_string("""AU
 2 0 0
-1 0 0 0 0
-2 0 0 1.0 0
+1 0 0 0 1.0
+2 0 0 1 1.0
 """
 )
-
-    def notest_neutral_zero_energy(self):
-        E = self.particlelist.total_energy()
-        self.assertEqual(E, 0.)
 
 def random_vector():
     return np.random.random(3)

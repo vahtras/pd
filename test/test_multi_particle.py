@@ -14,6 +14,7 @@ class MultiDipoleTest(unittest.TestCase):
 """.split("\n")))
         pass
 
+
         self.h2o = PointDipoleList(iterize(
 """AU
 3 1 0 1
@@ -107,4 +108,25 @@ class MultiDipoleTest(unittest.TestCase):
     def test_verify_solver(self):
         h2 = PointDipoleList(iterize(H2["POTFILE"]))
         pass
+
+    def test_static_charge_energy(self):
+        charges = PointDipoleList.from_string("""AU
+2 0 0
+1 0 0 0 1.0
+2 0 0 1 1.0
+"""
+)
+        E = charges.static_charge_energy()
+        self.assertEqual(E, 1.)
+
+    def test_static_dipole_energy(self):
+        dipoles = PointDipoleList.from_string("""AU
+2 1 0
+1 0 0 0 0.0 .0 .0 .3
+2 0 0 1 0.0 .0 .0 .3
+"""
+)
+        E_ref = - (3*0.3**2 - 1*0.3**2)
+        E = dipoles.static_dipole_energy()
+        self.assertAlmostEqual(E, E_ref)
 

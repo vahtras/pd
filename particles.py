@@ -124,6 +124,18 @@ class PointDipoleList(list):
 
         return E_at_p
 
+    def evaluate_potential_at_atoms(self, external=None):
+        V_at_p =  [
+            array(
+                [o.potential_at(p._r) for o in self if o is not p]
+                ).sum(axis=0)
+            for p in self
+            ]
+        if external is not None:
+            V_at_p = [external + p for p in V_at_p]
+
+        return V_at_p
+
 
     def _dEi_dF(self):
         """Represents change of local field due to change in external"""
@@ -141,14 +153,33 @@ class PointDipoleList(list):
 
     def total_static_energy(self):
         """Energy of induced/static dipoles in local field"""
+        _local_potential = self.evaluate_potential_at_atoms()
         _local_field = self.evaluate_field_at_atoms()
-        print "_local_field", _local_field
+        #print "_local_field", _local_field
         energy = 0
         for p, e in zip(self, _local_field):
             p.local_field = e
             energy += p.total_field_energy()
         energy *= 0.5
         return energy
+
+    def static_charge_energy(self):
+        _local_potential = self.evaluate_potential_at_atoms()
+        _energy = 0
+        for p, V in zip(self, _local_potential):
+            p.local_potential = V
+            _energy += p.charge_energy()
+        _energy *= 0.5
+        return _energy
+
+    def static_dipole_energy(self):
+        _local_field = self.evaluate_field_at_atoms()
+        _energy = 0
+        for p, E in zip(self, _local_field):
+            p.local_field = E
+            _energy += p.dipole_energy()
+        _energy *= 0.5
+        return _energy
 
 
 class PointDipole(object):
@@ -170,6 +201,7 @@ class PointDipole(object):
 
         variable:
             local_field
+            local_potential
         
         derived quantities 
         
@@ -349,6 +381,10 @@ class PointDipole(object):
         dr = r - self._r
         dr2 = dot(dr, dr)
         return self._q*dr/dr2**1.5
+
+    def potential_at(self, r):
+        print self.monopole_potential_at(r) + self.dipole_potential_at(r)
+        return self.monopole_potential_at(r) + self.dipole_potential_at(r)
 
     def dipole_potential_at(self, r):
         dr = (r - self._r)

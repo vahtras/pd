@@ -153,7 +153,7 @@ class PointDipoleList(list):
 
 class PointDipole(object):
     r""" 
-    A hyperpolarizable dipole object with dipole moment
+    A hyperpolarizable dipole object with charge :math:`q` and dipole moment
 
     .. math::
         \bar{p} = \bar{p}^0 + \bar{\bar\alpha}\cdot\bar{E} + \frac12 \bar{\bar\beta}:\bar{E}\bar{E}
@@ -198,15 +198,45 @@ class PointDipole(object):
         self.local_potential = kwargs.get('local_potential', 0)
 
     def coordinates(self):
+        r"""
+        get Cartesian coordinates of particle
+
+        .. math::
+            \bar{r} = (x, y, z)
+
+        :returns: ``np.array((x, y, z))``
+        """
         return self._r
 
     def set_coordinates(self, r):
+        r"""Set coordinates
+
+        Arguments:
+
+        :param r: coordinates :math:`(x, y, z)`
+        :type r: `arraylike`
+
+        :returns: ``None``
+        """
+        
         self._r = np.array(r)
 
     def charge(self):
+        """get particle charge
+        
+        :returns: charge :math:`q`
+        :rtype: `float`
+        """
+
         return self._q
 
     def set_charge(self, q):
+        """set particle charge
+
+        :param q: charge
+        :type q: float
+        """
+
         self._q = q
 
 
@@ -253,23 +283,54 @@ class PointDipole(object):
         return "1" + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
+        r"""Electrostatic energy of charge in local potential
+
+        :returns: energy :math:`E=qV(\bar{r})`
+        :rtype: float
+        """
+
         return self._q*self.local_potential
 
     def dipole_energy(self):
+        """Return total dipole energy in local field
+
+        :returns: :math:`E_{dip} = E_{perm} + E_{ind}`
+        """
+
         return self.permanent_dipole_energy() + \
             self.induced_dipole_energy()
 
     def permanent_dipole_energy(self):
+        r"""Returns permanent dipole energy in local field
+
+        :returns: :math:`E_{perm} = -\bar{p}\cdot\bar{E}(\bar{r})`
+        :rtype: float
+        """
         return -dot(self._p0, self.local_field)
 
     def induced_dipole_energy(self):
+        r"""Total induced dipole energy
+        
+        :returns: :math:`E_\alpha + E_\beta`
+        :rtype: float
+        """
+
         return self.alpha_induced_dipole_energy() + \
                self.beta_induced_dipole_energy()
 
     def alpha_induced_dipole_energy(self):
+        r""":math:`\alpha`-induced dipole energy
+        
+        :returns: :math:`E_\alpha = -\frac 12 \bar{E}\cdot\bar{\bar\alpha}\cdot\bar{E}`
+        :rtype: float
+        """
         return -0.5*dot(self.local_field, dot(self._a0, self.local_field))
 
     def beta_induced_dipole_energy(self):
+        r""":math:`\beta`-induced dipole energy
+
+        :returns: :math:`E_\beta = -\frac16 \bar{E}\cdot(\bar{\bar{\bar\beta}}\cdot\bar{E})\cdot\bar{E}
+        """
         e_field = self.local_field
         return -dot(e_field, dot(dot(self._b0, e_field), e_field))/6
 

@@ -21,6 +21,8 @@ class PointDipoleTest(unittest.TestCase):
         self.particle._b0[2, 2, 2] = 0.01
         self.particle.local_field = np.array([1., 2., 3.])
         self.particle.local_potential = 0.4
+        self.beta = np.zeros((3, 3, 3))
+        self.beta[0, 0, 0] = self.beta[1, 1, 1] = self.beta[2, 2, 2] = 0.01
 #
 # test instance attributes
 #
@@ -107,6 +109,17 @@ class PointDipoleTest(unittest.TestCase):
             self.particle.beta_induced_dipole_energy(), -0.06
             )
 
+    def test_total_field_energy(self):
+        dipole = PointDipole(
+            charge=1.2, 
+            local_potential=0.12,
+            dipole=(1, 2, 3),
+            iso_alpha=0.05,
+            beta=self.beta
+            )
+            
+        self.assertEqual(self.particle.total_field_energy(), -1.41)
+
     def test_dipole_potential_at(self):
         dipole = PointDipole(dipole=(.1, .2, .3))
         field_point = np.array([0., 3., 4.])
@@ -120,9 +133,6 @@ class PointDipoleTest(unittest.TestCase):
             dipole.dipole_field_at(field_point),
             ref
             )
-
-    def test_total_field_energy(self):
-        self.assertEqual(self.particle.total_field_energy(), -1.41)
 
     def test_total_field_at(self):
         field_point = np.array([0., 3., 4.])

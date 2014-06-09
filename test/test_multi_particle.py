@@ -126,7 +126,16 @@ class MultiDipoleTest(unittest.TestCase):
 2 0 0 1 0.0 .0 .0 .3
 """
 )
-        E_ref = - (3*0.3**2 - 1*0.3**2)
-        E = dipoles.static_dipole_energy()
+
+    def test_static_charge_dipole_energy(self):
+        charged_dipoles = PointDipoleList.from_string("""AU
+2 1 0
+1 0 0 0 4.0 .0 .0 .0
+2 0 0 1 0.0 .1 .2 .3
+"""
+)
+
+        E_ref = - 4.0*0.3
+        E = charged_dipoles.static_total_energy()
         self.assertAlmostEqual(E, E_ref)
 

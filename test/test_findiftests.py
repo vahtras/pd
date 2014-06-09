@@ -72,6 +72,22 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 """
 )
 
+        self.h2o_dimer=PointDipoleList.from_string("""AU
+2 1 1 0
+1 0.00000  0.00000  0.48861 0.0 0.00000 -0.00000 -0.76539  6.61822
+1 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
+""")
+
+    def test_finite_difference_polarizable_dimer(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        eps = .001
+        self.h2o_dimer.solve_scf_for_external((0,0,eps/2))
+        p0a = self.h2o_dimer[0].induced_dipole_moment()
+        self.h2o_dimer.solve_scf_for_external((0,0,-eps/2))
+        p0b = self.h2o_dimer[0].induced_dipole_moment()
+        dp0_dF = (p0a - p0b)/eps
+        self.assertAlmostEqual(dp0_dF[2], alphas[0][2, 2], places=3)
+
 def random_vector():
     return np.random.random(3)
 

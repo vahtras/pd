@@ -24,6 +24,22 @@ class MultiDipoleTest(unittest.TestCase):
 2  0.000  0.000  0.000  0.000  0.000 0.000  0.000 0.000"""
         ))
 
+
+    def test_empty_list(self):
+        empty_list = PointDipoleList()
+        self.assertEqual(len(empty_list), 0)
+
+    def test_append_list(self):
+        initial_list = PointDipoleList()
+        initial_list.append(PointDipole())
+        self.assertEqual(len(initial_list), 1)
+
+    def test_append_wroing(self):
+        initial_list = PointDipoleList()
+        def myappend(input_list, arg):
+            input_list.append(arg)
+        self.assertRaises(TypeError, myappend, initial_list, None)
+        
     def test_he2(self):
         alpha_he2 = self.He2.alpha()
         ref_alpha = np.diag(

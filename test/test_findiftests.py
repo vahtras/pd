@@ -98,6 +98,10 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dp0_dF = (p0a - p0b)/eps
         self.assertAlmostEqual(dp0_dF[0], alphas[0][0, 0], places=3)
 
+    def test_local_field_vs_external_field(self):
+        pass
+        
+
 def random_vector():
     return np.random.random(3)
 

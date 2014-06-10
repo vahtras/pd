@@ -10,16 +10,17 @@ BETA_ZERO = np.zeros((3, 3, 3))
 class PointDipoleList(list):
     """A list class of ``PointDipole`` objects"""
 
-    def __init__(self, pf):
+    def __init__(self, pf=None):
         """Class constructor 
         pf: potential file object (or iterator)
         """
-        units = pf.next()
-        header_dict = header_to_dict(pf.next())
-        for i, line in enumerate(pf):
-            if i == header_dict["#atoms"]: break
-            line_dict = line_to_dict(header_dict, line)
-            self.append(PointDipole(**line_dict))
+        if pf is not None:
+            units = pf.next()
+            header_dict = header_to_dict(pf.next())
+            for i, line in enumerate(pf):
+                if i == header_dict["#atoms"]: break
+                line_dict = line_to_dict(header_dict, line)
+                self.append(PointDipole(**line_dict))
 
     @staticmethod
     def from_string(potential):
@@ -28,7 +29,14 @@ class PointDipoleList(list):
         """
         return PointDipoleList(iter(potential.split("\n")))
         
-    def charge(self):
+    def append(self, arg):
+        """Overriding superclass list append: check if arg is PointDipole"""
+        if type(arg) != PointDipole:
+            raise TypeError
+        super(PointDipoleList, self).append(arg)
+
+
+    def total_charge(self):
         """Returns sum of charges of particles in the list"""
         return sum([p.charge() for p in self])
 

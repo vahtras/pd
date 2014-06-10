@@ -219,6 +219,19 @@ class PointDipole(object):
         self.local_field = kwargs.get('local_field', np.zeros(3))
         self.local_potential = kwargs.get('local_potential', 0)
 
+
+    @property
+    def p(self):
+        return self.dipole_moment()
+
+    @property
+    def da(self):
+        return self.alpha_induced()
+
+    @property
+    def a(self):
+        return self._a0 + self.da
+
     def coordinates(self):
         r"""
         get Cartesian coordinates of particle
@@ -276,19 +289,6 @@ class PointDipole(object):
 
     def beta_induced_dipole_moment(self):
         return 0.5*dot(dot(self._b0, self.local_field), self.local_field)
-
-
-    @property
-    def p(self):
-        return self.dipole_moment()
-
-    @property
-    def da(self):
-        return self.alpha_induced()
-
-    @property
-    def a(self):
-        return self._a0 + self.da
 
     def alpha_induced(self):
         return dot(self._b0, self.local_field)

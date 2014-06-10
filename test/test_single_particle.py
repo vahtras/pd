@@ -56,7 +56,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_alpha_induced(self):
         np.testing.assert_allclose(
-            self.particle.da, np.diag([0.01, 0.02, 0.03])
+            self.particle.induced_polarizability(), np.diag([0.01, 0.02, 0.03])
             )
 
     def test_total_alpha(self):
@@ -78,7 +78,7 @@ class PointDipoleTest(unittest.TestCase):
             beta=self.beta
             )
             
-        self.assertEqual(self.particle.total_field_energy(), -1.41)
+        self.assertEqual(self.particle.total_energy(), -1.41)
 
     def test_monopole_energy(self):
         charge_in_potential = PointDipole(charge=1.2, local_potential=0.12)

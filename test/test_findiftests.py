@@ -10,7 +10,7 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def test_finite_difference_energy(self):
 #zero
-        gradE = field_gradient(self.particle.total_field_energy)
+        gradE = field_gradient(self.particle.total_energy)
         dipole = self.particle._p0 + \
            self.particle.induced_dipole_moment()
 

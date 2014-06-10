@@ -168,7 +168,7 @@ class PointDipoleList(list):
         for p, E, V in zip(self, _local_field, _local_potential):
             p.local_field = E
             p.local_potential = V
-            energy += p.total_field_energy()
+            energy += p.total_energy()
         energy *= 0.5
         return energy
 
@@ -225,12 +225,8 @@ class PointDipole(object):
         return self.dipole_moment()
 
     @property
-    def da(self):
-        return self.alpha_induced()
-
-    @property
     def a(self):
-        return self._a0 + self.da
+        return self._a0 + self.induced_polarizability()
 
     def coordinates(self):
         r"""
@@ -290,7 +286,7 @@ class PointDipole(object):
     def beta_induced_dipole_moment(self):
         return 0.5*dot(dot(self._b0, self.local_field), self.local_field)
 
-    def alpha_induced(self):
+    def induced_polarizability(self):
         return dot(self._b0, self.local_field)
             
 
@@ -356,7 +352,7 @@ class PointDipole(object):
         e_field = self.local_field
         return -dot(e_field, dot(dot(self._b0, e_field), e_field))/6
 
-    def total_field_energy(self):
+    def total_energy(self):
         return \
             self.charge_energy() + \
             self.permanent_dipole_energy() + \

@@ -52,7 +52,7 @@ class MultiDipoleTest(unittest.TestCase):
 
     def test_h2o_charge(self):
         #round-off error in this example
-        self.assertAlmostEqual(self.h2o.charge(), 0., places=2) 
+        self.assertAlmostEqual(self.h2o.total_charge(), 0., places=2) 
 
     def test_h2o_dipole_tensor_zero(self):
         Tij = self.h2o.dipole_tensor()
@@ -132,7 +132,7 @@ class MultiDipoleTest(unittest.TestCase):
 2 0 0 1 1.0
 """
 )
-        E = charges.static_charge_energy()
+        E = charges.total_energy()
         self.assertEqual(E, 1.)
 
     def test_static_dipole_energy(self):
@@ -152,6 +152,6 @@ class MultiDipoleTest(unittest.TestCase):
 )
 
         E_ref = - 4.0*0.3
-        E = charged_dipoles.static_total_energy()
+        E = charged_dipoles.total_energy()
         self.assertAlmostEqual(E, E_ref)
 

@@ -124,7 +124,7 @@ class PointDipoleListTest(unittest.TestCase):
             ])
 
     def test_neutral_zero_energy(self):
-        E = self.dimer_template.static_total_energy()
+        E = self.dimer_template.total_energy()
         self.assertEqual(E, 0)
 
     def test_local_field_from_charges(self):

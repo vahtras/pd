@@ -91,7 +91,7 @@ class PointDipoleListTest(unittest.TestCase):
         self.h2.solve_scf_for_external(E_external, max_it = 100)
         np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=6)
         
-    def test_evaluate_local_field_at_atoms(self):
+    def test_evaluate_field_at_atoms(self):
         E_external = np.array([0., 0., 1.,])
         E_local = self.h2.evaluate_field_at_atoms()
         np.testing.assert_almost_equal(E_local, [[0, 0, 0], [0, 0, 0]])
@@ -127,7 +127,7 @@ class PointDipoleListTest(unittest.TestCase):
         E = self.dimer_template.total_energy()
         self.assertEqual(E, 0)
 
-    def test_local_field_from_charges(self):
+    def test_field_from_charges(self):
         charge_dimer = self.dimer_template
         charge_dimer.set_charges([1.0, 1.0])
         E = charge_dimer.evaluate_field_at_atoms()

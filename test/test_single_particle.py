@@ -19,7 +19,7 @@ class PointDipoleTest(unittest.TestCase):
         self.particle._b0[0, 0, 0] = 0.01
         self.particle._b0[1, 1, 1] = 0.01
         self.particle._b0[2, 2, 2] = 0.01
-        self.particle.local_field = np.array([1., 2., 3.])
+        self.particle.set_local_field([1., 2., 3.])
         self.particle.local_potential = 0.4
         self.beta = np.zeros((3, 3, 3))
         self.beta[0, 0, 0] = self.beta[1, 1, 1] = self.beta[2, 2, 2] = 0.01
@@ -150,7 +150,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_total_field_at(self):
         field_point = np.array([0., 3., 4.])
-        self.particle.local_field = np.zeros(3)
+        self.particle.set_local_field((0,0,0))
         self.particle._p0 = np.ones(3)
         ref = (3*field_point*7 - 25*np.ones(3))/5**5 +\
             1.0*field_point/5**3
@@ -159,16 +159,16 @@ class PointDipoleTest(unittest.TestCase):
             ref
             )
 
-    def test_set_local_field_raises_typeerror(self):
+    def test_set__field_raises_typeerror(self):
         def wrapper(particle, setvalue):
-            particle.local_field = setvalue
+            particle.set_local_field(setvalue)
         self.assertRaises(TypeError, wrapper, 0.0)
 
-    def test_setget_local_field(self):
+    def test_setget__field(self):
         reference_field = np.random.random((3))
-        self.particle.local_field = reference_field
-        local_field = self.particle.local_field
-        np.testing.assert_equal(reference_field, local_field)
+        self.particle.set_local_field(reference_field)
+        _field = self.particle.local_field()
+        np.testing.assert_equal(reference_field, _field)
 
 # output methods
 

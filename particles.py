@@ -113,7 +113,7 @@ class PointDipoleList(list):
         for i in range(max_it):
             E_at_p =  self.evaluate_field_at_atoms(external=E)
             for p, Ep in zip(self, E_at_p):
-                p.local_field = Ep
+                p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
             if residual < threshold:
                 return i, residual
@@ -162,11 +162,10 @@ class PointDipoleList(list):
     def total_energy(self):
         """Energy of induced/static dipoles in local field"""
         _local_potential = self.evaluate_potential_at_atoms()
-        _local_field = self.evaluate_field_at_atoms()
-        #print "_local_field", _local_field
+        _fields = self.evaluate_field_at_atoms()
         energy = 0
-        for p, E, V in zip(self, _local_field, _local_potential):
-            p.local_field = E
+        for p, E, V in zip(self, _fields, _local_potential):
+            p.set_local_field(E)
             p.local_potential = V
             energy += p.total_energy()
         energy *= 0.5
@@ -190,7 +189,7 @@ class PointDipole(object):
             b: hyperpolarizability tensor
 
         variable:
-            local_field
+            _field
             local_potential
         
         derived quantities 
@@ -216,7 +215,7 @@ class PointDipole(object):
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
-        self.local_field = kwargs.get('local_field', np.zeros(3))
+        self.set_local_field(kwargs.get('local_field', np.zeros(3)))
         self.local_potential = kwargs.get('local_potential', 0)
 
 
@@ -252,6 +251,12 @@ class PointDipole(object):
         
         self._r = np.array(r)
 
+    def local_field(self):
+        return self._field
+
+    def set_local_field(self, args):
+        self._field = np.array(args)
+
     def charge(self):
         """get particle charge
         
@@ -281,13 +286,13 @@ class PointDipole(object):
         return self.alpha_induced_dipole_moment() + self.beta_induced_dipole_moment()
 
     def alpha_induced_dipole_moment(self):
-        return dot(self._a0, self.local_field) 
+        return dot(self._a0, self.local_field()) 
 
     def beta_induced_dipole_moment(self):
-        return 0.5*dot(dot(self._b0, self.local_field), self.local_field)
+        return 0.5*dot(dot(self._b0, self.local_field()), self.local_field())
 
     def induced_polarizability(self):
-        return dot(self._b0, self.local_field)
+        return dot(self._b0, self.local_field())
             
 
     def __str__(self):
@@ -324,7 +329,7 @@ class PointDipole(object):
         :returns: :math:`E_{perm} = -\bar{p}\cdot\bar{E}(\bar{r})`
         :rtype: float
         """
-        return -dot(self._p0, self.local_field)
+        return -dot(self._p0, self.local_field())
 
     def induced_dipole_energy(self):
         r"""Total induced dipole energy
@@ -342,14 +347,14 @@ class PointDipole(object):
         :returns: :math:`E_\alpha = -\frac 12 \bar{E}\cdot\bar{\bar\alpha}\cdot\bar{E}`
         :rtype: float
         """
-        return -0.5*dot(self.local_field, dot(self._a0, self.local_field))
+        return -0.5*dot(self.local_field(), dot(self._a0, self.local_field()))
 
     def beta_induced_dipole_energy(self):
         r""":math:`\beta`-induced dipole energy
 
         :returns: :math:`E_\beta = -\frac16 \bar{E}\cdot(\bar{\bar{\bar\beta}}\cdot\bar{E})\cdot\bar{E}
         """
-        e_field = self.local_field
+        e_field = self.local_field()
         return -dot(e_field, dot(dot(self._b0, e_field), e_field))/6
 
     def total_energy(self):

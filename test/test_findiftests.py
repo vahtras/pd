@@ -50,9 +50,9 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def test_finite_difference_beta_induced_dipole_moment(self):
         self.particle._b0 = random_tensor2()
-        self.particle.local_field = random_vector()
+        self.particle.set_local_field(random_vector())
         gradp = field_gradient(self.particle.beta_induced_dipole_moment)
-        ref = np.dot(self.particle._b0, self.particle.local_field)
+        ref = np.dot(self.particle._b0, self.particle.local_field())
         np.testing.assert_almost_equal(gradp, ref)
 
     def test_finite_difference_total_dipole_moment(self):
@@ -98,7 +98,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dp0_dF = (p0a - p0b)/eps
         self.assertAlmostEqual(dp0_dF[0], alphas[0][0, 0], places=3)
 
-    def test_local_field_vs_external_field(self):
+    def test__field_vs_external_field(self):
         pass
         
 

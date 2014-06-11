@@ -367,21 +367,24 @@ class PointDipole(object):
             self.alpha_induced_dipole_energy() + \
             self.beta_induced_dipole_energy()
 
+    def potential_at(self, r):
+        return self.monopole_potential_at(r) + self.dipole_potential_at(r)
+
     def monopole_potential_at(self, r):
         dr = norm(r - self._r)
         return self._q/dr
+
+    def dipole_potential_at(self, r):
+        dr = (r - self._r)
+        return dot(self.p, dr)/norm(dr)**3
+
+    def field_at(self, r):
+        return self.monopole_field_at(r) + self.dipole_field_at(r)
 
     def monopole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
         return self._q*dr/dr2**1.5
-
-    def potential_at(self, r):
-        return self.monopole_potential_at(r) + self.dipole_potential_at(r)
-
-    def dipole_potential_at(self, r):
-        dr = (r - self._r)
-        return dot(self.p, dr)/norm(dr)**3
 
     def dipole_field_at(self, r):
         dr = r - self._r
@@ -389,8 +392,7 @@ class PointDipole(object):
         p = self.dipole_moment()
         return (3*dr*dot(dr, p) - dr2*p)/dr2**2.5
 
-    def field_at(self, r):
-        return self.monopole_field_at(r) + self.dipole_field_at(r)
+
 
 
 def header_to_dict(header):

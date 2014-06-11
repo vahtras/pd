@@ -161,12 +161,12 @@ class PointDipoleList(list):
 
     def total_energy(self):
         """Energy of induced/static dipoles in local field"""
-        _local_potential = self.evaluate_potential_at_atoms()
+        _potentials = self.evaluate_potential_at_atoms()
         _fields = self.evaluate_field_at_atoms()
         energy = 0
-        for p, E, V in zip(self, _fields, _local_potential):
+        for p, E, V in zip(self, _fields, _potentials):
             p.set_local_field(E)
-            p.local_potential = V
+            p.set_local_potential(V)
             energy += p.total_energy()
         energy *= 0.5
         return energy
@@ -190,7 +190,7 @@ class PointDipole(object):
 
         variable:
             _field
-            local_potential
+            _potential
         
         derived quantities 
         
@@ -216,7 +216,7 @@ class PointDipole(object):
 
         self.fmt = kwargs.get('fmt', "%10.5f")
         self.set_local_field(kwargs.get('local_field', np.zeros(3)))
-        self.local_potential = kwargs.get('local_potential', 0)
+        self._potential = kwargs.get('local_potential', 0)
 
 
     @property
@@ -256,6 +256,9 @@ class PointDipole(object):
 
     def set_local_field(self, args):
         self._field = np.array(args)
+
+    def set_local_potential(self, args):
+        self._potential = float(args)
 
     def charge(self):
         """get particle charge
@@ -312,7 +315,7 @@ class PointDipole(object):
         :rtype: float
         """
 
-        return self._q*self.local_potential
+        return self._q*self._potential
 
     def dipole_energy(self):
         """Return total dipole energy in local field

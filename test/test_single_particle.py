@@ -20,7 +20,7 @@ class PointDipoleTest(unittest.TestCase):
         self.particle._b0[1, 1, 1] = 0.01
         self.particle._b0[2, 2, 2] = 0.01
         self.particle.set_local_field([1., 2., 3.])
-        self.particle.local_potential = 0.4
+        self.particle.set_local_potential(0.4)
         self.beta = np.zeros((3, 3, 3))
         self.beta[0, 0, 0] = self.beta[1, 1, 1] = self.beta[2, 2, 2] = 0.01
 #

@@ -159,14 +159,17 @@ class PointDipoleList(list):
         TR = dot(T, R)
         return TR
 
-    def total_energy(self):
-        """Energy of induced/static dipoles in local field"""
+    def update_local_fields(self):
         _potentials = self.evaluate_potential_at_atoms()
         _fields = self.evaluate_field_at_atoms()
-        energy = 0
         for p, E, V in zip(self, _fields, _potentials):
             p.set_local_field(E)
             p.set_local_potential(V)
+
+    def total_energy(self):
+        """Energy of induced/static dipoles in local field"""
+        energy = 0
+        for p in self:
             energy += p.total_energy()
         energy *= 0.5
         return energy

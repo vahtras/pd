@@ -132,6 +132,7 @@ class MultiDipoleTest(unittest.TestCase):
 2 0 0 1 1.0
 """
 )
+        charges.update_local_fields()
         E = charges.total_energy()
         self.assertEqual(E, 1.)
 
@@ -152,6 +153,7 @@ class MultiDipoleTest(unittest.TestCase):
 )
 
         E_ref = - 4.0*0.3
+        charged_dipoles.update_local_fields()
         E = charged_dipoles.total_energy()
         self.assertAlmostEqual(E, E_ref)
 

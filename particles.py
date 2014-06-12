@@ -245,16 +245,23 @@ class PointDipole(object):
         self._r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:
-            self._q = kwargs['charge']
+            self._q = float(kwargs['charge'])
         else:
-            self._q = 0
+            self._q = 0.0
 
         if "dipole" in kwargs:
             self._p0 = array(kwargs["dipole"])
         else:
             self._p0 = ORIGO
-        self._a0 = kwargs.get("iso_alpha", 0)*I_3
-        self._b0 = kwargs.get("beta", BETA_ZERO)
+
+        if "alpha" in kwargs:
+            self._a0 = array(kwargs["alpha"])
+            print self._a0.shape
+            assert self._a0.shape == (3,3)
+        else:
+            self._a0 = kwargs.get("iso_alpha", 0)*I_3
+
+        self._b0 = array(kwargs.get("beta", BETA_ZERO))
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -495,8 +502,6 @@ def line_to_dict(header_dict, line):
     if full_pol:
         nextend = nextstart + 6
         line_dict['alpha'] = line_data[nextstart: nextend]
-    else:
-        line_dict['alpha'] = np.zeros(6)
 
     if hyp_pol:
         nextend = nextstart + 18

@@ -78,6 +78,48 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 1 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
 """)
 
+        self.h2o_monomer=PointDipoleList.from_string("""AU
+1 1 1 0
+1 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
+""")
+
+        self.h2o_monomer_hyp=PointDipoleList()
+
+        self.h2o_monomer_hyp.append(
+            PointDipole(
+                coordinates=(0, 0, 0.48861),
+                charge=0,
+                dipole=(0, 0, -0.81457755),
+                alpha=(
+                    (7.21103625278, 0, 0), 
+                    (0, 3.03446384360, 0),
+                    (0, 0, 5.22710462524)
+                ),
+                beta=(
+                    (
+                        (0, 0, -18.48299918),
+                        (0, 0, 0),
+                        (-18.48299918,0,0)
+                    ),
+                    (
+                        (0, 0, 0),
+                        (0, 0, -2.33649395),
+                        (0, -2.33649395, 0)
+                    ),
+                    (
+                        (-18.48299798, 0, 0),
+                        (0, -2.33649400, 0),
+                        (0, 0, -11.17349291)
+                    )
+                )
+            )
+        )
+
+    def test_finite_difference_polarizable_monomer_z(self):
+        alphas = self.h2o_monomer.solve_Applequist_equation()
+        dp0_dF = self.h2o_monomer.field_gradient_of_method(self.h2o_monomer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
     def test_finite_difference_polarizable_dimer_z(self):
         alphas = self.h2o_dimer.solve_Applequist_equation()
         dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
@@ -93,9 +135,20 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
         self.assertAlmostEqual(dp0_dF[0, 1, 1], alphas[0][1, 1], places=3)
 
+    def test_finite_difference_polarizable_dimer_z(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
     def test__field_vs_external_field(self):
         pass
         
+    def notest_finite_difference_hyperpolarizable_monomer_z(self):
+        print self.h2o_monomer_hyp[0]._a0
+        print self.h2o_monomer_hyp[0]._b0
+        alphas = self.h2o_monomer_hyp.solve_Applequist_equation()
+        dp0_dF = self.h2o_monomer_hyp.field_gradient_of_method(self.h2o_monomer_hyp.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
 
 def random_vector():
     return np.random.random(3)

@@ -90,13 +90,13 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
     def test_finite_difference_polarizable_dimer_x(self):
         alphas = self.h2o_dimer.solve_Applequist_equation()
-        eps = .001
-        self.h2o_dimer.solve_scf_for_external((eps/2,0,0))
-        p0a = self.h2o_dimer[0].induced_dipole_moment()
-        self.h2o_dimer.solve_scf_for_external((-eps/2,0,0))
-        p0b = self.h2o_dimer[0].induced_dipole_moment()
-        dp0_dF = (p0a - p0b)/eps
-        self.assertAlmostEqual(dp0_dF[0], alphas[0][0, 0], places=3)
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 0, 0], alphas[0][0, 0], places=3)
+
+    def test_finite_difference_polarizable_dimer_y(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 1, 1], alphas[0][1, 1], places=3)
 
     def test__field_vs_external_field(self):
         pass

@@ -174,6 +174,34 @@ class PointDipoleList(list):
         energy *= 0.5
         return energy
 
+    def induced_dipole_moment(self):
+        return np.array([p.induced_dipole_moment() for p in self])
+
+    def field_gradient_of_method(self, method):
+        from test.util import *
+        self.solve_scf_for_external(ex)
+        fx = method()
+        self.solve_scf_for_external(-ex)
+        fx -= method()
+        fx /= EPSILON
+
+        self.solve_scf_for_external(ey)
+        fy = method()
+        self.solve_scf_for_external(-ey)
+        fy -= method()
+        fy /= EPSILON
+
+        self.solve_scf_for_external(ez)
+        fz = method()
+        self.solve_scf_for_external(-ez)
+        fz -= method()
+        fz /= EPSILON
+
+        #transpose to put field index last
+        inrank = len(fx.shape)
+        cycle = tuple(range(1, inrank+1)) + (0,)
+        return np.array((fx, fy, fz)).transpose(cycle)
+
 class PointDipole(object):
     r""" 
     A hyperpolarizable dipole object with charge :math:`q` and dipole moment

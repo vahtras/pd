@@ -115,6 +115,68 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
             )
         )
 
+        self.h2o_dimer_hyp=PointDipoleList()
+
+        self.h2o_dimer_hyp.append(
+            PointDipole(
+                coordinates=(0, 0, 0.48861),
+                charge=0,
+                dipole=(0, 0, -0.81457755),
+                alpha=(
+                    (7.21103625278, 0, 0), 
+                    (0, 3.03446384360, 0),
+                    (0, 0, 5.22710462524)
+                ),
+                beta=(
+                    (
+                        (0, 0, -18.48299918),
+                        (0, 0, 0),
+                        (-18.48299918,0,0)
+                    ),
+                    (
+                        (0, 0, 0),
+                        (0, 0, -2.33649395),
+                        (0, -2.33649395, 0)
+                    ),
+                    (
+                        (-18.48299798, 0, 0),
+                        (0, -2.33649400, 0),
+                        (0, 0, -11.17349291)
+                    )
+                )
+            )
+        )
+
+        self.h2o_dimer_hyp.append(
+            PointDipole(
+                coordinates=(0, 0, 5.48861),
+                charge=0,
+                dipole=(0, 0, -0.81457755),
+                alpha=(
+                    (7.21103625278, 0, 0), 
+                    (0, 3.03446384360, 0),
+                    (0, 0, 5.22710462524)
+                ),
+                beta=(
+                    (
+                        (0, 0, -18.48299918),
+                        (0, 0, 0),
+                        (-18.48299918,0,0)
+                    ),
+                    (
+                        (0, 0, 0),
+                        (0, 0, -2.33649395),
+                        (0, -2.33649395, 0)
+                    ),
+                    (
+                        (-18.48299798, 0, 0),
+                        (0, -2.33649400, 0),
+                        (0, 0, -11.17349291)
+                    )
+                )
+            )
+        )
+
     def test_finite_difference_polarizable_monomer_z(self):
         alphas = self.h2o_monomer.solve_Applequist_equation()
         dp0_dF = self.h2o_monomer.field_gradient_of_method(self.h2o_monomer.induced_dipole_moment)
@@ -148,6 +210,13 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         print self.h2o_monomer_hyp[0]._b0
         alphas = self.h2o_monomer_hyp.solve_Applequist_equation()
         dp0_dF = self.h2o_monomer_hyp.field_gradient_of_method(self.h2o_monomer_hyp.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
+    def test_finite_difference_hyperpolarizable_dimer_z(self):
+        print self.h2o_dimer_hyp[0]._a0
+        print self.h2o_dimer_hyp[0]._b0
+        alphas = self.h2o_dimer_hyp.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer_hyp.field_gradient_of_method(self.h2o_dimer_hyp.induced_dipole_moment)
         self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
 
 def random_vector():

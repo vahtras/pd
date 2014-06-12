@@ -86,6 +86,7 @@ class PointDipoleList(list):
     def solve_Applequist_equation(self):
         # Solve the response equaitons
         n = len(self)
+        self.solve_scf_for_external(ORIGO)
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
@@ -93,7 +94,7 @@ class PointDipoleList(list):
 
     def form_Applequist_rhs(self):
         n = len(self)
-        alphas = [pd._a0 for pd in self]
+        alphas = [pd.a for pd in self]
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
@@ -101,7 +102,7 @@ class PointDipoleList(list):
         n = len(self)
         aT = self.dipole_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij
-        alphas = [pd._a0 for pd in self]
+        alphas = [pd.a for pd in self]
         for i, a in enumerate(alphas):
             aT[i, :, :] = dot(a, aT[i, :, :])
         #matrix (1 - alpha*T)
@@ -178,7 +179,7 @@ class PointDipoleList(list):
         return np.array([p.induced_dipole_moment() for p in self])
 
     def field_gradient_of_method(self, method):
-        from test.util import *
+        from test.util import ex, ey, ez, EPSILON
 
         self.clear_fields()
         self.solve_scf_for_external(ex)

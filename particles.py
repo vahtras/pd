@@ -131,7 +131,7 @@ class PointDipoleList(list):
         if external is not None:
             E_at_p = [external + p for p in E_at_p]
 
-        return E_at_p
+        return array(E_at_p)
 
     def evaluate_potential_at_atoms(self, external=None):
         V_at_p =  [
@@ -159,6 +159,13 @@ class PointDipoleList(list):
         R = self.solve_Applequist_equation().reshape(n*3, 3)
         TR = dot(T, R)
         return TR
+
+    def alphas_as_matrix(self):
+        n = len(self)
+        M = np.zeros((n, 3, n, 3))
+        for i, p in enumerate(self):
+            M[i, :, i, :] = p.a[:, :]
+        return M.reshape((n*3, n*3))
 
     def update_local_fields(self):
         _potentials = self.evaluate_potential_at_atoms()

@@ -220,9 +220,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
     def test_finite_difference_local_fields(self):
         molecule = self.h2o_dimer_hyp
         molecule.solve_scf_for_external(ORIGO)
-        #test_this =  molecule._dEi_dF()
         test_this =  molecule._dEi_dF_indirect()
-        #test_this =  molecule.dEi_dF()
         method = molecule.evaluate_field_at_atoms
         dEi_dF = molecule.field_gradient_of_method(method)
         np.testing.assert_almost_equal(test_this, dEi_dF, decimal=3)

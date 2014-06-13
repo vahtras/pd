@@ -188,34 +188,25 @@ class PointDipoleList(list):
     def field_gradient_of_method(self, method):
         from test.util import ex, ey, ez, EPSILON
 
-        self.clear_fields()
-        self.solve_scf_for_external(ex)
-        fx = method()
-        self.clear_fields()
-        self.solve_scf_for_external(-ex)
-        fx -= method()
-        fx /= EPSILON
-
-        self.clear_fields()
-        self.solve_scf_for_external(ey)
-        fy = method()
-        self.clear_fields()
-        self.solve_scf_for_external(-ey)
-        fy -= method()
-        fy /= EPSILON
-
-        self.clear_fields()
-        self.solve_scf_for_external(ez)
-        fz = method()
-        self.clear_fields()
-        self.solve_scf_for_external(-ez)
-        fz -= method()
-        fz /= EPSILON
+        fx = self.finite_difference(method, ex)
+        fy = self.finite_difference(method, ey)
+        fz = self.finite_difference(method, ez)
 
         #transpose to put field index last
         inrank = len(fx.shape)
         cycle = tuple(range(1, inrank+1)) + (0,)
         return np.array((fx, fy, fz)).transpose(cycle)
+
+    def finite_difference(self, method, dF):
+        self.clear_fields()
+        self.solve_scf_for_external(dF)
+        dm = method()
+        self.clear_fields()
+        self.solve_scf_for_external(-dF)
+        dm -= method()
+        dm /= 2*norm(dF)
+        return dm
+        
 
     def clear_fields(self):
         for p in self:

@@ -22,12 +22,18 @@ def gradx(f, eps):
 
 
 def hess_zz(f):
+    return hess(f, ez, ez)
+
+def hess(f, e1, e2):
     E_0 = f.__self__.local_field()
-    f0 = f()
-    f.__self__.set_local_field(E_0 + 2*ez)
-    f1 = f()
-    f.__self__.set_local_field(E_0 - 2*ez)
-    f2 = f()
-    return (f1 + f2 - 2*f0)/EPSILON**2
+    f.__self__.set_local_field(E_0 + e1 + e2)
+    f12 = f()
+    f.__self__.set_local_field(E_0 + e1 - e2)
+    f12 -= f()
+    f.__self__.set_local_field(E_0 - e1 + e2)
+    f12 -= f()
+    f.__self__.set_local_field(E_0 - e1 - e2)
+    f12 += f()
+    return f12/EPSILON**2
 
 

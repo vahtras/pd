@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from ..particles import *
-from util import field_gradient
+from util import field_gradient, hess_zz
 
 class PointDipoleFiniteFieldTests(unittest.TestCase):
 
@@ -61,6 +61,12 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         gradp = field_gradient(self.particle.dipole_moment)
         np.testing.assert_almost_equal(gradp, self.particle._a0)
 
+    def test_finite_difference_hessian_dipole_moment(self):
+        self.particle._p0 = random_vector()
+        self.particle._a0 = random_tensor()
+        self.particle._b0 = random_tensor2()
+        fin_diff_zz = hess_zz(self.particle.dipole_moment)
+        np.testing.assert_almost_equal(fin_diff_zz, self.particle._b0[:, 2, 2])
 
 class PointDipoleListFiniteFieldTests(unittest.TestCase):
     
@@ -212,10 +218,15 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dp0_dF = self.h2o_monomer_hyp.field_gradient_of_method(self.h2o_monomer_hyp.induced_dipole_moment)
         self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
 
-    def test_finite_difference_hyperpolarizable_dimer_z(self):
+    def test_finite_difference_hyperpolarizable_dimer(self):
         alphas = self.h2o_dimer_hyp.solve_Applequist_equation()
         dp0_dF = self.h2o_dimer_hyp.field_gradient_of_method(self.h2o_dimer_hyp.induced_dipole_moment)
-        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+        np.testing.assert_almost_equal(dp0_dF, alphas, decimal=3)
+
+    def notest_finite_difference_hyperpolarizable_dimer2(self):
+        betas = self.h2o_dimer_hyp.solve_second_Applequist_equation()
+        d2p_dF2 = self.h2o_dimer_hyp.field_gradient_of_method(self.h2o_dimer_hyp.solve_Applequist_equation)
+        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
 
     def test_finite_difference_local_fields(self):
         molecule = self.h2o_dimer_hyp

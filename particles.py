@@ -92,11 +92,27 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
+    def solve_second_Applequist_equation(self):
+        # Solve the response equaitons
+        n = len(self)
+        self.solve_scf_for_external(ORIGO)
+        dF2 = self.form_second_Applequist_rhs()
+        L = self.form_Applequist_coefficient_matrix()
+        d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
+        return d2p_dF2
+
     def form_Applequist_rhs(self):
         n = len(self)
         alphas = [pd.a for pd in self]
         dE = array(alphas).reshape((n*3, 3))
         return dE
+
+    def form_second_Applequist_rhs(self):
+        n = len(self)
+        betas = [pd._b0 for pd in self]  #(n, 3, 3, 3)
+        C = self._dEi_dF()                 #(n, 3; 3)
+        dF2 = [dot(dot(b, c), c) for b, c in zip(betas, C)]
+        return array(dF2).reshape((n*3, 9))
 
     def form_Applequist_coefficient_matrix(self):
         n = len(self)

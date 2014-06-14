@@ -24,6 +24,14 @@ def gradx(f, eps):
 def hess_zz(f):
     return hess(f, ez, ez)
 
+def field_hessian(f):
+    return np.array([
+        [hess(f, ex, ex), hess(f, ex, ey), hess(f, ex, ez)],
+        [hess(f, ey, ex), hess(f, ey, ey), hess(f, ey, ez)],
+        [hess(f, ez, ex), hess(f, ez, ey), hess(f, ez, ez)]
+        ])
+        
+
 def hess(f, e1, e2):
     E_0 = f.__self__.local_field()
     f.__self__.set_local_field(E_0 + e1 + e2)

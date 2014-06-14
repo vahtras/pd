@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from ..particles import *
-from util import field_gradient, hess_zz
+from util import field_gradient, field_hessian
 
 class PointDipoleFiniteFieldTests(unittest.TestCase):
 
@@ -65,8 +65,8 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         self.particle._p0 = random_vector()
         self.particle._a0 = random_tensor()
         self.particle._b0 = random_tensor2()
-        fin_diff_zz = hess_zz(self.particle.dipole_moment)
-        np.testing.assert_almost_equal(fin_diff_zz, self.particle._b0[:, 2, 2])
+        hess_p = field_hessian(self.particle.dipole_moment)
+        np.testing.assert_almost_equal(hess_p, self.particle._b0)
 
 class PointDipoleListFiniteFieldTests(unittest.TestCase):
     

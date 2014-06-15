@@ -55,7 +55,7 @@ class MultiDipoleTest(unittest.TestCase):
         self.assertAlmostEqual(self.h2o.total_charge(), 0., places=2) 
 
     def test_h2o_dipole_tensor_zero(self):
-        Tij = self.h2o.dipole_tensor()
+        Tij = self.h2o.dipole_coupling_tensor()
         zeromat = np.zeros((3,3))
         self.assertTrue (np.allclose(Tij[0, :, 0, :], zeromat))
         self.assertTrue (np.allclose(Tij[1, :, 1, :], zeromat))
@@ -69,7 +69,7 @@ class MultiDipoleTest(unittest.TestCase):
         y = 0
         z = 0.698 + 0.349
         r_5 = (x*x + y*y + z*z)**2.5
-        T01 = self.h2o.dipole_tensor()[0, :, 1, :]
+        T01 = self.h2o.dipole_coupling_tensor()[0, :, 1, :]
         T01xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T01xx, T01[0,0])
         T01xy =  0.0
@@ -88,7 +88,7 @@ class MultiDipoleTest(unittest.TestCase):
         y = 0
         z = 0.698 + 0.349
         r_5 = (x*x + y*y + z*z)**2.5
-        T02 = self.h2o.dipole_tensor()[0, :, 2, :]
+        T02 = self.h2o.dipole_coupling_tensor()[0, :, 2, :]
         T02xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T02xx, T02[0,0])
         T02xy =  0.0
@@ -107,7 +107,7 @@ class MultiDipoleTest(unittest.TestCase):
         y = 0
         z = 0
         r_5 = (x*x + y*y + z*z)**2.5
-        T12 = self.h2o.dipole_tensor()[1, :, 2, :]
+        T12 = self.h2o.dipole_coupling_tensor()[1, :, 2, :]
         T12xx =  (2*x*x - y*y - z*z) / r_5
         self.assertAlmostEqual(T12xx, T12[0,0])
         T12xy =  0.0

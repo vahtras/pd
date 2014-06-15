@@ -29,13 +29,16 @@ class PointDipoleList(list):
         """
         return PointDipoleList(iter(potential.split("\n")))
         
+    def __str__(self):
+        """String representation of class - delgated to list members"""
+        return "\n\n".join([str(p) for p in self])
+
     def append(self, arg):
         """Overriding superclass list append: check if arg is PointDipole"""
         if type(arg) != PointDipole:
             print "PointDipoleList.append called with object of type", type(arg)
             raise TypeError
         super(PointDipoleList, self).append(arg)
-
 
     def total_charge(self):
         """Returns sum of charges of particles in the list"""
@@ -45,7 +48,7 @@ class PointDipoleList(list):
         for p, q in zip(self, charges):
             p.set_charge(q)
 
-    def dipole_tensor(self):
+    def dipole_coupling_tensor(self):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to
         another electric dipole:
@@ -68,8 +71,6 @@ class PointDipoleList(list):
                 _T[j, :, i, :] = Tij
         return _T
 
-    def __str__(self):
-        return "\n\n".join([str(p) for p in self])
 
     def alpha_iso(self):
         r"""Return the isotropic polarizability
@@ -117,7 +118,7 @@ class PointDipoleList(list):
 
     def form_Applequist_coefficient_matrix(self):
         n = len(self)
-        aT = self.dipole_tensor().reshape((n, 3, 3*n))
+        aT = self.dipole_coupling_tensor().reshape((n, 3, 3*n))
         # evaluate alphai*Tij
         alphas = [pd.a for pd in self]
         for i, a in enumerate(alphas):
@@ -172,7 +173,7 @@ class PointDipoleList(list):
     def _dEi_dF_indirect(self):
         """Change in local field due to change from other dipoles"""
         n = len(self)
-        T = self.dipole_tensor().reshape(n, 3, n*3)
+        T = self.dipole_coupling_tensor().reshape(n, 3, n*3)
         R = self.solve_Applequist_equation().reshape(n*3, 3)
         TR = dot(T, R)
         return TR

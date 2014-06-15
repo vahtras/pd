@@ -4,7 +4,7 @@ from numpy.linalg import norm
 from numpy import outer, dot, array, zeros
 
 I_3 = np.identity(3)
-ORIGO = np.zeros(3)
+ZERO_VECTOR = np.zeros(3)
 BETA_ZERO = np.zeros((3, 3, 3))
 
 class PointDipoleList(list):
@@ -87,7 +87,7 @@ class PointDipoleList(list):
     def solve_Applequist_equation(self):
         # Solve the response equaitons
         n = len(self)
-        self.solve_scf_for_external(ORIGO)
+        self.solve_scf_for_external(ZERO_VECTOR)
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
@@ -96,7 +96,7 @@ class PointDipoleList(list):
     def solve_second_Applequist_equation(self):
         # Solve the response equaitons
         n = len(self)
-        self.solve_scf_for_external(ORIGO)
+        self.solve_scf_for_external(ZERO_VECTOR)
         dF2 = self.form_second_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
         d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
@@ -261,7 +261,7 @@ class PointDipoleList(list):
 
     def clear_fields(self):
         for p in self:
-            p.set_local_field(ORIGO)
+            p.set_local_field(ZERO_VECTOR)
             p.set_local_potential(0)
 
 class PointDipole(object):
@@ -302,7 +302,7 @@ class PointDipole(object):
         if "dipole" in kwargs:
             self._p0 = array(kwargs["dipole"])
         else:
-            self._p0 = ORIGO
+            self._p0 = ZERO_VECTOR
 
         if "alpha" in kwargs:
             self._a0 = array(kwargs["alpha"])
@@ -375,7 +375,7 @@ class PointDipole(object):
         :type q: float
         """
 
-        self._q = q
+        self._q = float(q)
 
 
     def dipole_moment(self):

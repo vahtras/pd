@@ -249,7 +249,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
     def test_finite_difference_local_fields(self):
         molecule = self.h2o_dimer_hyp
-        molecule.solve_scf_for_external(ORIGO)
+        molecule.solve_scf_for_external(ZERO_VECTOR)
         test_this =  molecule._dEi_dF_indirect()
         method = molecule.evaluate_field_at_atoms
         dEi_dF = molecule.field_gradient_of_method(method)

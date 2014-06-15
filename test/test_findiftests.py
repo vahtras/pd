@@ -125,7 +125,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
         self.h2o_dimer_hyp.append(
             PointDipole(
-                coordinates=(0, 0, 0.48861),
+                coordinates=(0, 0, 0),
                 charge=0,
                 dipole=(0, 0, -0.81457755),
                 alpha=(
@@ -155,7 +155,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
         self.h2o_dimer_hyp.append(
             PointDipole(
-                coordinates=(0, 0, 5.48861),
+                coordinates=(0, 0, 10),
                 charge=0,
                 dipole=(0, 0, -0.81457755),
                 alpha=(
@@ -219,9 +219,10 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
 
     def test_finite_difference_hyperpolarizable_dimer(self):
-        alphas = self.h2o_dimer_hyp.solve_Applequist_equation()
-        dp0_dF = self.h2o_dimer_hyp.field_gradient_of_method(self.h2o_dimer_hyp.induced_dipole_moment)
-        np.testing.assert_almost_equal(dp0_dF, alphas, decimal=3)
+        dimer = self.h2o_dimer_hyp
+        alphas = dimer.solve_Applequist_equation()
+        dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(dp_dF, alphas, decimal=3)
 
     def test_finite_difference_hessian_dipole_moment(self):
         monomer = PointDipoleList()
@@ -234,14 +235,16 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         betas = monomer.solve_second_Applequist_equation()
         np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
 
-    def notest_second_finite_difference_hyperpolarizable_monomer(self):
-        betas = self.h2o_monomer_hyp.solve_second_Applequist_equation()
-        d2p_dF2 = self.h2o_monomer_hyp.field_hessian_of_method(self.h2o_monomer_hyp.induced_dipole_moment)
+    def test_second_finite_difference_hyperpolarizable_monomer(self):
+        monomer = self.h2o_monomer_hyp
+        betas = monomer.solve_second_Applequist_equation()
+        d2p_dF2 = monomer.field_hessian_of_method(monomer.induced_dipole_moment)
         np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
 
-    def notest_finite_difference_hyperpolarizable_dimer2(self):
-        betas = self.h2o_dimer_hyp.solve_second_Applequist_equation()
-        d2p_dF2 = self.h2o_dimer_hyp.field_hessian_of_method(self.h2o_dimer_hyp.induced_dipole_moment)
+    def test_second_finite_difference_hyperpolarizable_dimer(self):
+        dimer = self.h2o_dimer_hyp
+        betas = dimer.solve_second_Applequist_equation()
+        d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
         np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
 
     def test_finite_difference_local_fields(self):

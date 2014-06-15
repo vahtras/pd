@@ -32,6 +32,7 @@ class PointDipoleList(list):
     def append(self, arg):
         """Overriding superclass list append: check if arg is PointDipole"""
         if type(arg) != PointDipole:
+            print "PointDipoleList.append called with object of type", type(arg)
             raise TypeError
         super(PointDipoleList, self).append(arg)
 
@@ -223,6 +224,37 @@ class PointDipoleList(list):
         dm /= 2*norm(dF)
         return dm
         
+    def field_hessian_of_method(self, method):
+        from test.util import ex, ey, ez, EPSILON
+
+        fxx = self.finite_difference2(method, ex, ex)
+        fxy = self.finite_difference2(method, ex, ey)
+        fxz = self.finite_difference2(method, ex, ez)
+        fyy = self.finite_difference2(method, ey, ey)
+        fyz = self.finite_difference2(method, ey, ez)
+        fzz = self.finite_difference2(method, ez, ez)
+
+        inrank = len(fxx.shape)
+        cycle_twice_left = tuple(range(2, inrank+2)) + (0, 1)
+        return np.array(
+            ((fxx, fxy, fxz), 
+             (fxy, fyy, fyz),
+             (fxz, fyz, fzz))
+            ).transpose(cycle_twice_left)
+
+    def finite_difference2(self, method, dF1, dF2):
+        self.clear_fields()
+        self.solve_scf_for_external(dF1+dF2)
+        d2m = method()
+        self.solve_scf_for_external(dF1-dF2)
+        d2m -= method()
+        self.solve_scf_for_external(-dF1+dF2)
+        d2m -= method()
+        self.solve_scf_for_external(-dF1-dF2)
+        d2m += method()
+        d2m /= 4*norm(dF1)*norm(dF2)
+        return d2m
+
 
     def clear_fields(self):
         for p in self:
@@ -271,7 +303,6 @@ class PointDipole(object):
 
         if "alpha" in kwargs:
             self._a0 = array(kwargs["alpha"])
-            print self._a0.shape
             assert self._a0.shape == (3,3)
         else:
             self._a0 = kwargs.get("iso_alpha", 0)*I_3

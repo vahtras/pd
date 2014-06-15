@@ -42,6 +42,7 @@ def hess(f, e1, e2):
     f12 -= f()
     f.__self__.set_local_field(E_0 - e1 - e2)
     f12 += f()
+    f.__self__.set_local_field(E_0)
     return f12/EPSILON**2
 
 

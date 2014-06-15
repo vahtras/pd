@@ -82,11 +82,15 @@ class PointDipoleList(list):
         return np.trace(self.alpha())/3
 
     def alpha(self):
-        dpdE = self.solve_Applequist_equation()
-        return dpdE.sum(axis=0)
+        dpdF = self.solve_Applequist_equation()
+        return dpdF.sum(axis=0)
+
+    def beta(self):
+        d2pdF2 = self.solve_second_Applequist_equation()
+        return d2p_dF2.sum(axis=0)
 
     def solve_Applequist_equation(self):
-        # Solve the response equaitons
+        # Solve the linear response equaitons
         n = len(self)
         self.solve_scf_for_external(ZERO_VECTOR)
         dE = self.form_Applequist_rhs()
@@ -95,7 +99,7 @@ class PointDipoleList(list):
         return dpdE
 
     def solve_second_Applequist_equation(self):
-        # Solve the response equaitons
+        # Solve the quadratic response equaitons
         n = len(self)
         self.solve_scf_for_external(ZERO_VECTOR)
         dF2 = self.form_second_Applequist_rhs()

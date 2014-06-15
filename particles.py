@@ -112,7 +112,7 @@ class PointDipoleList(list):
         n = len(self)
         betas = [pd._b0 for pd in self]  #(n, 3, 3, 3)
         C = self._dEi_dF()                 #(n, 3; 3)
-        dF2 = [dot(dot(b, c), c) for b, c in zip(betas, C)]
+        dF2 = [np.einsum('ijk,jl,km', b, c, c) for b, c in zip(betas, C)]   # b( i, j, k) c(k; l) -> b(i, j, l) 
         return array(dF2).reshape((n*3, 9))
 
     def form_Applequist_coefficient_matrix(self):
@@ -246,10 +246,13 @@ class PointDipoleList(list):
         self.clear_fields()
         self.solve_scf_for_external(dF1+dF2)
         d2m = method()
+        self.clear_fields()
         self.solve_scf_for_external(dF1-dF2)
         d2m -= method()
+        self.clear_fields()
         self.solve_scf_for_external(-dF1+dF2)
         d2m -= method()
+        self.clear_fields()
         self.solve_scf_for_external(-dF1-dF2)
         d2m += method()
         d2m /= 4*norm(dF1)*norm(dF2)

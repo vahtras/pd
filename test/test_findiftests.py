@@ -245,7 +245,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dimer = self.h2o_dimer_hyp
         betas = dimer.solve_second_Applequist_equation()
         d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
-        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
+        np.testing.assert_allclose(d2p_dF2, betas, rtol=1e-3)
 
     def test_finite_difference_local_fields(self):
         molecule = self.h2o_dimer_hyp

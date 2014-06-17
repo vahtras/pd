@@ -121,10 +121,6 @@ class MultiDipoleTest(unittest.TestCase):
         T12zz = (2*z*z - x*x - y*y) / r_5
         self.assertAlmostEqual(T12zz, T12[2,2])
 
-    def test_verify_solver(self):
-        h2 = PointDipoleList(iterize(H2["POTFILE"]))
-        pass
-
     def test_static_charge_energy(self):
         charges = PointDipoleList.from_string("""AU
 2 0 0
@@ -157,3 +153,12 @@ class MultiDipoleTest(unittest.TestCase):
         E = charged_dipoles.total_energy()
         self.assertAlmostEqual(E, E_ref)
 
+    def test_static_sipole_moment(self):
+        h2o_dimer = PointDipoleList.from_string("""AU
+2 1 0 0
+1 0.0 0.0 -0.2249058930 0. 0. 0. -0.81457755
+2 0.0 0.0  4.775094107  0. 0. 0. -0.81457755
+""")
+        np.testing.assert_almost_equal(
+            h2o_dimer.total_static_dipole_moment()[2], -0.81457755*2
+            )

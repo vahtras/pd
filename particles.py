@@ -48,6 +48,10 @@ class PointDipoleList(list):
         for p, q in zip(self, charges):
             p.set_charge(q)
 
+    def total_static_dipole_moment(self):
+       return sum([p.dipole_moment() for p in self])
+        
+
     def dipole_coupling_tensor(self):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to

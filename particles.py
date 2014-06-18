@@ -50,6 +50,12 @@ class PointDipoleList(list):
 
     def total_static_dipole_moment(self):
        return sum([p.dipole_moment() for p in self])
+
+    def total_induced_dipole_moment(self):
+       return sum([p.induced_dipole_moment() for p in self])
+
+    def total_dipole_moment(self):
+       return sum([p.dipole_moment() for p in self])
         
 
     def dipole_coupling_tensor(self):
@@ -134,6 +140,9 @@ class PointDipoleList(list):
         #matrix (1 - alpha*T)
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
+
+    def solve_scf(self, max_it=100, threshold=1e-6):
+        self.solve_scf_for_external(ZERO_VECTOR, max_it, threshold)
 
     def solve_scf_for_external(self, E, max_it=100, threshold=1e-6):
         E_p0 = np.zeros((len(self), 3))

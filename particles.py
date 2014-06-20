@@ -16,10 +16,10 @@ class PointDipoleList(list):
         """
         if pf is not None:
             units = pf.next()
-            header_dict = header_to_dict(pf.next())
+            self.header_dict = header_to_dict(pf.next())
             for i, line in enumerate(pf):
-                if i == header_dict["#atoms"]: break
-                line_dict = line_to_dict(header_dict, line)
+                if i == self.header_dict["#atoms"]: break
+                line_dict = line_to_dict(self.header_dict, line)
                 self.append(PointDipole(**line_dict))
 
     @staticmethod
@@ -324,11 +324,43 @@ class PointDipole(object):
 
         if "alpha" in kwargs:
             self._a0 = array(kwargs["alpha"])
-            assert self._a0.shape == (3,3)
+            assert self._a0.shape == (3, 3)
+        elif "ut_alpha" in kwargs:
+            upper_triangular_pol = array(kwargs["ut_alpha"])
+            assert upper_triangular_pol.shape == (6,)
+            self._a0 = np.zeros((3,3))
+            ij = 0
+            for i in range(3):
+                self._a0[i, i] = upper_triangular_pol[ij]
+                ij += 1
+                for j in range(i+1, 3):
+                    self._a0[i, j] = upper_triangular_pol[ij]
+                    self._a0[j, i] = upper_triangular_pol[ij]
+                    ij += 1
+            
         else:
             self._a0 = kwargs.get("iso_alpha", 0)*I_3
 
-        self._b0 = array(kwargs.get("beta", BETA_ZERO))
+        if "ut_beta" in kwargs:
+            upper_triangular_hyppol = array(kwargs["ut_beta"])
+            assert upper_triangular_hyppol.shape == (15,)
+            self._b0 = np.zeros((3,3,3))
+            ijk = 0
+            for i in range(3):
+                self._b0[i, i, i] = upper_triangular_hyppol[ijk]
+                ijk += 1
+                for k in range(i+1, 3):
+                    self_b0[i, i, k] = upper_trianguar_hyppol[ijk]
+                    ijk += 1
+                for j in range(i+1, 3):
+                    self._b0[i, j, j] = upper_triangular_hyppol[ijk]
+                    for k in range(j+1, 3):
+                        self_b0[i, j, k] = upper_trianguar_hyppol[ijk]
+                        ijk += 1
+                        
+        else:
+            self._b0 = BETA_ZERO
+
         self.args = args
 
         self.fmt = kwargs.get('fmt', "%10.5f")
@@ -519,16 +551,20 @@ def header_to_dict(header):
         "#atoms": 0, 
         "max_angmom": 0, 
         "iso_pol": False, 
+        "ut_pol": False, 
         "full_pol": False, 
-        "hyp_pol": False, 
+        "ut_hyp_pol": False, 
+        "full_hyp_pol": False, 
         }
 
     header_data = map(int, header.split())
     header_dict["#atoms"] = header_data[0]
     header_dict["max_angmom"] = header_data[1]
-    header_dict["iso_pol"] = len(header_data) > 2 and header_data[2] == 1
-    header_dict["full_pol"] = len(header_data) > 2 and header_data[2] == 2
-    header_dict["hyp_pol"] = len(header_data) > 4 and header_data[3] == 1
+    header_dict["iso_pol"] = len(header_data) > 2 and header_data[2] % 10 == 1
+    header_dict["ut_pol"] = len(header_data) > 2 and header_data[2] % 10 == 2
+    header_dict["full_pol"] = len(header_data) > 2 and header_data[2] % 10 == 3
+    header_dict["ut_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 2
+    header_dict["full_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 3
 
     return header_dict
 
@@ -544,6 +580,7 @@ def line_to_dict(header_dict, line):
 
     max_angmom = header_dict.get('max_angmom', 0)
     iso_pol = header_dict.get('iso_pol', False)
+    ut_pol = header_dict.get('ut_pol', False)
     full_pol = header_dict.get('full_pol', False)
     hyp_pol = header_dict.get('hyp_pol', False)
 
@@ -566,8 +603,12 @@ def line_to_dict(header_dict, line):
     else:
         line_dict['iso_alpha'] = 0
 
-    if full_pol:
+    if ut_pol:
         nextend = nextstart + 6
+        line_dict['ut_alpha'] = line_data[nextstart: nextend]
+
+    if full_pol:
+        nextend = nextstart + 9
         line_dict['alpha'] = line_data[nextstart: nextend]
 
     if hyp_pol:

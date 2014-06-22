@@ -10,9 +10,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def setUp(self):
         self.coordinates = np.random.random(3)
-        #self.coordinates = np.zeros(3)
         self.particle = PointDipole(
-            #coordinates=[0.,0.,0.],
             coordinates=self.coordinates,
             charge=1.0,
             dipole=[0.1, 0.2, 0.3],
@@ -31,7 +29,6 @@ class PointDipoleTest(unittest.TestCase):
 #
 
     def test_coor(self):
-        #np.testing.assert_allclose(self.particle.coordinates(), (0., 0., 0.))
         np.testing.assert_allclose(
             self.particle.coordinates(), self.coordinates
             )

@@ -9,8 +9,11 @@ class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
     def setUp(self):
+        self.coordinates = np.random.random(3)
+        #self.coordinates = np.zeros(3)
         self.particle = PointDipole(
-            coordinates=[0.,0.,0.],
+            #coordinates=[0.,0.,0.],
+            coordinates=self.coordinates,
             charge=1.0,
             dipole=[0.1, 0.2, 0.3],
             iso_alpha=0.05,
@@ -28,7 +31,10 @@ class PointDipoleTest(unittest.TestCase):
 #
 
     def test_coor(self):
-        np.testing.assert_allclose(self.particle.coordinates(), (0., 0., 0.))
+        #np.testing.assert_allclose(self.particle.coordinates(), (0., 0., 0.))
+        np.testing.assert_allclose(
+            self.particle.coordinates(), self.coordinates
+            )
 
     def test_set_coor_tuple(self):
         self.particle.set_coordinates((1, 2, 3))
@@ -148,15 +154,15 @@ class PointDipoleTest(unittest.TestCase):
             ref
             )
 
-    def test_total_field_at(self):
-        field_point = np.array([0., 3., 4.])
-        self.particle.set_local_field((0,0,0))
-        self.particle._p0 = np.ones(3)
-        ref = (3*field_point*7 - 25*np.ones(3))/5**5 +\
-            1.0*field_point/5**3
+    def test_permanent_dipole_field_at(self):
+        self.particle.set_local_field((0,0,0)) # no induced dipole
+        self.particle._p0 = np.ones(3)         # only permanent dipole
+        dR = np.array([0., 3., 4.])
+        field_point = self.coordinates + dR
+        reference_field = (3*dR*7 - 25*np.ones(3))/5**5 + 1.0*dR/5**3
         np.testing.assert_almost_equal(
             self.particle.field_at(field_point),
-            ref
+            reference_field
             )
 
     def test_set__field_raises_typeerror(self):
@@ -175,18 +181,8 @@ class PointDipoleTest(unittest.TestCase):
     def test_str(self):
         self.particle.fmt = "%5.2f"
         self.assertEqual(str(self.particle),
-            "1 0.00 0.00 0.00 1.00 0.10 0.20 0.30 0.05"
+            "1%5.2f%5.2f%5.2f 1.00 0.10 0.20 0.30 0.05" % tuple(self.coordinates)
             )
-
-    def test_str_with_no_dipole(self):
-        self.particle.fmt = "%5.2f"
-        self.particle._p0 = None
-        self.assertEqual(str(self.particle),
-            "1 0.00 0.00 0.00 1.00 0.05"
-            )
-
-
-
 
     def test_header_number_of_atoms(self):
         header_dict = header_to_dict("2 0 0")
@@ -281,6 +277,28 @@ class PointDipoleTest(unittest.TestCase):
         pot_line = "1 0 0 0 1.5 1 2 3 .1 .2 .3 .4 .5 .6"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['quadrupole'], [.1, .2, .3, .4, .5, .6])
+
+    def test_line_to_dict_isopol(self):
+        header_dict = {"iso_pol": True}
+        pot_line = "1 0 0 0 0 7"
+        line_dict = line_to_dict(header_dict, pot_line)
+        print "line_dict", line_dict
+        self.assertEqual(line_dict['iso_alpha'], 7.0)
+
+    def test_line_to_dict_ut_pol(self):
+        header_dict = {"ut_pol": True}
+        pot_line = "1 0 0 0 0 1 2 3 4 5 6"
+        line_dict = line_to_dict(header_dict, pot_line)
+        print "line_dict", line_dict
+        self.assertEqual(line_dict['ut_alpha'], range(1,7))
+
+    def test_dict_isopol_to_PointDipole(self):
+        pd = PointDipole(iso_alpha=7.0)
+        np.testing.assert_equal(pd._a0, 7.0*I_3)
+
+    def test_dict_utpol_to_PointDipole(self):
+        pd = PointDipole(ut_alpha=(1, 2, 3, 4, 5, 6))
+        np.testing.assert_equal(pd._a0, ((1, 2, 3), (2, 4, 5), (3, 5, 6)))
 
 
 # More constructor tests

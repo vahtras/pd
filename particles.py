@@ -3,8 +3,11 @@ import numpy as np
 from numpy.linalg import norm 
 from numpy import outer, dot, array, zeros
 
+import ut
+
 I_3 = np.identity(3)
 ZERO_VECTOR = np.zeros(3)
+ALPHA_ZERO = np.zeros((3, 3))
 BETA_ZERO = np.zeros((3, 3, 3))
 
 class PointDipoleList(list):
@@ -322,24 +325,19 @@ class PointDipole(object):
         else:
             self._p0 = ZERO_VECTOR
 
-        if "alpha" in kwargs:
-            self._a0 = array(kwargs["alpha"])
-            assert self._a0.shape == (3, 3)
+        if "iso_alpha" in kwargs:
+            self._a0 = float(kwargs["iso_alpha"])*I_3
         elif "ut_alpha" in kwargs:
             upper_triangular_pol = array(kwargs["ut_alpha"])
             assert upper_triangular_pol.shape == (6,)
             self._a0 = np.zeros((3,3))
-            ij = 0
-            for i in range(3):
-                self._a0[i, i] = upper_triangular_pol[ij]
-                ij += 1
-                for j in range(i+1, 3):
-                    self._a0[i, j] = upper_triangular_pol[ij]
-                    self._a0[j, i] = upper_triangular_pol[ij]
-                    ij += 1
-            
+            for ij, (i, j) in enumerate(ut.upper_triangular(2)):
+                aij = upper_triangular_pol[ij]
+                self._a0[i, j] = aij
+                self._a0[j, i] = aij
         else:
-            self._a0 = kwargs.get("iso_alpha", 0)*I_3
+            self._a0 = ALPHA_ZERO
+            
 
         if "ut_beta" in kwargs:
             upper_triangular_hyppol = array(kwargs["ut_beta"])
@@ -597,17 +595,15 @@ def line_to_dict(header_dict, line):
         line_dict['quadrupole'] = line_data[nextstart: nextend]
         nextstart = nextend
 
+    print "max_angmom", max_angmom
+    print "pol",iso_pol, ut_pol, full_pol
     if iso_pol:
         nextend = nextstart + 1
         line_dict['iso_alpha'] = line_data[nextstart]
-    else:
-        line_dict['iso_alpha'] = 0
-
-    if ut_pol:
+    elif ut_pol:
         nextend = nextstart + 6
         line_dict['ut_alpha'] = line_data[nextstart: nextend]
-
-    if full_pol:
+    elif full_pol:
         nextend = nextstart + 9
         line_dict['alpha'] = line_data[nextstart: nextend]
 

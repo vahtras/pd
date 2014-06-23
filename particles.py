@@ -402,7 +402,12 @@ class PointDipole(object):
         return self._field
 
     def set_local_field(self, args):
-        self._field = np.array(args)
+        PointDipole._assert_vector_like(args)
+        self._field = np.array(args, dtype=float)
+
+    @staticmethod
+    def _assert_vector_like(args):
+        if len(args) != 3: raise ValueError
 
     def set_local_potential(self, args):
         self._potential = float(args)
@@ -560,6 +565,8 @@ def header_to_dict(header):
     header_dict["max_angmom"] = header_data[1]
     header_dict["iso_pol"] = len(header_data) > 2 and header_data[2] % 10 == 1
     header_dict["ut_pol"] = len(header_data) > 2 and header_data[2] % 10 == 2
+    if len(header_data) > 2 and header_data[2] % 10 > 2: 
+        raise TypeError
     header_dict["full_pol"] = len(header_data) > 2 and header_data[2] % 10 == 3
     header_dict["ut_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 2
     header_dict["full_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 3

@@ -18,17 +18,16 @@ class  TestHeader(unittest.TestCase):
         header_dict = header_to_dict("2 1 0")
         self.assertEqual(header_dict["iso_pol"], False)
 
-    def test_header_1_isotropic_polarizability_1_true(self):
+    def test_header_1_isotropic_polarizability_true(self):
         header_dict = header_to_dict("2 1 1")
         self.assertEqual(header_dict["iso_pol"], True)
 
-    def test_header_2_isotropic_polarizability_2_false(self):
+    def test_header_2_isotropic_polarizability_false(self):
         header_dict = header_to_dict("2 1 2")
         self.assertEqual(header_dict["iso_pol"], False)
 
-    def test_header_2_isotropic_polarizability_3_false(self):
-        header_dict = header_to_dict("2 1 3")
-        self.assertEqual(header_dict["iso_pol"], False)
+    def test_header_3_unvalid(self):
+        self.assertRaises(TypeError, header_to_dict, "2 1 3")
 
     def test_header_nopol_upper_triangular_polarizability_false(self):
         header_dict = header_to_dict("2 1")
@@ -42,10 +41,6 @@ class  TestHeader(unittest.TestCase):
         header_dict = header_to_dict("2 1 2")
         self.assertEqual(header_dict["ut_pol"], True)
 
-    def test_header_3_upper_triangular_polarizability_false(self):
-        header_dict = header_to_dict("2 1 3")
-        self.assertEqual(header_dict["ut_pol"], False)
-
     def test_header_nopol_full_polarizability_false(self):
         header_dict = header_to_dict("2 1")
         self.assertEqual(header_dict["full_pol"], False)
@@ -54,17 +49,9 @@ class  TestHeader(unittest.TestCase):
         header_dict = header_to_dict("2 1 0")
         self.assertEqual(header_dict["full_pol"], False)
 
-    def test_header_1_full_polarizability_1_false(self):
+    def test_header_1_full_polarizability_false(self):
         header_dict = header_to_dict("2 1 1")
         self.assertEqual(header_dict["full_pol"], False)
-
-    def test_header_2_upper_triangular_polarizability_1_true(self):
-        header_dict = header_to_dict("2 1 2")
-        self.assertEqual(header_dict["ut_pol"], True)
-
-    def test_header_2_full_polarizability_1_true(self):
-        header_dict = header_to_dict("2 1 3")
-        self.assertEqual(header_dict["full_pol"], True)
 
     def test_header_0_ut_hyperpolarizability_false(self):
         header_dict = header_to_dict("2 1 01 1")
@@ -77,6 +64,12 @@ class  TestHeader(unittest.TestCase):
     def test_header_2_ut_hyperpolarizability_true(self):
         header_dict = header_to_dict("2 1 21 1")
         self.assertEqual(header_dict["ut_hyp_pol"], True)
+
+    def test_header_3_ut_hyperpolarizability_true(self):
+        header_dict = header_to_dict("2 1 31 1")
+        self.assertEqual(header_dict["ut_hyp_pol"], False)
+
+    # full hyp input test here...
 
     def test_line_to_dict_charges(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 0}

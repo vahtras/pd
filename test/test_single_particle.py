@@ -162,10 +162,8 @@ class PointDipoleTest(unittest.TestCase):
             reference_field
             )
 
-    def test_set__field_raises_typeerror(self):
-        def wrapper(particle, setvalue):
-            particle.set_local_field(setvalue)
-        self.assertRaises(TypeError, wrapper, 0.0)
+    def test_set_field_raises_typeerror(self):
+        self.assertRaises(ValueError, self.particle.set_local_field, (0,))
 
     def test_setget__field(self):
         reference_field = np.random.random((3))

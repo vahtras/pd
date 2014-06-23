@@ -341,21 +341,16 @@ class PointDipole(object):
 
         if "ut_beta" in kwargs:
             upper_triangular_hyppol = array(kwargs["ut_beta"])
-            assert upper_triangular_hyppol.shape == (15,)
+            assert upper_triangular_hyppol.shape == (10,)
             self._b0 = np.zeros((3,3,3))
-            ijk = 0
-            for i in range(3):
-                self._b0[i, i, i] = upper_triangular_hyppol[ijk]
-                ijk += 1
-                for k in range(i+1, 3):
-                    self_b0[i, i, k] = upper_trianguar_hyppol[ijk]
-                    ijk += 1
-                for j in range(i+1, 3):
-                    self._b0[i, j, j] = upper_triangular_hyppol[ijk]
-                    for k in range(j+1, 3):
-                        self_b0[i, j, k] = upper_trianguar_hyppol[ijk]
-                        ijk += 1
-                        
+            for ijk, (i, j, k) in enumerate(ut.upper_triangular(3)):
+                bijk = upper_triangular_hyppol[ijk]
+                self._b0[i, j, k] = bijk
+                self._b0[k, i, j] = bijk
+                self._b0[j, k, i] = bijk
+                self._b0[i, k, j] = bijk
+                self._b0[j, i, k] = bijk
+                self._b0[k, j, i] = bijk
         else:
             self._b0 = BETA_ZERO
 

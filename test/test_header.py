@@ -41,18 +41,6 @@ class  TestHeader(unittest.TestCase):
         header_dict = header_to_dict("2 1 2")
         self.assertEqual(header_dict["ut_pol"], True)
 
-    def test_header_nopol_full_polarizability_false(self):
-        header_dict = header_to_dict("2 1")
-        self.assertEqual(header_dict["full_pol"], False)
-
-    def test_header_0_full_polarizability_false(self):
-        header_dict = header_to_dict("2 1 0")
-        self.assertEqual(header_dict["full_pol"], False)
-
-    def test_header_1_full_polarizability_false(self):
-        header_dict = header_to_dict("2 1 1")
-        self.assertEqual(header_dict["full_pol"], False)
-
     def test_header_0_ut_hyperpolarizability_false(self):
         header_dict = header_to_dict("2 1 01 1")
         self.assertEqual(header_dict["ut_hyp_pol"], False)
@@ -64,12 +52,6 @@ class  TestHeader(unittest.TestCase):
     def test_header_2_ut_hyperpolarizability_true(self):
         header_dict = header_to_dict("2 1 21 1")
         self.assertEqual(header_dict["ut_hyp_pol"], True)
-
-    def test_header_3_ut_hyperpolarizability_true(self):
-        header_dict = header_to_dict("2 1 31 1")
-        self.assertEqual(header_dict["ut_hyp_pol"], False)
-
-    # full hyp input test here...
 
     def test_line_to_dict_charges(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 0}
@@ -110,3 +92,25 @@ class  TestHeader(unittest.TestCase):
     def test_dict_utpol_to_PointDipole(self):
         pd = PointDipole(ut_alpha=(1, 2, 3, 4, 5, 6))
         np.testing.assert_equal(pd._a0, ((1, 2, 3), (2, 4, 5), (3, 5, 6)))
+
+    def test_dict_ut_hyppol_to_PointDipole(self):
+        pd = PointDipole(ut_beta=range(10))
+        np.testing.assert_equal(
+            pd._b0, (
+                (
+                    (0, 1, 2),
+                    (1, 3, 4), 
+                    (2, 4, 5),
+                ),
+                (
+                    (1, 3, 4),
+                    (3, 6, 7),
+                    (4, 7, 8),
+                ),
+                (
+                    (2, 4, 5),
+                    (4, 7, 8),
+                    (5, 8, 9)
+                )
+            )
+        )

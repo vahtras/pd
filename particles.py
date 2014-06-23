@@ -99,7 +99,7 @@ class PointDipoleList(list):
         return dpdF.sum(axis=0)
 
     def beta(self):
-        d2pdF2 = self.solve_second_Applequist_equation()
+        d2p_dF2 = self.solve_second_Applequist_equation()
         return d2p_dF2.sum(axis=0)
 
     def solve_Applequist_equation(self):

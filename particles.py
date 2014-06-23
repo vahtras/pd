@@ -610,8 +610,8 @@ def line_to_dict(header_dict, line):
         line_dict['alpha'] = line_data[nextstart: nextend]
 
     if hyp_pol:
-        nextend = nextstart + 18
-        line_dict['beta'] = line_data[nextstart: nextend]
+        nextend = nextstart + 10
+        line_dict['ut_beta'] = line_data[nextstart: nextend]
     else:
         #line_dict['beta'] = np.zeros(27)
         pass

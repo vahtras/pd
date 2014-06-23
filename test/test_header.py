@@ -43,15 +43,15 @@ class  TestHeader(unittest.TestCase):
 
     def test_header_0_ut_hyperpolarizability_false(self):
         header_dict = header_to_dict("2 1 01 1")
-        self.assertEqual(header_dict["ut_hyp_pol"], False)
+        self.assertEqual(header_dict["ut_hyppol"], False)
 
     def test_header_1_ut_hyperpolarizability_False(self):
         header_dict = header_to_dict("2 1 11 1")
-        self.assertEqual(header_dict["ut_hyp_pol"], False)
+        self.assertEqual(header_dict["ut_hyppol"], False)
 
     def test_header_2_ut_hyperpolarizability_true(self):
         header_dict = header_to_dict("2 1 21 1")
-        self.assertEqual(header_dict["ut_hyp_pol"], True)
+        self.assertEqual(header_dict["ut_hyppol"], True)
 
     def test_line_to_dict_charges(self):
         header_dict = {"#atoms:2": 2, "max_angmom": 0}
@@ -86,13 +86,13 @@ class  TestHeader(unittest.TestCase):
         self.assertEqual(line_dict['ut_alpha'], range(1,7))
 
     def test_line_to_dict_ut_hyppol(self):
-        header_dict = {"hyp_pol": True}
+        header_dict = {"ut_hyppol": True}
         pot_line = "1 0 0 0 0  0 1 2 3 4 5 6 7 8 9"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['ut_beta'], range(10))
 
     def test_line_to_dict_ut_hyppol2(self):
-        header_dict = {"ut_pol": True, "hyp_pol": True}
+        header_dict = {"ut_pol": True, "ut_hyppol": True}
         pot_line = "1 0 0 0  0  1 2 3 4 5 6   0 1 2 3 4 5 6 7 8 9"
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['ut_beta'], range(10))

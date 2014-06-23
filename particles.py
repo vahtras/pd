@@ -551,7 +551,7 @@ def header_to_dict(header):
         "max_angmom": 0, 
         "iso_pol": False, 
         "ut_pol": False, 
-        "ut_hyp_pol": False, 
+        "ut_hyppol": False, 
         }
 
     header_data = map(int, header.split())
@@ -561,7 +561,7 @@ def header_to_dict(header):
     header_dict["ut_pol"] = len(header_data) > 2 and header_data[2] % 10 == 2
     if len(header_data) > 2 and header_data[2] % 10 > 2: 
         raise TypeError
-    header_dict["ut_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 2
+    header_dict["ut_hyppol"] = len(header_data) > 2 and header_data[2] // 10 == 2
 
     return header_dict
 
@@ -578,7 +578,7 @@ def line_to_dict(header_dict, line):
     max_angmom = header_dict.get('max_angmom', 0)
     iso_pol = header_dict.get('iso_pol', False)
     ut_pol = header_dict.get('ut_pol', False)
-    hyp_pol = header_dict.get('hyp_pol', False)
+    hyp_pol = header_dict.get('ut_hyppol', False)
 
     if max_angmom >= 0: 
         nextend = nextstart + 1

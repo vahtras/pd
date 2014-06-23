@@ -91,6 +91,11 @@ class  TestHeader(unittest.TestCase):
         line_dict = line_to_dict(header_dict, pot_line)
         self.assertEqual(line_dict['ut_beta'], range(10))
 
+    def test_line_to_dict_ut_hyppol2(self):
+        header_dict = {"ut_pol": True, "hyp_pol": True}
+        pot_line = "1 0 0 0  0  1 2 3 4 5 6   0 1 2 3 4 5 6 7 8 9"
+        line_dict = line_to_dict(header_dict, pot_line)
+        self.assertEqual(line_dict['ut_beta'], range(10))
 
     def test_dict_isopol_to_PointDipole(self):
         pd = PointDipole(iso_alpha=7.0)

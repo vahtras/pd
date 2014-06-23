@@ -339,6 +339,7 @@ class PointDipole(object):
             self._a0 = ALPHA_ZERO
             
 
+        print "PD init kwargs", kwargs
         if "ut_beta" in kwargs:
             upper_triangular_hyppol = array(kwargs["ut_beta"])
             assert upper_triangular_hyppol.shape == (10,)
@@ -550,9 +551,7 @@ def header_to_dict(header):
         "max_angmom": 0, 
         "iso_pol": False, 
         "ut_pol": False, 
-        "full_pol": False, 
         "ut_hyp_pol": False, 
-        "full_hyp_pol": False, 
         }
 
     header_data = map(int, header.split())
@@ -562,9 +561,7 @@ def header_to_dict(header):
     header_dict["ut_pol"] = len(header_data) > 2 and header_data[2] % 10 == 2
     if len(header_data) > 2 and header_data[2] % 10 > 2: 
         raise TypeError
-    header_dict["full_pol"] = len(header_data) > 2 and header_data[2] % 10 == 3
     header_dict["ut_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 2
-    header_dict["full_hyp_pol"] = len(header_data) > 2 and header_data[2] // 10 == 3
 
     return header_dict
 
@@ -581,7 +578,6 @@ def line_to_dict(header_dict, line):
     max_angmom = header_dict.get('max_angmom', 0)
     iso_pol = header_dict.get('iso_pol', False)
     ut_pol = header_dict.get('ut_pol', False)
-    full_pol = header_dict.get('full_pol', False)
     hyp_pol = header_dict.get('hyp_pol', False)
 
     if max_angmom >= 0: 
@@ -597,17 +593,13 @@ def line_to_dict(header_dict, line):
         line_dict['quadrupole'] = line_data[nextstart: nextend]
         nextstart = nextend
 
-    print "max_angmom", max_angmom
-    print "pol",iso_pol, ut_pol, full_pol
     if iso_pol:
         nextend = nextstart + 1
         line_dict['iso_alpha'] = line_data[nextstart]
     elif ut_pol:
         nextend = nextstart + 6
         line_dict['ut_alpha'] = line_data[nextstart: nextend]
-    elif full_pol:
-        nextend = nextstart + 9
-        line_dict['alpha'] = line_data[nextstart: nextend]
+    nextstart = nextend
 
     if hyp_pol:
         nextend = nextstart + 10

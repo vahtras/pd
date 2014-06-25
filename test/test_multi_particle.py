@@ -183,6 +183,17 @@ class MultiDipoleTest(unittest.TestCase):
             h2o_dimer.total_dipole_moment(), (0,0,-0.81457755*2)
             )
 
+    def test_static_dipole_moment_for_polarizable_system(self):
+        h2o_dimer = PointDipoleList.from_string("""AU
+2 1 2 0
+1 0.0 0.0 -0.2249058930 0. 0. 0. -0.81457755 0 0 0 0 0 5.22710462524
+2 0.0 0.0  4.775094107  0. 0. 0. -0.81457755 0 0 0 0 0 5.22710462524
+""")
+        h2o_dimer.solve_scf()
+        np.testing.assert_almost_equal(
+            h2o_dimer.total_static_dipole_moment(), (0,0,-0.81457755*2)
+            )
+
     def test_induced_dipole_moment_for_polarizable_system(self):
         h2o_dimer = PointDipoleList.from_string("""AU
 2 1 2 0

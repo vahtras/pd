@@ -52,7 +52,7 @@ class PointDipoleList(list):
             p.set_charge(q)
 
     def total_static_dipole_moment(self):
-       return sum([p.dipole_moment() for p in self])
+       return sum([p.permanent_dipole_moment() for p in self])
 
     def total_induced_dipole_moment(self):
        return sum([p.induced_dipole_moment() for p in self])

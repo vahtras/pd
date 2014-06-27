@@ -133,6 +133,9 @@ class PointDipoleListTest(unittest.TestCase):
         E = charge_dimer.evaluate_field_at_atoms()
         np.testing.assert_almost_equal(E, [[0,0,-1], [0,0,1]])
 
+    def test_unconverged_solver_raises_exception(self):
+        kwargs = {"max_it": 1}
+        self.assertRaises(Exception, self.h2o_dimer.solve_scf, **kwargs)
         
 if __name__ == "__main__":
     unittest.main()

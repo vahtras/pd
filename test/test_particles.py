@@ -111,6 +111,14 @@ class PointDipoleListTest(unittest.TestCase):
         E_local = self.h2.evaluate_field_at_atoms()
         np.testing.assert_almost_equal(E_local, [[0, 0, 0], [0, 0, 0]])
 
+    def test_evaluate_monopole_field_at_atoms(self):
+        dimer=PointDipoleList()
+        dimer.append(PointDipole(coordinates=(0,0,0), charge=2))
+        dimer.append(PointDipole(coordinates=(0,0,1)))
+        E_atoms = dimer.evaluate_field_at_atoms()
+        np.testing.assert_almost_equal(E_atoms, [[0,0,0],[0,0,2]])
+
+
     def test_evaluate_total_field_at_atoms(self):
         E_external = np.array([0., 0., 1.,])
         E_local = self.h2.evaluate_field_at_atoms(external=E_external)

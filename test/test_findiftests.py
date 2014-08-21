@@ -14,6 +14,7 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         self.particle._p0 = random_vector()
         self.particle._a0 = random_tensor()
         self.particle._b0 = random_tensor2()
+        self.particle._field = random_vector()
 
     def test_finite_difference_energy(self):
 #zero
@@ -37,8 +38,9 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         np.testing.assert_almost_equal(-gradE, self.particle.beta_induced_dipole_moment())
 
     def test_finite_difference_induced_dipole_energy(self):
-        gradE = field_gradient(self.particle.alpha_induced_dipole_energy)
-        np.testing.assert_almost_equal(-gradE, self.particle.induced_dipole_moment())
+        gradE = field_gradient(self.particle.induced_dipole_energy)
+        p_ind = self.particle.induced_dipole_moment()
+        np.testing.assert_almost_equal(-gradE, p_ind)
 
     def test_finite_difference_total_dipole_energy(self):
         gradE = field_gradient(self.particle.dipole_energy)
@@ -60,7 +62,7 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def test_finite_difference_total_dipole_moment(self):
         gradp = field_gradient(self.particle.dipole_moment)
-        np.testing.assert_almost_equal(gradp, self.particle._a0)
+        np.testing.assert_almost_equal(gradp, self.particle.a)
 
     def test_finite_difference_hessian_dipole_moment(self):
         hess_p = field_hessian(self.particle.dipole_moment)

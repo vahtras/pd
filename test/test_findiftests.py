@@ -1,5 +1,6 @@
 import unittest
 import random
+import math
 import numpy as np
 from ..particles import *
 from .util import *
@@ -259,7 +260,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dimer.append(RandomPointDipole())
         dimer.append(RandomPointDipole())
         #separate them 
-        dimer[1]._r += 2*np.ones(3)
+        dimer[1]._r += 4*np.ones(3)/math.sqrt(3)
         alphas = dimer.solve_Applequist_equation()
         dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
         np.testing.assert_almost_equal(dp_dF, alphas, decimal=5)

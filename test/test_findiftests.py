@@ -25,17 +25,18 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
 
     def test_finite_difference_permanent_dipole_energy(self):
-        self.particle._p0 = random_vector()
         gradE = field_gradient(self.particle.permanent_dipole_energy)
         np.testing.assert_almost_equal(-gradE, self.particle.permanent_dipole_moment())
 
     def test_finite_difference_alpha_induced_dipole_energy(self):
-        self.particle._a0 = random_tensor()
         gradE = field_gradient(self.particle.alpha_induced_dipole_energy)
         np.testing.assert_almost_equal(-gradE, self.particle.alpha_induced_dipole_moment())
 
+    def test_finite_difference_beta_induced_dipole_energy(self):
+        gradE = field_gradient(self.particle.beta_induced_dipole_energy)
+        np.testing.assert_almost_equal(-gradE, self.particle.beta_induced_dipole_moment())
+
     def test_finite_difference_induced_dipole_energy(self):
-        self.particle._a0 = random_tensor()
         gradE = field_gradient(self.particle.alpha_induced_dipole_energy)
         np.testing.assert_almost_equal(-gradE, self.particle.induced_dipole_moment())
 

@@ -1,4 +1,5 @@
 import numpy as np
+from ..particles import PointDipole
 
 def iterize(multi_line_string):
     return iter(multi_line_string.split('\n'))
@@ -63,3 +64,13 @@ def random_tensor2():
     b = b + b.transpose((1, 2, 0)) +  b.transpose((2, 0, 1)) +\
         b.transpose((1, 0, 2)) + b.transpose((2, 1, 0)) + b.transpose((0, 2, 1))
     return  b
+
+class RandomPointDipole(PointDipole):
+    
+    def __init__(self):
+        PointDipole.__init__(self)
+        self._r = random_vector()
+        self._q = random_scalar()
+        self._p0 = random_vector()
+        self._a0 = random_tensor()
+        self._b0 = random_tensor2()

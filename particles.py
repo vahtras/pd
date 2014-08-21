@@ -38,7 +38,7 @@ class PointDipoleList(list):
 
     def append(self, arg):
         """Overriding superclass list append: check if arg is PointDipole"""
-        if type(arg) != PointDipole:
+        if not isinstance(arg,  PointDipole):
             print "PointDipoleList.append called with object of type", type(arg)
             raise TypeError
         super(PointDipoleList, self).append(arg)
@@ -345,7 +345,6 @@ class PointDipole(object):
             self._a0 = ALPHA_ZERO
             
 
-        print "PD init kwargs", kwargs
         if "ut_beta" in kwargs:
             upper_triangular_hyppol = array(kwargs["ut_beta"])
             assert upper_triangular_hyppol.shape == (10,)

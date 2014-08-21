@@ -2,8 +2,7 @@ import unittest
 import random
 import numpy as np
 from ..particles import *
-from .util import field_gradient, field_hessian
-from .util import random_scalar, random_vector, random_tensor, random_tensor2
+from .util import *
 
 class PointDipoleFiniteFieldTests(unittest.TestCase):
 
@@ -254,4 +253,9 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         method = molecule.evaluate_field_at_atoms
         dEi_dF = molecule.field_gradient_of_method(method)
         np.testing.assert_almost_equal(test_this, dEi_dF, decimal=3)
+
+    def test_alpha_finite_random_dimer(self):
+        dimer = PointDipoleList()
+        dimer.append(RandomPointDipole())
+        pass
 

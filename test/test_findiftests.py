@@ -7,6 +7,9 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def setUp(self):
         self.particle = PointDipole()
+        self.particle._p0 = random_vector()
+        self.particle._a0 = random_tensor()
+        self.particle._b0 = random_tensor2()
 
     def test_finite_difference_energy(self):
 #zero
@@ -33,38 +36,28 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         np.testing.assert_almost_equal(-gradE, self.particle.induced_dipole_moment())
 
     def test_finite_difference_total_dipole_energy(self):
-        self.particle._p0 = random_vector()
-        self.particle._a0 = random_tensor()
         gradE = field_gradient(self.particle.dipole_energy)
         np.testing.assert_almost_equal(-gradE, self.particle.dipole_moment())
 
     def test_finite_difference_permanent_dipole_moment(self):
-        self.particle._p0 = np.random.random(3)
         gradE = field_gradient(self.particle.permanent_dipole_moment)
         np.testing.assert_almost_equal(-gradE, np.zeros((3, 3)))
 
     def test_finite_difference_alpha_induced_dipole_moment(self):
-        self.particle._a0 = random_tensor()
         gradp = field_gradient(self.particle.alpha_induced_dipole_moment)
         np.testing.assert_almost_equal(gradp, self.particle._a0)
 
     def test_finite_difference_beta_induced_dipole_moment(self):
-        self.particle._b0 = random_tensor2()
         self.particle.set_local_field(random_vector())
         gradp = field_gradient(self.particle.beta_induced_dipole_moment)
         ref = np.dot(self.particle._b0, self.particle.local_field())
         np.testing.assert_almost_equal(gradp, ref)
 
     def test_finite_difference_total_dipole_moment(self):
-        self.particle._p0 = random_vector()
-        self.particle._a0 = random_tensor()
         gradp = field_gradient(self.particle.dipole_moment)
         np.testing.assert_almost_equal(gradp, self.particle._a0)
 
     def test_finite_difference_hessian_dipole_moment(self):
-        self.particle._p0 = random_vector()
-        self.particle._a0 = random_tensor()
-        self.particle._b0 = random_tensor2()
         hess_p = field_hessian(self.particle.dipole_moment)
         np.testing.assert_almost_equal(hess_p, self.particle._b0)
 

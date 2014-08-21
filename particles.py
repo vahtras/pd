@@ -51,6 +51,10 @@ class PointDipoleList(list):
         for p, q in zip(self, charges):
             p.set_charge(q)
 
+    def set_dipoles(self, dipoles):
+        for p, p0 in zip(self, dipoles):
+            p.set_dipole(p0)
+
     def total_static_dipole_moment(self):
        return sum([p.permanent_dipole_moment() for p in self])
 
@@ -335,6 +339,8 @@ class PointDipole(object):
                 aij = upper_triangular_pol[ij]
                 self._a0[i, j] = aij
                 self._a0[j, i] = aij
+        elif "alpha" in kwargs:
+            self._a0 = array(kwargs["alpha"])
         else:
             self._a0 = ALPHA_ZERO
             
@@ -425,6 +431,9 @@ class PointDipole(object):
         """
 
         self._q = float(q)
+
+    def set_dipole(self, p0):
+        self._p0 = np.array(p0)
 
 
     def dipole_moment(self):

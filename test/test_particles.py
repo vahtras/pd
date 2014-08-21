@@ -1,7 +1,8 @@
 import unittest
 import numpy as np
+from numpy.linalg import norm
 from ..particles import PointDipole, PointDipoleList
-from .util import iterize
+from .util import iterize, random_scalar, random_vector
 from const import *
 from test_applequist import H2
 
@@ -91,6 +92,20 @@ class PointDipoleListTest(unittest.TestCase):
         self.h2.solve_scf_for_external(E_external, max_it = 100)
         np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=6)
         
+    def test_evaluate_charge_potential_at_atoms(self):
+        self.h2.set_charges((1.0, 1.0))
+        V_local = self.h2.evaluate_potential_at_atoms()
+        np.testing.assert_almost_equal(V_local, [1.0/H2['R'], 1.0/H2['R']])
+
+    def test_evaluate_dipole_potential_at_atoms(self):
+        V_external = random_vector()
+        p0 = random_vector()
+        self.h2.set_dipoles([p0, p0])
+        V_local = self.h2.evaluate_potential_at_atoms(V_external)
+        r12 = self.h2[0]._r - self.h2[1]._r
+        V_ref = np.dot(p0, r12)/norm(r12)**3
+        np.testing.assert_almost_equal(V_local, [V_external+V_ref, V_external-V_ref])
+
     def test_evaluate_field_at_atoms(self):
         E_external = np.array([0., 0., 1.,])
         E_local = self.h2.evaluate_field_at_atoms()
@@ -136,6 +151,23 @@ class PointDipoleListTest(unittest.TestCase):
     def test_unconverged_solver_raises_exception(self):
         kwargs = {"max_it": 1}
         self.assertRaises(Exception, self.h2o_dimer.solve_scf, **kwargs)
+
+    def test_alphas_as_matrix(self):
+        a = np.array(range(9)).reshape((3,3))
+        dimer = PointDipoleList()
+        dimer.append(PointDipole(alpha=a))
+        dimer.append(PointDipole(alpha=a))
+        mat = dimer.alphas_as_matrix()
+        np.testing.assert_almost_equal(
+            mat, [
+                [0, 1, 2, 0, 0, 0],
+                [3, 4, 5, 0, 0, 0],
+                [6, 7, 8, 0, 0, 0],
+                [0, 0, 0, 0, 1, 2],
+                [0, 0, 0, 3, 4, 5],
+                [0, 0, 0, 6, 7, 8]
+                ]
+            )
         
 if __name__ == "__main__":
     unittest.main()

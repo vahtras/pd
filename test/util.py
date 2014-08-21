@@ -3,7 +3,7 @@ import numpy as np
 def iterize(multi_line_string):
     return iter(multi_line_string.split('\n'))
 
-EPSILON = 0.0001
+EPSILON = 0.0005
 ex = np.array([EPSILON/2, 0, 0])
 ey = np.array([0, EPSILON/2, 0])
 ez = np.array([0, 0, EPSILON/2])

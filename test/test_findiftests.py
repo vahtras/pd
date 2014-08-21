@@ -2,7 +2,8 @@ import unittest
 import random
 import numpy as np
 from ..particles import *
-from util import field_gradient, field_hessian
+from .util import field_gradient, field_hessian
+from .util import random_scalar, random_vector, random_tensor, random_tensor2
 
 class PointDipoleFiniteFieldTests(unittest.TestCase):
 
@@ -251,19 +252,3 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dEi_dF = molecule.field_gradient_of_method(method)
         np.testing.assert_almost_equal(test_this, dEi_dF, decimal=3)
 
-def random_scalar():
-    return random.random()
-
-def random_vector():
-    return np.random.random(3)
-
-def random_tensor():
-    a = np.random.random((3, 3))
-    a = 0.5*(a + a.T)
-    return  a
-
-def random_tensor2():
-    b = np.random.random((3, 3, 3))
-    b = b + b.transpose((1, 2, 0)) +  b.transpose((2, 0, 1)) +\
-        b.transpose((1, 0, 2)) + b.transpose((2, 1, 0)) + b.transpose((0, 2, 1))
-    return  b

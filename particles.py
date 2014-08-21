@@ -300,7 +300,7 @@ class PointDipole(object):
            _q: charge
            _p0: permanent dipole
             _a0: polarizability tensor
-            b: hyperpolarizability tensor
+            _b0: hyperpolarizability tensor
 
         variable:
             _field

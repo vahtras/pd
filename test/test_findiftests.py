@@ -257,5 +257,20 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
     def test_alpha_finite_random_dimer(self):
         dimer = PointDipoleList()
         dimer.append(RandomPointDipole())
-        pass
+        dimer.append(RandomPointDipole())
+        #separate them 
+        dimer[1]._r += 2*np.ones(3)
+        alphas = dimer.solve_Applequist_equation()
+        dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(dp_dF, alphas, decimal=5)
+
+    def test_beta_finite_random_dimer(self):
+        dimer = PointDipoleList()
+        dimer.append(RandomPointDipole())
+        dimer.append(RandomPointDipole())
+        #separate them 
+        dimer[1]._r += 2*np.ones(3)
+        betas = dimer.solve_second_Applequist_equation()
+        d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=5)
 

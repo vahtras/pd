@@ -109,7 +109,13 @@ class PointDipoleList(list):
     def solve_Applequist_equation(self):
         # Solve the linear response equaitons
         n = len(self)
-        self.solve_scf_for_external(ZERO_VECTOR)
+        try:
+            self.solve_scf_for_external(ZERO_VECTOR)
+        except SCFNotConverged as e:
+            print "SCF Not converged: residual=%f, threshold=%f"% (
+                float(e.residual), float(e.threshold)
+                )
+            
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
@@ -151,17 +157,18 @@ class PointDipoleList(list):
     def solve_scf(self, max_it=100, threshold=1e-6):
         self.solve_scf_for_external(ZERO_VECTOR, max_it, threshold)
 
-    def solve_scf_for_external(self, E, max_it=100, threshold=1e-6):
+    def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
         E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
             E_at_p =  self.evaluate_field_at_atoms(external=E)
+            #print i, E_at_p
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p
-        raise Exception("SCF not converged")
+        raise SCFNotConverged(residual, threshold)
 
     def evaluate_field_at_atoms(self, external=None):
         E_at_p =  [
@@ -540,11 +547,13 @@ class PointDipole(object):
     def monopole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
         return self._q*dr/dr2**1.5
 
     def dipole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
         p = self.dipole_moment()
         return (3*dr*dot(dr, p) - dr2*p)/dr2**2.5
 
@@ -618,6 +627,10 @@ def line_to_dict(header_dict, line):
     
     return line_dict
 
+class SCFNotConverged(Exception):
+    def __init__(self, residual, threshold):
+        self.residual = residual
+        self.threshold = threshold
 
 if __name__ == "__main__":
     import argparse

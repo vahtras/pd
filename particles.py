@@ -312,8 +312,8 @@ class PointDipole(object):
         
         derived quantities 
         
-           dp: induced dipole moment
            p:  total dipole moment
+           a:  effective polarizability
         
         """
 

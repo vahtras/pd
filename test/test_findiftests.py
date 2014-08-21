@@ -9,7 +9,7 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def setUp(self):
         self.particle = PointDipole()
-        self.particle._r = random_scalar()
+        self.particle._r = random_vector()
         self.particle._q = random_scalar()
         self.particle._p0 = random_vector()
         self.particle._a0 = random_tensor()
@@ -183,10 +183,10 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
             )
         )
 
-    def test_finite_difference_polarizable_monomer_z(self):
+    def test_finite_difference_polarizable_monomer(self):
         alphas = self.h2o_monomer.solve_Applequist_equation()
         dp0_dF = self.h2o_monomer.field_gradient_of_method(self.h2o_monomer.induced_dipole_moment)
-        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+        np.testing.assert_almost_equal(dp0_dF, alphas)
 
     def test_finite_difference_polarizable_dimer_z(self):
         alphas = self.h2o_dimer.solve_Applequist_equation()

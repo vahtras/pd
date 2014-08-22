@@ -81,7 +81,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         self.h2o_dimer=PointDipoleList.from_string("""AU
 2 1 1 0
 1 0.00000  0.00000  0.48861 0.0 0.00000 -0.00000 -0.76539  6.61822
-1 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
+2 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
 """)
 
         self.h2o_monomer=PointDipoleList.from_string("""AU

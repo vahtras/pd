@@ -197,6 +197,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
         self.h2o_dimer_hyp.append(
             PointDipole(
+                group=1,
                 coordinates=(0, 0, 0),
                 charge=0,
                 dipole=(0, 0, -0.81457755),
@@ -227,6 +228,7 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
 
         self.h2o_dimer_hyp.append(
             PointDipole(
+                group=2,
                 coordinates=(0, 0, 10),
                 charge=0,
                 dipole=(0, 0, -0.81457755),
@@ -330,9 +332,10 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
     def test_alpha_finite_random_dimer(self):
         dimer = PointDipoleList()
         dimer.append(RandomPointDipole())
-        dimer.append(RandomPointDipole())
+        dimer.append(RandomPointDipole(group=2))
         #separate them 
         dimer[1]._r += 4*np.ones(3)/math.sqrt(3)
+        dimer[1].group = dimer[0].group + 1
         alphas = dimer.solve_Applequist_equation()
         dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
         np.testing.assert_almost_equal(dp_dF, alphas, decimal=5)
@@ -343,6 +346,8 @@ class PointDipoleListFiniteFieldTests(unittest.TestCase):
         dimer.append(RandomPointDipole())
         #separate them 
         dimer[1]._r += 2*np.ones(3)
+        dimer[1].group = dimer[0].group + 1
+
         betas = dimer.solve_second_Applequist_equation()
         d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
         np.testing.assert_almost_equal(d2p_dF2, betas, decimal=5)

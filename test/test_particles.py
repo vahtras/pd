@@ -19,6 +19,12 @@ H2O_DIMER = """AU
 1 0.00000  0.00000  0.48861 0.0 0.00000 -0.00000 -0.76539  6.61822
 2 0.00000  0.00000  5.48861 0.0 0.00000 -0.00000 -0.76539  6.61822 
 """
+
+H2O_DIMER_UNIT = """AU
+2 1 22 1
+1 0 0 -0.2249058930  0   0 0 0.814576406    7.21103625278 0 0 3.03446384360 0 5.22710462524    0 0 -18.48299798 0 0 0 0 -2.33649400 0 -11.17349291
+1 0 0  0.7750941070  0   0 0 0.814576406    7.21103625278 0 0 3.03446384360 0 5.22710462524    0 0 -18.48299798 0 0 0 0 -2.33649400 0 -11.17349291
+"""
         
 class PointDipoleListTest(unittest.TestCase):
 
@@ -92,8 +98,13 @@ class PointDipoleListTest(unittest.TestCase):
         self.h2.solve_scf_for_external(E_external, max_it = 100)
         np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=6)
         
+    def test_set_groups(self):
+        self.h2.set_groups((1, 2))
+        self.assertEqual(self.h2.groups(), (1, 2))
+        
     def test_evaluate_charge_potential_at_atoms(self):
         self.h2.set_charges((1.0, 1.0))
+        self.h2.set_groups((1, 2))
         V_local = self.h2.evaluate_potential_at_atoms()
         np.testing.assert_almost_equal(V_local, [1.0/H2['R'], 1.0/H2['R']])
 
@@ -101,6 +112,7 @@ class PointDipoleListTest(unittest.TestCase):
         V_external = random_vector()
         p0 = random_vector()
         self.h2.set_dipoles([p0, p0])
+        self.h2.set_groups((1, 2))
         V_local = self.h2.evaluate_potential_at_atoms(V_external)
         r12 = self.h2[0]._r - self.h2[1]._r
         V_ref = np.dot(p0, r12)/norm(r12)**3
@@ -113,8 +125,8 @@ class PointDipoleListTest(unittest.TestCase):
 
     def test_evaluate_monopole_field_at_atoms(self):
         dimer=PointDipoleList()
-        dimer.append(PointDipole(coordinates=(0,0,0), charge=2))
-        dimer.append(PointDipole(coordinates=(0,0,1)))
+        dimer.append(PointDipole(group=2, coordinates=(0,0,0), charge=2))
+        dimer.append(PointDipole(group=3, coordinates=(0,0,1)))
         E_atoms = dimer.evaluate_field_at_atoms()
         np.testing.assert_almost_equal(E_atoms, [[0,0,0],[0,0,2]])
 
@@ -176,6 +188,15 @@ class PointDipoleListTest(unittest.TestCase):
                 [0, 0, 0, 6, 7, 8]
                 ]
             )
+
+    def test_read_dimer_unit(self):
+        h2o_2 = PointDipoleList.from_string(H2O_DIMER_UNIT)
+        self.assertEqual(len(h2o_2), 2)
+
+    def test_unit_not_self_polarizing(self):
+        h2o2 = PointDipoleList.from_string(H2O_DIMER_UNIT)
+        h2o2.solve_scf()
+        np.testing.assert_equal(h2o2.total_static_dipole_moment(), h2o2.total_dipole_moment())
         
 if __name__ == "__main__":
     unittest.main()

@@ -73,8 +73,8 @@ def random_tensor2():
 
 class RandomPointDipole(PointDipole):
     
-    def __init__(self):
-        PointDipole.__init__(self)
+    def __init__(self, *args, **kwargs):
+        PointDipole.__init__(self, *args, **kwargs)
         self._r = random_vector()
         self._q = random_scalar()
         self._p0 = random_vector()

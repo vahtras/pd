@@ -46,6 +46,13 @@ class PointDipoleList(list):
         """Returns sum of charges of particles in the list"""
         return sum([p.charge() for p in self])
 
+    def set_groups(self, groups):
+        for p, group in zip(self, groups):
+            p.group = group
+
+    def groups(self):
+        return tuple([p.group for p in self])
+
     def set_charges(self, charges):
         for p, q in zip(self, charges):
             p.set_charge(q)
@@ -98,11 +105,17 @@ class PointDipoleList(list):
         return np.trace(self.alpha())/3
 
     def alpha(self):
-        dpdF = self.solve_Applequist_equation()
+        try:
+            dpdF = self.solve_Applequist_equation()
+        except SCFNotConverged:
+            return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
     def beta(self):
-        d2p_dF2 = self.solve_second_Applequist_equation()
+        try:
+            d2p_dF2 = self.solve_second_Applequist_equation()
+        except SCFNotConverged:
+            return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
     def solve_Applequist_equation(self):
@@ -114,6 +127,7 @@ class PointDipoleList(list):
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
                 )
+            raise
             
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix()
@@ -172,7 +186,7 @@ class PointDipoleList(list):
     def evaluate_field_at_atoms(self, external=None):
         E_at_p =  [
             array(
-                [o.field_at(p._r) for o in self if o is not p]
+                [o.field_at(p._r) for o in self if not o.in_group_of(p)]
                 ).sum(axis=0) 
             for p in self
             ]
@@ -184,7 +198,7 @@ class PointDipoleList(list):
     def evaluate_potential_at_atoms(self, external=None):
         V_at_p =  [
             array(
-                [o.potential_at(p._r) for o in self if o is not p]
+                [o.potential_at(p._r) for o in self if not o.in_group_of(p)]
                 ).sum(axis=0)
             for p in self
             ]
@@ -323,6 +337,7 @@ class PointDipole(object):
         
         """
 
+        self.group = kwargs.get('group', 1)
         self._r = array(kwargs.get('coordinates', np.zeros(3)))
 
         if 'charge' in kwargs:
@@ -374,6 +389,8 @@ class PointDipole(object):
         self.set_local_field(kwargs.get('local_field', np.zeros(3)))
         self._potential = kwargs.get('local_potential', 0)
 
+    def in_group_of(self, other):
+        return self.group == other.group
 
     @property
     def p(self):
@@ -470,7 +487,7 @@ class PointDipole(object):
             value_line += list(self._p0)
         if self._a0 is not None:
             value_line +=  [self._a0[0, 0]]
-        return "1" + self.fmt*len(value_line) % tuple(value_line)
+        return "%d" % self.group + self.fmt*len(value_line) % tuple(value_line)
 
     def charge_energy(self):
         r"""Electrostatic energy of charge in local potential
@@ -586,9 +603,11 @@ def header_to_dict(header):
 def line_to_dict(header_dict, line):
     """Transfer line data to dictonary"""
 
-
-    line_data = map(float, line.split()[1:])
     line_dict = {}
+    line_items = line.split()
+
+    line_dict['group'] = int(line_items[0])
+    line_data = map(float, line_items[1:])
 
     line_dict['coordinates'] = line_data[:3]
     nextstart = 3

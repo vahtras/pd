@@ -198,6 +198,10 @@ class PointDipoleTest(unittest.TestCase):
     def test_verify_default_hyperpol(self):
         default_atom = PointDipole()
         np.testing.assert_equal(default_atom._b0, ZERO_RANK_3_TENSOR)
+
+    def test_in_group(self):
+        default_atom = PointDipole()
+        self.assertTrue(default_atom.in_group_of(default_atom))
             
 
     #def test_H2_verify_default_hyperbol

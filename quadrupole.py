@@ -560,10 +560,7 @@ class Quadrupole( PointDipole ):
         return dot(self.p, dr)/norm(dr)**3
 
     def field_at(self, r):
-        print self.monopole_field_at(r)
-        print self.dipole_field_at(r)
         print self.quadrupole_field_at(r)
-        raise SystemExit
         return self.monopole_field_at(r) + self.dipole_field_at(r) +\
                 self.quadrupole_field_at(r)
 
@@ -596,7 +593,7 @@ class Quadrupole( PointDipole ):
                         tmp +=  dr[j]
                     if i == j:
                         tmp +=  dr[k]
-                    tensor[i, j, k] = (15 * dr[i] * dr[j] * dr[k] - 3*tmp*dr2 ) / (dr2 ** 7.5 )
+                    tensor[i, j, k] = (15 * dr[i] * dr[j] * dr[k] - 3*tmp*dr2 ) / (dr2 ** 3.5 )
         q = self.quadrupole_moment()
         return  einsum("ijk,jk", tensor, q )
 

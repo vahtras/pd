@@ -1,0 +1,9 @@
+@TITLE "Dipole moment error as a function of r"
+@LEGEND ON
+@LEGEND BOX ON
+@LEGEND LOCTYPE VIEW
+@LEGEND 0.80, 0.80
+@ s0 LEGEND "hyper, dipole"
+@ XAXIS LABEL "r"
+@ YAXIS LABEL "Absolute error"
+@ SORT s0 X ASCENDING

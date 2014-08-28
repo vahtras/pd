@@ -18,7 +18,7 @@ class GaussianTest( unittest.TestCase ):
 
     def setUp(self):
 
-        self._source = np.array( [0,0,0], dtype = float )
+        self._source = np.array( [0.1, -0.2 , 1.0], dtype = float )
         self._dest = np.array( [0.5, 0.5, 1.0], dtype = float )
         #self._source = np.random.random( 3 )
         #self._dest = np.random.random( 3 )
@@ -51,7 +51,7 @@ class GaussianTest( unittest.TestCase ):
         first = erf( dr / R)
         second = 2 * dr * invpi / R * np.exp( -dr**2/R**2 )
         third = 4*invpi/R**3*np.outer((d-s),(d-s))/dr**2*np.exp( -dr**2/R**2)
-        return (3*np.outer((d-s),(d-s))-dr**2*np.ones((3,3))) / dr**5 *(first - second) - third
+        return (3*np.outer((d-s),(d-s))- dr**2*np.diag((1,1,1)) )/ dr**5 *(first - second) - third
 
     def test_finite_first(self):
 
@@ -67,9 +67,9 @@ class GaussianTest( unittest.TestCase ):
         E_y_ana = self.equation_two( self._dest )[1]
         E_z_ana = self.equation_two( self._dest )[2]
 
-        np.testing.assert_almost_equal( E_x_fin , E_x_ana , 6)
-        np.testing.assert_almost_equal( E_y_fin , E_y_ana , 6)
-        np.testing.assert_almost_equal( E_z_fin , E_z_ana , 6)
+        np.testing.assert_almost_equal( E_x_fin , E_x_ana , 3)
+        np.testing.assert_almost_equal( E_y_fin , E_y_ana , 3)
+        np.testing.assert_almost_equal( E_z_fin , E_z_ana , 3)
 
     def test_finite_second(self):
 
@@ -94,11 +94,12 @@ class GaussianTest( unittest.TestCase ):
         E_zz_ana = self.equation_three(  r  )[2][2]
 
         np.testing.assert_almost_equal( E_xx_fin , E_xx_ana , 5)
-        #np.testing.assert_almost_equal( E_xy_fin , E_xy_ana , 5)
-        #np.testing.assert_almost_equal( E_xz_fin , E_xz_ana , 5)
-        np.testing.assert_almost_equal( E_yy_fin , E_yy_ana , 5)
-        np.testing.assert_almost_equal( E_yz_fin , E_yz_ana , 5)
-        np.testing.assert_almost_equal( E_zz_fin , E_zz_ana , 5)
+        np.testing.assert_almost_equal( E_xy_fin , E_xy_ana , 5)
+        np.testing.assert_almost_equal( E_xy_fin , E_xy_ana , 5)
+        np.testing.assert_almost_equal( E_xz_fin , E_xz_ana , 5)
+        np.testing.assert_almost_equal( E_yy_fin , E_yy_ana , 3)
+        np.testing.assert_almost_equal( E_yz_fin , E_yz_ana , 3)
+        np.testing.assert_almost_equal( E_zz_fin , E_zz_ana , 3)
 
 
 if __name__ == '__main__':

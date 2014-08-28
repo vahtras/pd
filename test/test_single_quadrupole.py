@@ -4,7 +4,7 @@ from ..particles import line_to_dict, header_to_dict
 from ..quadrupole import Quadrupole
 from util import field_gradient
 
-from ..particles import I_3, ZERO_VECTOR, BETA_ZERO
+from ..particles import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
 
 class QuadrupoleTest(unittest.TestCase):
     """Test basic particle properties"""
@@ -198,10 +198,13 @@ class QuadrupoleTest(unittest.TestCase):
 
     def test_verify_default_hyperpol(self):
         default_atom = Quadrupole()
-        np.testing.assert_equal(default_atom._b0, BETA_ZERO)
-            
+        np.testing.assert_equal(default_atom._b0, ZERO_RANK_3_TENSOR)
 
-    #def test_H2_verify_default_hyperbol
+    def test_verify_default_quadrupole(self):
+        default_atom = Quadrupole()
+        np.testing.assert_equal(default_atom._Q0, ZERO_TENSOR)
+        
+            
 
 if __name__ == "__main__":
     unittest.main()

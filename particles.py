@@ -1,14 +1,13 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 """Module defining polarizable point dipole class""" 
+
 import numpy as np 
 from numpy.linalg import norm 
 from numpy import outer, dot, array, zeros
-
 import ut
+from constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
 
-I_3 = np.identity(3)
-ZERO_VECTOR = np.zeros(3)
-ALPHA_ZERO = np.zeros((3, 3))
-BETA_ZERO = np.zeros((3, 3, 3))
 
 class PointDipoleList(list):
     """A list class of ``PointDipole`` objects"""
@@ -349,7 +348,7 @@ class PointDipole(object):
         elif "alpha" in kwargs:
             self._a0 = array(kwargs["alpha"])
         else:
-            self._a0 = ALPHA_ZERO
+            self._a0 = ZERO_TENSOR
             
 
         if "ut_beta" in kwargs:
@@ -365,7 +364,7 @@ class PointDipole(object):
                 self._b0[j, i, k] = bijk
                 self._b0[k, j, i] = bijk
         else:
-            self._b0 = BETA_ZERO
+            self._b0 = ZERO_RANK_3_TENSOR
 
         self.args = args
 

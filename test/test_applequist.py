@@ -1,9 +1,10 @@
 import unittest
 import numpy as np
 from ..particles import PointDipoleList
-from const import *
+from ..constants import *
 from data_applequist import *
 
+DECIMALS = 1
 
 
 class ApplequistTest(unittest.TestCase):
@@ -37,7 +38,7 @@ class ApplequistTest(unittest.TestCase):
         h2 = PointDipoleList.from_string(H2["POTFILE"])
         ha, hb = h2
         
-        np.testing.assert_array_equal(ha._b0, BETA_ZERO)
+        np.testing.assert_array_equal(ha._b0, ZERO_RANK_3_TENSOR)
 
     def test_N2_iso(self):
 

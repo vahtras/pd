@@ -1,16 +1,17 @@
 import unittest
 import numpy as np
-from ..particles import PointDipole, line_to_dict, header_to_dict
+from ..particles import line_to_dict, header_to_dict
+from ..quadrupole import Quadrupole
 from util import field_gradient
 
 from ..particles import I_3, ZERO_VECTOR, BETA_ZERO
 
-class PointDipoleTest(unittest.TestCase):
+class QuadrupoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
     def setUp(self):
         self.coordinates = np.random.random(3)
-        self.particle = PointDipole(
+        self.particle = Quadrupole(
             coordinates=self.coordinates,
             charge=1.0,
             dipole=[0.1, 0.2, 0.3],
@@ -73,7 +74,7 @@ class PointDipoleTest(unittest.TestCase):
 # energy:
 #
     def test_total_field_energy(self):
-        dipole = PointDipole(
+        dipole = Quadrupole(
             charge=1.2, 
             local_potential=0.12,
             dipole=(1, 2, 3),
@@ -84,27 +85,27 @@ class PointDipoleTest(unittest.TestCase):
         self.assertEqual(self.particle.total_energy(), -1.41)
 
     def test_monopole_energy(self):
-        charge_in_potential = PointDipole(charge=1.2, local_potential=0.12)
+        charge_in_potential = Quadrupole(charge=1.2, local_potential=0.12)
         np.testing.assert_almost_equal(
             charge_in_potential.charge_energy(),
             0.144
             )
 
     def test_permanent_dipole_energy(self):
-        dipole = PointDipole(dipole=(.1, .2, .3), local_field=(1, 2, 3))
+        dipole = Quadrupole(dipole=(.1, .2, .3), local_field=(1, 2, 3))
         self.assertEqual(
             dipole.permanent_dipole_energy(), 
             -1.4
             )
 
     def test_alpha_induced_dipole_energy(self):
-        dipole = PointDipole(iso_alpha=0.05, local_field=(1, 2, 3))
+        dipole = Quadrupole(iso_alpha=0.05, local_field=(1, 2, 3))
         self.assertAlmostEqual(
             dipole.alpha_induced_dipole_energy(), -0.35
             )
 
     def test_beta_induced_dipole_energy(self):
-        dipole = PointDipole(iso_alpha=0.05, local_field=(1, 2, 3))
+        dipole = Quadrupole(iso_alpha=0.05, local_field=(1, 2, 3))
         self.assertAlmostEqual(
             self.particle.beta_induced_dipole_energy(), -0.06
             )
@@ -112,14 +113,14 @@ class PointDipoleTest(unittest.TestCase):
 # Potential at external point
 
     def test_total_potential_at(self):
-        charge = PointDipole(charge=1.3, dipole=(.1, .2, .3))
+        charge = Quadrupole(charge=1.3, dipole=(.1, .2, .3))
         field_point = np.array([0., 3., 4.])
         np.testing.assert_almost_equal(
             charge.potential_at(field_point),
             1.3/5 + 1.8/125
             )
     def test_monopole_potential_at(self):
-        charge = PointDipole(charge=1.3)
+        charge = Quadrupole(charge=1.3)
         field_point = np.array([0., 3., 4.])
         np.testing.assert_almost_equal(
             charge.monopole_potential_at(field_point),
@@ -127,14 +128,14 @@ class PointDipoleTest(unittest.TestCase):
             )
 
     def test_dipole_potential_at(self):
-        dipole = PointDipole(dipole=(.1, .2, .3))
+        dipole = Quadrupole(dipole=(.1, .2, .3))
         field_point = np.array([0., 3., 4.])
         np.testing.assert_almost_equal(dipole.dipole_potential_at(field_point), 1.8/125)
 
 # Field at external point
 
     def test_monopole_field_at(self):
-        charge = PointDipole(charge=1.3)
+        charge = Quadrupole(charge=1.3)
         field_point = np.array([0., 3., 4.])
         np.testing.assert_almost_equal(
             charge.monopole_field_at(field_point),
@@ -143,7 +144,7 @@ class PointDipoleTest(unittest.TestCase):
 
 
     def test_dipole_field_at(self):
-        dipole = PointDipole(dipole=(1, 1, 1))
+        dipole = Quadrupole(dipole=(1, 1, 1))
         field_point = np.array([0., 3., 4.])
         ref = (3*field_point*7 - 25*np.ones(3))/3125
         np.testing.assert_almost_equal(
@@ -184,19 +185,19 @@ class PointDipoleTest(unittest.TestCase):
 # More constructor tests
 
     def test_verify_default_origin(self):
-        default_atom = PointDipole()
+        default_atom = Quadrupole()
         np.testing.assert_equal(default_atom._r, np.zeros(3))
 
     def test_verify_default_dipole(self):
-        default_atom = PointDipole()
+        default_atom = Quadrupole()
         np.testing.assert_equal(default_atom._p0, ZERO_VECTOR)
 
     def test_verify_default_isopol(self):
-        default_atom = PointDipole()
+        default_atom = Quadrupole()
         np.testing.assert_equal(default_atom._a0.diagonal(), np.zeros(3))
 
     def test_verify_default_hyperpol(self):
-        default_atom = PointDipole()
+        default_atom = Quadrupole()
         np.testing.assert_equal(default_atom._b0, BETA_ZERO)
             
 

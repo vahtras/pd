@@ -9,6 +9,7 @@ from particles import PointDipole, PointDipoleList, header_to_dict, line_to_dict
 
 I_3 = np.identity(3)
 ZERO_VECTOR = np.zeros(3)
+ZERO_TENSOR = np.zeros((3, 3))
 ALPHA_ZERO = np.zeros((3, 3))
 BETA_ZERO = np.zeros((3, 3, 3))
 
@@ -101,6 +102,8 @@ class Quadrupole( PointDipole ):
                 aij = upper_triangular_quadru[ij]
                 self._Q0[i, j] = aij
                 self._Q0[j, i] = aij
+        else:
+            self._Q0 = ZERO_TENSOR
 
 #Overriding default field_at
     def field_at(self, r):

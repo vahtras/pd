@@ -91,12 +91,7 @@ class Quadrupole( PointDipole ):
 #Additional attribute
         if "quadrupole" in kwargs:
             upper_triangular_quadru = array( kwargs.get( 'quadrupole' , zeros( 6, ) ))
-            assert upper_triangular_quadru.shape == ( 6,) 
-            self._Q0 = np.zeros(( 3, 3 ))
-            for ij, (i, j) in enumerate(ut.upper_triangular(2)):
-                aij = upper_triangular_quadru[ij]
-                self._Q0[i, j] = aij
-                self._Q0[j, i] = aij
+            self.set_quadrupole_moment(upper_triangular_quadru)
         else:
             self._Q0 = ZERO_TENSOR
 
@@ -127,6 +122,13 @@ class Quadrupole( PointDipole ):
         return  einsum("ijk,jk", tensor, q )
 
 #For generality
+    def set_quadrupole_moment(self, Q):
+        assert Q.shape == ( 6,) 
+        self._Q0 = np.zeros(( 3, 3 ))
+        for ij, (i, j) in enumerate(ut.upper_triangular(2)):
+            self._Q0[i, j] = Q[ij]
+            self._Q0[j, i] = Q[ij]
+        
     def quadrupole_moment(self):
         return self._Q0
 

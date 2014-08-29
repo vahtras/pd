@@ -16,15 +16,12 @@ class QuadrupoleTest(unittest.TestCase):
             charge=1.0,
             dipole=[0.1, 0.2, 0.3],
             iso_alpha=0.05,
-            beta=np.zeros((3, 3, 3))
+            ut_beta=[0.01, 0, 0, 0, 0, 0, 0.01, 0, 0, 0.01],
+            quadrupole = np.arange(6)
             )
-        self.particle._b0[0, 0, 0] = 0.01
-        self.particle._b0[1, 1, 1] = 0.01
-        self.particle._b0[2, 2, 2] = 0.01
         self.particle.set_local_field([1., 2., 3.])
         self.particle.set_local_potential(0.4)
         self.beta = np.zeros((3, 3, 3))
-        self.beta[0, 0, 0] = self.beta[1, 1, 1] = self.beta[2, 2, 2] = 0.01
 #
 # test instance attributes
 #
@@ -48,6 +45,15 @@ class QuadrupoleTest(unittest.TestCase):
     def test_set_charge(self):
         self.particle.set_charge(1.7)
         self.assertEqual(self.particle.charge(), 1.7)
+
+    def test_set_quadrupole(self):
+        self.particle.set_quadrupole_moment(np.arange(6))
+        np.testing.assert_equal(self.particle.quadrupole_moment(),
+            ((0.0, 1.0, 2.0), 
+             (1.0, 3.0, 4.0), 
+             (2.0, 4.0, 5.0))
+            )
+         
 
     def test_permanent_dipole(self):
         np.testing.assert_allclose(self.particle.permanent_dipole_moment(), (0.1, 0.2, 0.3))
@@ -153,13 +159,14 @@ class QuadrupoleTest(unittest.TestCase):
             )
 
     def test_permanent_dipole_field_at(self):
-        self.particle.set_local_field((0,0,0)) # no induced dipole
-        self.particle._p0 = np.ones(3)         # only permanent dipole
+        dipole = Quadrupole(dipole=(1, 1, 1))
         dR = np.array([0., 3., 4.])
-        field_point = self.coordinates + dR
-        reference_field = (3*dR*7 - 25*np.ones(3))/5**5 + 1.0*dR/5**3
+        field_point = dipole.coordinates() + dR
+        reference_field = (3*dR*7 - 25*np.ones(3))/5**5 #+ 1.0*dR/5**3
+        Ep = dipole.dipole_field_at(field_point)
+        print Ep
         np.testing.assert_almost_equal(
-            self.particle.field_at(field_point),
+            dipole.dipole_field_at(field_point),
             reference_field
             )
 

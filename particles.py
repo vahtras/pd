@@ -363,6 +363,8 @@ class PointDipole(object):
                 self._b0[i, k, j] = bijk
                 self._b0[j, i, k] = bijk
                 self._b0[k, j, i] = bijk
+        elif "beta" in kwargs:
+            self._b0 = np.array(kwargs["beta"])
         else:
             self._b0 = ZERO_RANK_3_TENSOR
 

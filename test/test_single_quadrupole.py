@@ -54,7 +54,6 @@ class QuadrupoleTest(unittest.TestCase):
              (2.0, 4.0, 5.0))
             )
          
-
     def test_permanent_dipole(self):
         np.testing.assert_allclose(self.particle.permanent_dipole_moment(), (0.1, 0.2, 0.3))
 
@@ -115,6 +114,9 @@ class QuadrupoleTest(unittest.TestCase):
         self.assertAlmostEqual(
             self.particle.beta_induced_dipole_energy(), -0.06
             )
+
+    def test_quadrupole_energy(self):
+        quadrupole = Quadrupole(quadrupole=np.arange(6), local_field=(1, 0, 0))
 
 # Potential at external point
 

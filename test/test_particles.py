@@ -3,7 +3,7 @@ import numpy as np
 from numpy.linalg import norm
 from ..particles import PointDipole, PointDipoleList
 from .util import iterize, random_scalar, random_vector
-from const import *
+from ..constants import *
 from test_applequist import H2
 
 # Other model systems

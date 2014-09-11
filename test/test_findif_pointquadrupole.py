@@ -8,7 +8,7 @@ from ..gaussian import *
 from .util import *
 
 class RandomQuadrupole(Quadrupole):
-    def __init__(self):
+    def __init__(self, **kwargs):
         Quadrupole.__init__(self,
             coordinates=random_vector(),
             charge=random_scalar(),
@@ -16,7 +16,8 @@ class RandomQuadrupole(Quadrupole):
             quadrupole=random_two_rank_triangular(),
             alpha=random_tensor(),
             beta=random_tensor2(),
-            local_field=random_vector()
+            local_field=random_vector(),
+            **kwargs
             )
 
 class PointQuadrupoleFiniteFieldTests(unittest.TestCase):
@@ -95,7 +96,7 @@ class PointQuadrupoleListFiniteFieldTests(unittest.TestCase):
         self.h2o_monomer_hyp=QuadrupoleList()
 
         self.h2o_monomer_hyp.append(
-            PointDipole(
+            Quadrupole(
                 coordinates=(0, 0, 0.48861),
                 charge=0,
                 dipole=(0, 0, -0.81457755),
@@ -124,10 +125,10 @@ class PointQuadrupoleListFiniteFieldTests(unittest.TestCase):
             )
         )
 
-        self.h2o_dimer_hyp=PointDipoleList()
+        self.h2o_dimer_hyp=QuadrupoleList()
 
         self.h2o_dimer_hyp.append(
-            PointDipole(
+            Quadrupole(
                 group=1,
                 coordinates=(0, 0, 0),
                 charge=0,
@@ -158,7 +159,7 @@ class PointQuadrupoleListFiniteFieldTests(unittest.TestCase):
         )
 
         self.h2o_dimer_hyp.append(
-            PointDipole(
+            Quadrupole(
                 group=2,
                 coordinates=(0, 0, 10),
                 charge=0,
@@ -187,3 +188,91 @@ class PointQuadrupoleListFiniteFieldTests(unittest.TestCase):
                 )
             )
         )
+
+    def test_finite_difference_polarizable_monomer(self):
+        alphas = self.h2o_monomer.solve_Applequist_equation()
+        dp0_dF = self.h2o_monomer.field_gradient_of_method(self.h2o_monomer.induced_dipole_moment)
+        np.testing.assert_almost_equal(dp0_dF, alphas)
+
+    def test_finite_difference_polarizable_dimer_z(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
+    def test_finite_difference_polarizable_dimer_x(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 0, 0], alphas[0][0, 0], places=3)
+
+    def test_finite_difference_polarizable_dimer_y(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 1, 1], alphas[0][1, 1], places=3)
+
+    def test_finite_difference_polarizable_dimer_z(self):
+        alphas = self.h2o_dimer.solve_Applequist_equation()
+        dp0_dF = self.h2o_dimer.field_gradient_of_method(self.h2o_dimer.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
+    def test_finite_difference_hyperpolarizable_monomer_z(self):
+        print self.h2o_monomer_hyp[0]._a0
+        print self.h2o_monomer_hyp[0]._b0
+        alphas = self.h2o_monomer_hyp.solve_Applequist_equation()
+        dp0_dF = self.h2o_monomer_hyp.field_gradient_of_method(self.h2o_monomer_hyp.induced_dipole_moment)
+        self.assertAlmostEqual(dp0_dF[0, 2, 2], alphas[0][2, 2], places=3)
+
+    def test_finite_difference_hyperpolarizable_dimer(self):
+        dimer = self.h2o_dimer_hyp
+        alphas = dimer.solve_Applequist_equation()
+        dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(dp_dF, alphas, decimal=3)
+
+    def test_finite_difference_hessian_dipole_moment(self):
+        monomer = QuadrupoleList()
+        monomer.append(RandomQuadrupole())
+        d2p_dF2 = monomer.field_hessian_of_method(monomer.induced_dipole_moment)
+        betas = monomer.solve_second_Applequist_equation()
+        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
+
+    def test_second_finite_difference_hyperpolarizable_monomer(self):
+        monomer = self.h2o_monomer_hyp
+        betas = monomer.solve_second_Applequist_equation()
+        d2p_dF2 = monomer.field_hessian_of_method(monomer.induced_dipole_moment)
+        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=3)
+
+    def test_second_finite_difference_hyperpolarizable_dimer(self):
+        dimer = self.h2o_dimer_hyp
+        betas = dimer.solve_second_Applequist_equation()
+        d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_allclose(d2p_dF2, betas, atol=1e-6)
+
+    def test_finite_difference_local_fields(self):
+        molecule = self.h2o_dimer_hyp
+        molecule.solve_scf_for_external(ZERO_VECTOR)
+        test_this =  molecule._dEi_dF_indirect()
+        method = molecule.evaluate_field_at_atoms
+        dEi_dF = molecule.field_gradient_of_method(method)
+        np.testing.assert_almost_equal(test_this, dEi_dF, decimal=3)
+
+    def test_alpha_finite_random_dimer(self):
+        dimer = QuadrupoleList()
+        dimer.append(RandomQuadrupole())
+        dimer.append(RandomQuadrupole(group=2))
+        #separate them 
+        dimer[1]._r += 4*np.ones(3)/math.sqrt(3)
+        dimer[1].group = dimer[0].group + 1
+        alphas = dimer.solve_Applequist_equation()
+        dp_dF = dimer.field_gradient_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(dp_dF, alphas, decimal=5)
+
+    def test_beta_finite_random_dimer(self):
+        dimer = QuadrupoleList()
+        dimer.append(RandomQuadrupole())
+        dimer.append(RandomQuadrupole())
+        #separate them 
+        dimer[1]._r += 2*np.ones(3)
+        dimer[1].group = dimer[0].group + 1
+
+        betas = dimer.solve_second_Applequist_equation()
+        d2p_dF2 = dimer.field_hessian_of_method(dimer.induced_dipole_moment)
+        np.testing.assert_almost_equal(d2p_dF2, betas, decimal=5)

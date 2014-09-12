@@ -86,9 +86,6 @@ class PointDipoleList(list):
         for i in range(n):
             ri = self[i]._r
             for j in range(i):
-#Skip dipole induction if other particle in same group
-                if self[i].in_group_of( self[j] ):
-                    continue
                 rj = self[j]._r
                 rij = ri - rj
                 rij2 = dot(rij, rij)

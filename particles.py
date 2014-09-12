@@ -661,5 +661,4 @@ if __name__ == "__main__":
     parser.add_argument('potfile')
     args = parser.parse_args()
     pdl = PointDipoleList(open(args.potfile))
-    print pdl.alpha()
-    print pdl.alpha_iso()
+    print pdl.beta()

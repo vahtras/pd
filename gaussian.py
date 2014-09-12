@@ -272,9 +272,7 @@ class GaussianQuadrupole( PointDipole ):
 
         first = erf( dr2**0.5 / R)
         second = 2 * invpi * dr2**0.5 / R * np.exp( -dr2 /R**2 )
-
         third = 4*invpi/R**3* outer( dr , dr ) / dr2 * np.exp( -dr2 /R**2)
-
         E =  (3* outer( dr, dr ) - dr2 * I_3 )/ dr2**2.5 *(first - second) - third
 
         return dot(p,E )
@@ -325,13 +323,4 @@ if __name__ == "__main__":
         i._R_q = args.Rq
         i._R_p = args.Rp
 
-    #pdl.solve_scf()
-    t = BETA_ZERO
-    for book in array( [o._a0 for o in pdl]): 
-        t += book
-    print t
-    print "alpha: "
-    print pdl.alpha()
-
-
-
+    print pdl.beta()

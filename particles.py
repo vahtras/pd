@@ -86,6 +86,8 @@ class PointDipoleList(list):
         for i in range(n):
             ri = self[i]._r
             for j in range(i):
+                if self[i].in_group_of( self[j] ):
+                    continue
                 rj = self[j]._r
                 rij = ri - rj
                 rij2 = dot(rij, rij)

@@ -6,14 +6,15 @@ from math import erf
 from numpy.linalg import norm , tensorinv
 from numpy import outer, dot, array, zeros, einsum, diag
 import ut
-from particles import PointDipole, PointDipoleList, header_to_dict, line_to_dict
+from particles import header_to_dict, line_to_dict
+from quadrupole import Quadrupole, QuadrupoleList
 
 I_3 = np.identity(3)
 ZERO_VECTOR = np.zeros(3)
 ALPHA_ZERO = np.zeros((3, 3))
 BETA_ZERO = np.zeros((3, 3, 3))
 
-class GaussianQuadrupoleList( PointDipoleList ):
+class GaussianQuadrupoleList( QuadrupoleList ):
     """
     A list class of ``GaussianQuadrupole`` objects
 
@@ -36,6 +37,9 @@ class GaussianQuadrupoleList( PointDipoleList ):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict( self.header_dict, line)
                 self.append( GaussianQuadrupole(**line_dict) )
+
+    def center(self):
+        return array([o._r for o in self]).sum(axis=0)/len(self)
 
     @staticmethod
     def from_string(potential):
@@ -159,10 +163,14 @@ class GaussianQuadrupoleList( PointDipoleList ):
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
+    def total_dipole_moment(self, dist = False):
+        if dist:
+            return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
+        else:
+            return sum([p.dipole_moment() for p in self]) 
 
 
-
-class GaussianQuadrupole( PointDipole ):
+class GaussianQuadrupole( Quadrupole ):
     """ 
 
     Inherits PointDipole with new attributes:
@@ -213,7 +221,7 @@ class GaussianQuadrupole( PointDipole ):
 #Default initialization using PointDipole initiator
         super( GaussianQuadrupole , self).__init__( **kwargs )
 
-        self._R_q = float( kwargs.get( 'charge_std' , 0.00000001   ))
+        self._R_q = float( kwargs.get( 'charge_std' , 0.00000001  ))
         self._R_p = float( kwargs.get( 'dipole_std' , 0.00000001  ))
 
 #Additional attribute
@@ -229,6 +237,7 @@ class GaussianQuadrupole( PointDipole ):
             self._Q0 = np.zeros(( 3,3, ))
 
 #Overriding default field_at
+
     def field_at(self, r):
 
         #print "Monopole: " , self.monopole_field_at(r)
@@ -244,7 +253,7 @@ class GaussianQuadrupole( PointDipole ):
     def monopole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
-        if dr2 < .1: raise Exception("Nuclei too close")
+        #if dr2 < .1: raise Exception("Nuclei too close")
 
         q = self._q
         R = self._R_q
@@ -261,7 +270,7 @@ class GaussianQuadrupole( PointDipole ):
         dr = r - self._r
         dr2 = dot(dr, dr)
 
-        if dr2 < .1: raise Exception("Nuclei too close")
+        #if dr2 < .1: raise Exception("Nuclei too close")
         
         R = self._R_p
         p = self.dipole_moment()
@@ -281,7 +290,7 @@ class GaussianQuadrupole( PointDipole ):
     def quadrupole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
-        if dr2 < .1: raise Exception("Nuclei too close")
+        #if dr2 < .1: raise Exception("Nuclei too close")
 
         tensor = zeros( (3, 3, 3,) )
         q = self.quadrupole_moment()
@@ -304,6 +313,24 @@ class GaussianQuadrupole( PointDipole ):
     def quadrupole_moment(self):
         return self._Q0
 
+    def __str__(self):
+        """The output simulate the line of a potential input file"""
+
+        value_line = list(self._r) + [self._q]
+
+        if self._p0 is not None:
+            value_line += list(self._p0)
+
+        if self._Q0 is not None:
+            value_line += [self._Q0[0,0]]
+
+        if self._a0 is not None:
+            value_line +=  [self._a0[0, 0]]
+
+        return "%d" % self.group + self.fmt*len(value_line) % tuple(value_line)
+
+
+
 class SCFNotConverged(Exception):
     def __init__(self, residual, threshold):
         self.residual = residual
@@ -323,4 +350,8 @@ if __name__ == "__main__":
         i._R_q = args.Rq
         i._R_p = args.Rp
 
+    pdl.solve_scf()
+    print pdl.total_dipole_moment(dist = True)
+    print pdl.alpha()
     print pdl.beta()
+

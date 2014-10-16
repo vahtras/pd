@@ -67,8 +67,11 @@ class PointDipoleList(list):
     def total_induced_dipole_moment(self):
        return sum([p.induced_dipole_moment() for p in self])
 
-    def total_dipole_moment(self):
-       return sum([p.dipole_moment() for p in self])
+    def total_dipole_moment(self, dist = False):
+        if dist:
+            return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
+        else:
+            return sum([p.dipole_moment() for p in self]) 
         
 
     def dipole_coupling_tensor(self):
@@ -599,7 +602,6 @@ def header_to_dict(header):
     if len(header_data) > 2 and header_data[2] % 10 > 2: 
         raise TypeError
     header_dict["ut_hyppol"] = len(header_data) > 2 and header_data[2] // 10 == 2
-
     return header_dict
 
 def line_to_dict(header_dict, line):
@@ -660,4 +662,3 @@ if __name__ == "__main__":
     parser.add_argument('potfile')
     args = parser.parse_args()
     pdl = PointDipoleList(open(args.potfile))
-    print pdl.beta()

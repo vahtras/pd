@@ -6,15 +6,14 @@ from math import erf
 from numpy.linalg import norm , tensorinv
 from numpy import outer, dot, array, zeros, einsum, diag
 import ut
-from particles import header_to_dict, line_to_dict
-from quadrupole import Quadrupole, QuadrupoleList
+from particles import PointDipole, PointDipoleList, header_to_dict, line_to_dict
 
 I_3 = np.identity(3)
 ZERO_VECTOR = np.zeros(3)
 ALPHA_ZERO = np.zeros((3, 3))
 BETA_ZERO = np.zeros((3, 3, 3))
 
-class GaussianQuadrupoleList( QuadrupoleList ):
+class GaussianQuadrupoleList( PointDipoleList ):
     """
     A list class of ``GaussianQuadrupole`` objects
 
@@ -30,6 +29,7 @@ class GaussianQuadrupoleList( QuadrupoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
+
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict( pf.next() )
@@ -71,6 +71,7 @@ class GaussianQuadrupoleList( QuadrupoleList ):
             E_p0[:, :] = E_at_p
         raise SCFNotConverged(residual, threshold)
 
+
     def evaluate_field_at_atoms(self, external=None):
         E_at_p =  [
             array(
@@ -100,7 +101,6 @@ class GaussianQuadrupoleList( QuadrupoleList ):
         for i in range(n):
             ri = self[i]._r
             for j in range(i):
-
                 if self[i].in_group_of( self[j] ):
                     continue
 
@@ -116,61 +116,18 @@ class GaussianQuadrupoleList( QuadrupoleList ):
                 _T[i, :, j, :] = Tij
                 _T[j, :, i, :] = Tij
 
-
-        #for i, book in enumerate (_T):
-        #    for j, page in enumerate(book):
-        #        for k, row in enumerate(page):
-        #            for l, col in enumerate(row):
-        #                _T[i, j, k, l] = 0.0
         return _T
 
-    def solve_Applequist_equation(self):
-        # Solve the linear response equaitons
-        n = len(self)
-        try:
-            self.solve_scf_for_external(ZERO_VECTOR)
-        except SCFNotConverged as e:
-            print "SCF Not converged: residual=%f, threshold=%f"% (
-                float(e.residual), float(e.threshold)
-                )
-            raise
-        dE = self.form_Applequist_rhs()
-        L = self.form_Applequist_coefficient_matrix()
-        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
-        return dpdE
+    def total_dipole_moment(self):
+        return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
 
-    def form_Applequist_rhs(self):
-        n = len(self)
-        alphas = [pd.a for pd in self]
-        dE = array(alphas).reshape((n*3, 3))
-        return dE
-
-    def form_Applequist_coefficient_matrix(self):
-        n = len(self)
-        aT = self.dipole_coupling_tensor().reshape((n, 3, 3*n))
-        # evaluate alphai*Tij
-        alphas = [pd.a for pd in self]
-        for i, a in enumerate(alphas):
-            aT[i, :, :] = dot(a, aT[i, :, :])
-        #matrix (1 - alpha*T)
-        L = np.identity(3*n) - aT.reshape((3*n, 3*n))
-        return L
-
-    def alpha(self):
-        try:
-            dpdF = self.solve_Applequist_equation()
-        except SCFNotConverged:
-            return np.zeros((3, 3))
-        return dpdF.sum(axis=0)
-
-    def total_dipole_moment(self, dist = False):
-        if dist:
-            return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
-        else:
-            return sum([p.dipole_moment() for p in self]) 
+    def set_damping(self, rp, rq):
+        for i in self:
+            i._R_q = rq
+            i._R_p = rp
 
 
-class GaussianQuadrupole( Quadrupole ):
+class GaussianQuadrupole( PointDipole ):
     """ 
 
     Inherits PointDipole with new attributes:
@@ -221,10 +178,11 @@ class GaussianQuadrupole( Quadrupole ):
 #Default initialization using PointDipole initiator
         super( GaussianQuadrupole , self).__init__( **kwargs )
 
+#Practically zero damping, gives fields from each point equivalent to PointDipole
         self._R_q = float( kwargs.get( 'charge_std' , 0.00000001  ))
         self._R_p = float( kwargs.get( 'dipole_std' , 0.00000001  ))
 
-#Additional attribute
+#Additional attribute for quadrupole
         if "quadrupole" in kwargs:
             upper_triangular_quadru = array( kwargs.get( 'quadrupole' , zeros( 6, ) ))
             assert upper_triangular_quadru.shape == ( 6,) 
@@ -237,23 +195,15 @@ class GaussianQuadrupole( Quadrupole ):
             self._Q0 = np.zeros(( 3,3, ))
 
 #Overriding default field_at
-
     def field_at(self, r):
-
-        #print "Monopole: " , self.monopole_field_at(r)
-        #print "Dipole: " , self.dipole_field_at(r)
-        #print "Quadrupole: " , self.quadrupole_field_at(r) , "\n-----"
-
-        return self.monopole_field_at(r) + self.dipole_field_at(r) +\
+        return self.monopole_field_at(r) + self.dipole_field_at(r) + \
                 self.quadrupole_field_at(r)
 
 # New version of monopole_field_at which stems from a gaussian distribution of the source charge
-# Set self._R_q = 0.000001 for classical point dipole behaivor
-
     def monopole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
-        #if dr2 < .1: raise Exception("Nuclei too close")
+        if dr2 < .1: raise Exception("Nuclei too close")
 
         q = self._q
         R = self._R_q
@@ -269,8 +219,7 @@ class GaussianQuadrupole( Quadrupole ):
     def dipole_field_at( self, r ):
         dr = r - self._r
         dr2 = dot(dr, dr)
-
-        #if dr2 < .1: raise Exception("Nuclei too close")
+        if dr2 < .1: raise Exception("Nuclei too close")
         
         R = self._R_p
         p = self.dipole_moment()
@@ -284,13 +233,13 @@ class GaussianQuadrupole( Quadrupole ):
         third = 4*invpi/R**3* outer( dr , dr ) / dr2 * np.exp( -dr2 /R**2)
         E =  (3* outer( dr, dr ) - dr2 * I_3 )/ dr2**2.5 *(first - second) - third
 
-        return dot(p,E )
+        return dot( p,E )
 
 #New for GaussianQuadrupole , a point-like quadrupole induced field
     def quadrupole_field_at(self, r):
         dr = r - self._r
         dr2 = dot(dr, dr)
-        #if dr2 < .1: raise Exception("Nuclei too close")
+        if dr2 < .1: raise Exception("Nuclei too close")
 
         tensor = zeros( (3, 3, 3,) )
         q = self.quadrupole_moment()
@@ -306,12 +255,8 @@ class GaussianQuadrupole( Quadrupole ):
                     if i == j:
                         tmp +=  dr[k]
                     tensor[i, j, k] = (15 * dr[i] * dr[j] * dr[k] - 3*tmp*dr2 ) / (dr2 ** 3.5 )
-        #print einsum("ijk,jk", tensor, q )
-        return  einsum("ijk,jk", tensor, q )
-
-#For generality
-    def quadrupole_moment(self):
-        return self._Q0
+        val = einsum("ijk,jk", tensor, q )
+        return  val
 
     def __str__(self):
         """The output simulate the line of a potential input file"""
@@ -320,15 +265,16 @@ class GaussianQuadrupole( Quadrupole ):
 
         if self._p0 is not None:
             value_line += list(self._p0)
-
         if self._Q0 is not None:
             value_line += [self._Q0[0,0]]
-
         if self._a0 is not None:
             value_line +=  [self._a0[0, 0]]
-
+        if self._b0 is not None:
+            value_line +=  [self._b0[0, 0, 2]]
         return "%d" % self.group + self.fmt*len(value_line) % tuple(value_line)
 
+    def quadrupole_moment(self):
+        return self._Q0
 
 
 class SCFNotConverged(Exception):
@@ -345,13 +291,4 @@ if __name__ == "__main__":
     parser.add_argument('-Rp' , type = float, default = 0.000001)
     args = parser.parse_args()
 
-    pdl = GaussianQuadrupoleList(open(args.potfile))
-    for i in pdl:
-        i._R_q = args.Rq
-        i._R_p = args.Rp
-
-    pdl.solve_scf()
-    print pdl.total_dipole_moment(dist = True)
-    print pdl.alpha()
-    print pdl.beta()
-
+    pdl = GaussianQuadrupoleList(open(args.potfile), dist = True)

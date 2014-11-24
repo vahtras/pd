@@ -58,15 +58,15 @@ def random_two_rank_triangular():
     return np.random.random(6)
 
 def random_tensor():
-    a = np.random.random((3, 3))
+    a = np.random.random( (3, 3) )
     a = 0.5*(a + a.T)
     return  a
 
 def random_three_rank_triangular():
-    return np.random.random(10)
+    return np.random.uniform( -2, 2, [10] )
 
 def random_tensor2():
-    b = np.random.random((3, 3, 3))
+    b = np.random.uniform( -2,2, [3,3,3] )
     b = b + b.transpose((1, 2, 0)) +  b.transpose((2, 0, 1)) +\
         b.transpose((1, 0, 2)) + b.transpose((2, 1, 0)) + b.transpose((0, 2, 1))
     return  b

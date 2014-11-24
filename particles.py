@@ -68,12 +68,8 @@ class PointDipoleList(list):
        return sum([p.induced_dipole_moment() for p in self])
 
     def total_dipole_moment(self, dist = False):
-        if dist:
-            return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
-        else:
-            return sum([p.dipole_moment() for p in self]) 
+        return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
         
-
     def dipole_coupling_tensor(self):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to

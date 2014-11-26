@@ -41,13 +41,6 @@ class GaussianQuadrupoleList( PointDipoleList ):
     def center(self):
         return array([o._r for o in self]).sum(axis=0)/len(self)
 
-    @staticmethod
-    def from_string(potential):
-        """Used to build the ``GaussianQuadrupoleList`` object when the
-           potential file is given as a triple quoted string with newlines
-        """
-        return GaussianQuadrupoleList(iter(potential.split("\n")))
-
     def append(self, arg):
         """Overriding superclass list append: check if arg is GaussianQuadrupole"""
         if not isinstance(arg,  GaussianQuadrupole):

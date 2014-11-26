@@ -24,12 +24,12 @@ class PointDipoleList(list):
                 line_dict = line_to_dict(self.header_dict, line)
                 self.append(PointDipole(**line_dict))
 
-    @staticmethod
-    def from_string(potential):
+    @classmethod
+    def from_string(cls, potential):
         """Used to build the ``PointDipoleList`` object when the
            potential file is given as a triple quoted string with newlines
         """
-        return PointDipoleList(iter(potential.split("\n")))
+        return cls(iter(potential.split("\n")))
         
     def __str__(self):
         """String representation of class - delgated to list members"""

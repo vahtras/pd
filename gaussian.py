@@ -30,6 +30,7 @@ class GaussianQuadrupoleList( PointDipoleList ):
         pf: potential file object (or iterator)
         """
 
+        a0 = 0.52917721092
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict( pf.next() )
@@ -37,6 +38,9 @@ class GaussianQuadrupoleList( PointDipoleList ):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict( self.header_dict, line)
                 self.append( GaussianQuadrupole(**line_dict) )
+            if units == 'AA':
+                for p in self:
+                    p._r /= a0
 
     def center(self):
         return array([o._r for o in self]).sum(axis=0)/len(self)

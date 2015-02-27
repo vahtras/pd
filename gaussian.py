@@ -118,7 +118,7 @@ class GaussianQuadrupoleList( PointDipoleList ):
     def total_dipole_moment(self):
         return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
 
-    def set_damping(self, rp, rq):
+    def set_damping(self, rq, rp):
         for i in self:
             i._R_q = rq
             i._R_p = rp

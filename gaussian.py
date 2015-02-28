@@ -115,6 +115,36 @@ class GaussianQuadrupoleList( PointDipoleList ):
 
         return _T
 
+    @staticmethod
+    def dyadic_tensor( ri = [0,0,0], rj = [0, 0, 10] , 
+            Rq = 1e-9, Rp = 1e-9 ):
+        """Calculates the dipole coupling, tensor, describing the
+        electric field strength at a given particle due to
+        another electric dipole distribution:
+
+        .. math::
+            \mathbf{T}_{ij} = (3\mathbf{r}_{ij}\mathbf{r}_{ij}-r_{ij}^2\mathbf{1})/r_{ij}^5
+
+        """
+        ri, rj = map( np.array, [ri, rj] )
+        n = 1
+        _T = zeros((n, 3, n,  3))
+        invpi = 1/ np.sqrt( np.pi )
+        R = Rp
+
+        rij = ri - rj
+        rij2 = dot(rij, rij)
+
+        first = erf( rij2**0.5 / R)
+        second = 2 * invpi * rij2**0.5 / R * np.exp( -rij2 /R**2 )
+        third = 4*invpi/R**3* outer( rij , rij ) / rij2 * np.exp( -rij2 /R**2)
+        Tij =  (3* outer( rij, rij ) - rij2 * I_3 )/ rij2**2.5 *(first - second) - third
+
+        return Tij
+
+
+
+
     def total_dipole_moment(self):
         return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
 

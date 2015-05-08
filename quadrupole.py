@@ -31,14 +31,6 @@ class QuadrupoleList( PointDipoleList ):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict( self.header_dict, line)
                 self.append( Quadrupole(**line_dict) )
-
-    @staticmethod
-    def from_string(potential):
-        """Used to build the ``QuadrupoleList`` object when the
-           potential file is given as a triple quoted string with newlines
-        """
-        return QuadrupoleList(iter(potential.split("\n")))
-
     def append(self, arg):
         """Overriding superclass list append: check if arg is Quadrupole"""
         if not isinstance(arg,  Quadrupole):

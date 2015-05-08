@@ -16,6 +16,7 @@ class PointDipoleList(list):
         """Class constructor 
         pf: potential file object (or iterator)
         """
+        a0 = 0.52917721092
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict(pf.next())
@@ -23,13 +24,16 @@ class PointDipoleList(list):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict(self.header_dict, line)
                 self.append(PointDipole(**line_dict))
+            if units == 'AA':
+                for p in self:
+                    p._r /= a0
 
-    @staticmethod
-    def from_string(potential):
+    @classmethod
+    def from_string(cls, potential):
         """Used to build the ``PointDipoleList`` object when the
            potential file is given as a triple quoted string with newlines
         """
-        return PointDipoleList(iter(potential.split("\n")))
+        return cls(iter(potential.split("\n")))
         
     def __str__(self):
         """String representation of class - delgated to list members"""

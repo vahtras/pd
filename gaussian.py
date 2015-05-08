@@ -30,6 +30,7 @@ class GaussianQuadrupoleList( PointDipoleList ):
         pf: potential file object (or iterator)
         """
 
+        a0 = 0.52917721092
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict( pf.next() )
@@ -37,16 +38,12 @@ class GaussianQuadrupoleList( PointDipoleList ):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict( self.header_dict, line)
                 self.append( GaussianQuadrupole(**line_dict) )
+            if units == 'AA':
+                for p in self:
+                    p._r /= a0
 
     def center(self):
         return array([o._r for o in self]).sum(axis=0)/len(self)
-
-    @staticmethod
-    def from_string(potential):
-        """Used to build the ``GaussianQuadrupoleList`` object when the
-           potential file is given as a triple quoted string with newlines
-        """
-        return GaussianQuadrupoleList(iter(potential.split("\n")))
 
     def append(self, arg):
         """Overriding superclass list append: check if arg is GaussianQuadrupole"""
@@ -118,10 +115,40 @@ class GaussianQuadrupoleList( PointDipoleList ):
 
         return _T
 
+    @staticmethod
+    def dyadic_tensor( ri = [0,0,0], rj = [0, 0, 10] , 
+            Rq = 1e-9, Rp = 1e-9 ):
+        """Calculates the dipole coupling, tensor, describing the
+        electric field strength at a given particle due to
+        another electric dipole distribution:
+
+        .. math::
+            \mathbf{T}_{ij} = (3\mathbf{r}_{ij}\mathbf{r}_{ij}-r_{ij}^2\mathbf{1})/r_{ij}^5
+
+        """
+        ri, rj = map( np.array, [ri, rj] )
+        n = 1
+        _T = zeros((n, 3, n,  3))
+        invpi = 1/ np.sqrt( np.pi )
+        R = Rp
+
+        rij = ri - rj
+        rij2 = dot(rij, rij)
+
+        first = erf( rij2**0.5 / R)
+        second = 2 * invpi * rij2**0.5 / R * np.exp( -rij2 /R**2 )
+        third = 4*invpi/R**3* outer( rij , rij ) / rij2 * np.exp( -rij2 /R**2)
+        Tij =  (3* outer( rij, rij ) - rij2 * I_3 )/ rij2**2.5 *(first - second) - third
+
+        return Tij
+
+
+
+
     def total_dipole_moment(self):
         return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
 
-    def set_damping(self, rp, rq):
+    def set_damping(self, rq, rp):
         for i in self:
             i._R_q = rq
             i._R_p = rp

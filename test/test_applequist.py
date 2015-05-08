@@ -202,7 +202,7 @@ class ApplequistTest(unittest.TestCase):
     def test_CH3OH_iso(self):
 
         ch3oh = PointDipoleList.from_string(CH3OH["POTFILE"])
-        self.assertAlmostEqual(ch3oh.alpha_iso(), CH3OH["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(0.1*ch3oh.alpha_iso(), 0.1*CH3OH["ALPHA_ISO"], places=DECIMALS)
 
     def test_C2H6_iso(self):
 
@@ -217,14 +217,14 @@ class ApplequistTest(unittest.TestCase):
     def test_CP_iso(self):
 
         cp = PointDipoleList.from_string(CP["POTFILE"])
-        self.assertAlmostEqual(.1*cp.alpha_iso(), .1*CP["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(.01*cp.alpha_iso(), .01*CP["ALPHA_ISO"], places=DECIMALS)
 
     def test_NP_iso(self):
 
         np = PointDipoleList.from_string(NP["POTFILE"])
-        self.assertAlmostEqual(.1*np.alpha_iso(), .1*NP["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(.01*np.alpha_iso(), .01*NP["ALPHA_ISO"], places=DECIMALS)
 
     def test_DME_iso(self):
 
         dme = PointDipoleList.from_string(DME["POTFILE"])
-        self.assertAlmostEqual(dme.alpha_iso(), DME["ALPHA_ISO"], places=DECIMALS)
+        self.assertAlmostEqual(0.1*dme.alpha_iso(), 0.1*DME["ALPHA_ISO"], places=DECIMALS)

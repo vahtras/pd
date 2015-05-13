@@ -4,7 +4,7 @@ from numpy.linalg import norm
 from ..particles import PointDipole, PointDipoleList
 from .util import iterize, random_scalar, random_vector
 from ..constants import *
-from test_applequist import H2
+from test_applequist import H2, ANGSTROM, ANGSTROM3
 
 # Other model systems
 
@@ -59,7 +59,8 @@ class PointDipoleListTest(unittest.TestCase):
             [0., 0.168, 0.], 
             [0., 0., 0.168]
             ])
-        np.testing.assert_array_equal(h2_rhs, h2_rhs_ref)
+        h2_rhs_ref *= ANGSTROM3
+        np.testing.assert_allclose( h2_rhs, h2_rhs_ref, atol=1e-7 )
 
     def test_form_Applequist_coefficient_matrix(self):
         L_h2_ref = np.array([
@@ -84,18 +85,21 @@ class PointDipoleListTest(unittest.TestCase):
             [0., 0.11894578,  0.],
             [0., 0., 0.95899377]
             ]])
-        np.testing.assert_almost_equal(alphas, alphas_ref)
+        alphas_ref *= ANGSTROM3
+        np.testing.assert_almost_equal(alphas, alphas_ref, 5)
 
     def test_induced_parallel_dipole_on_one_atom(self):
         E_external = np.array([0., 0., 1.,])
-        p_ind_ref =  np.array([0., 0., 0.95899377])
+        p_ind_ref =  np.array([0., 0., 6.47160434])
         self.h2.solve_scf_for_external(E_external, max_it = 100)
-        np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=6)
+
+        np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=4)
 
     def test_induced_orthogonal_dipole_on_one_atom(self):
         E_external = np.array([1., 0., 0.,])
         p_ind_ref =  np.array([0.11894578, 0., 0.])
         self.h2.solve_scf_for_external(E_external, max_it = 100)
+        p_ind_ref *= ANGSTROM3
         np.testing.assert_almost_equal(self.h2[0].dipole_moment(), p_ind_ref, decimal=6)
         
     def test_set_groups(self):
@@ -106,7 +110,7 @@ class PointDipoleListTest(unittest.TestCase):
         self.h2.set_charges((1.0, 1.0))
         self.h2.set_groups((1, 2))
         V_local = self.h2.evaluate_potential_at_atoms()
-        np.testing.assert_almost_equal(V_local, [1.0/H2['R'], 1.0/H2['R']])
+        np.testing.assert_almost_equal(V_local, [1.0*ANGSTROM/H2['R'], 1.0*ANGSTROM/H2['R']])
 
     def test_evaluate_dipole_potential_at_atoms(self):
         V_external = random_vector()
@@ -145,7 +149,7 @@ class PointDipoleListTest(unittest.TestCase):
             [[-2.45481065*(0.11894578), 0., 0.],
              [0, -2.45481065*(0.11894578), 0.],
              [0., 0., 4.90962131*0.95899377]]
-            ])
+            ], decimal = 5)
 
     def test_dEi_dF(self):
         C = self.h2._dEi_dF()
@@ -156,7 +160,7 @@ class PointDipoleListTest(unittest.TestCase):
             [[1-2.45481065*(0.11894578), 0., 0.],
              [0, 1-2.45481065*(0.11894578), 0.],
              [0., 0., 1+4.90962131*0.95899377]]
-            ])
+            ], decimal = 5)
 
     def test_neutral_zero_energy(self):
         E = self.dimer_template.total_energy()

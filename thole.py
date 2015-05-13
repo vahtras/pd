@@ -66,11 +66,17 @@ class TholeList( GaussianQuadrupoleList ):
                     continue
                 rj = self[j]._r
                 _rij = ri - rj
-                rij = np.sqrt( dot( _rij, _rij ))
-                first_sum = 3*np.einsum('i,j->ij',ri, rj ) / rij**5 * (1 - (a**3/6 * rij**3 + a**2 *rij**2 *0.5 + a* rij +1 ) * np.exp(-a * rij)) 
-                second_sum = rij**-3 * ( 1- (a**2*rij**2*0.5 + a*rij + 1) * np.exp(-a*rij) )
-                _Tij = first_sum - second_sum
+                r = rij = np.sqrt( dot( _rij, _rij ))
+
+                first_sum = 3 * r**-5 * np.outer( ri, rj ) * (1 - (a**3*r**3/6 + a**2 * r**2/2 + a*r + 1 ) * np.exp(-a* r)) 
+
+                second_sum = r**-3 * (1 - (0.5*a**2*r**2 + a*r + 1) * np.exp(-a*r) )
+
+                _Tij = first_sum 
                 _T[ i, :, j, : ] = _Tij
+                _T[ i, 0, j, 0 ] -= second_sum
+                _T[ i, 1, j, 1 ] -= second_sum
+                _T[ i, 2, j, 2 ] -= second_sum
         return _T
 
 class Thole( GaussianQuadrupole ):

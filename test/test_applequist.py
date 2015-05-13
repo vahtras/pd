@@ -95,7 +95,7 @@ class ApplequistTest(unittest.TestCase):
         cl2_alpha = cl2.alpha()
         cl2_alpha_par = cl2_alpha[2, 2]
         
-        self.assertAlmostEqual(cl2_alpha_par, Cl2["ALPHA_PAR"], decimal)
+        self.assertAlmostEqual(cl2_alpha_par, Cl2["ALPHA_PAR"], DECIMALS )
 
     def test_Cl2_ort(self):
 

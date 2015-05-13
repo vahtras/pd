@@ -36,11 +36,11 @@ O2 = {
 O2["POTFILE"] = DIATOMIC % (0, O2["ALPHA_O"], O2["R"], O2["ALPHA_O"])
 
 Cl2 = {
-    "R": 1.2074,
-    "ALPHA_Cl": 0.562,
-    "ALPHA_ISO": 1.60,
-    "ALPHA_PAR": 3.11,
-    "ALPHA_ORT": 0.85,
+    "R": 1.988,
+    "ALPHA_Cl": 1.934,
+    "ALPHA_ISO": 4.61,
+    "ALPHA_PAR": 7.62,
+    "ALPHA_ORT": 3.10,
     }
 Cl2["POTFILE"] = DIATOMIC % (0, Cl2["ALPHA_Cl"], Cl2["R"], Cl2["ALPHA_Cl"])
 

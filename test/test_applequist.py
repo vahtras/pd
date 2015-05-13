@@ -87,7 +87,6 @@ class ApplequistTest(unittest.TestCase):
     def test_Cl2_iso(self):
 
         cl2 = PointDipoleList.from_string(Cl2["POTFILE"])
-
         self.assertAlmostEqual(cl2.alpha_iso(), Cl2["ALPHA_ISO"], places=DECIMALS)
 
     def test_Cl2_par(self):
@@ -96,7 +95,7 @@ class ApplequistTest(unittest.TestCase):
         cl2_alpha = cl2.alpha()
         cl2_alpha_par = cl2_alpha[2, 2]
         
-        self.assertAlmostEqual(cl2_alpha_par, Cl2["ALPHA_PAR"], places=DECIMALS)
+        self.assertAlmostEqual(cl2_alpha_par, Cl2["ALPHA_PAR"], decimal)
 
     def test_Cl2_ort(self):
 

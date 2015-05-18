@@ -1,7 +1,7 @@
-ANGSTROM = 0.52917721092 #Bohr
-ANGSTROM3 = 1/ANGSTROM # a.u.
+ANGSTROM = 1/0.52917721092 #Bohr
+ANGSTROM3 = ANGSTROM**3 # a.u.
 DIATOMIC = """AU
-2 0 1 1
+2 0 1 0
 1  0.000  0.000  %f 0.000 %f
 2  0.000  0.000  %f 0.000 %f
 """
@@ -13,7 +13,6 @@ C_A = 8.6959
 N_A = 6.5565
 O_A = 5.7494
 CL_A = 16.1979
-DAMP= 2.1304
 
 # Thole data fit to 52 molecules in AA, exponential damping scheme, Atomic units
 # Table 11 in J. Phys. Chem. A, Vol. 102, No. 14, 1998

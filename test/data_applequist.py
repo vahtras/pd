@@ -67,8 +67,8 @@ HCl["POTFILE"] = DIATOMIC % (0, HCl["ALPHA_H"], HCl["R"], HCl["ALPHA_Cl"])
 
 HBr = {
     "R": 1.408,
-    "ALPHA_H": 3.31,
-    "ALPHA_Br": 0.071,
+    "ALPHA_H": 0.071,
+    "ALPHA_Br": 3.31,
     "ALPHA_ISO": 3.61,
     "ALPHA_PAR": 4.22,
     "ALPHA_ORT": 3.31,

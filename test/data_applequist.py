@@ -1,6 +1,9 @@
-ANGSTROM = 1.88971616463 #Bohr
-ANGSTROM3 = 1/1.48184712e-1 # a.u.
-DIATOMIC = """AU
+ANGSTROM = 1/0.52917721092 #Bohr
+ANGSTROM3 = ANGSTROM**3  # a.u.
+
+#The AU tag is only concerned with coordinates, as in dalton,
+#convert all coordinates and properties to AU if the pot is in AA to make tests pass
+DIATOMIC = """AA
 2 0 1 1
 1  0.000  0.000  %f 0.000 %f
 2  0.000  0.000  %f 0.000 %f
@@ -15,6 +18,8 @@ H2 = {
     "ALPHA_PAR": 1.92,
     "ALPHA_ORT": 0.24,
     }
+H2 = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(H2.keys(),
+    H2.values())}
 H2["POTFILE"] = DIATOMIC % (0, H2["ALPHA_H"], H2["R"], H2["ALPHA_H"])
 
 N2 = {
@@ -24,6 +29,8 @@ N2 = {
     "ALPHA_PAR": 3.84,
     "ALPHA_ORT": 0.72,
     }
+N2 = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(N2.keys(),
+    N2.values())}
 N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
 
 O2 = {
@@ -33,45 +40,52 @@ O2 = {
     "ALPHA_PAR": 3.11,
     "ALPHA_ORT": 0.85,
     }
+O2 = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(O2.keys(),
+    O2.values())}
 O2["POTFILE"] = DIATOMIC % (0, O2["ALPHA_O"], O2["R"], O2["ALPHA_O"])
 
 Cl2 = {
-    "R": 1.2074,
-    "ALPHA_Cl": 0.562,
-    "ALPHA_ISO": 1.60,
-    "ALPHA_PAR": 3.11,
-    "ALPHA_ORT": 0.85,
+    "R": 1.988,
+    "ALPHA_Cl": 1.934,
+    "ALPHA_ISO": 4.61,
+    "ALPHA_PAR": 7.62,
+    "ALPHA_ORT": 3.10,
     }
+Cl2 = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(Cl2.keys(), Cl2.values())}
 Cl2["POTFILE"] = DIATOMIC % (0, Cl2["ALPHA_Cl"], Cl2["R"], Cl2["ALPHA_Cl"])
 
 HCl = {
     "R": 1.2745,
-    "ALPHA_H": 2.39,
-    "ALPHA_Cl": 0.059,
+    "ALPHA_H": 0.059,
+    "ALPHA_Cl": 2.39,
     "ALPHA_ISO": 2.63,
     "ALPHA_PAR": 3.13,
     "ALPHA_ORT": 2.39,
     }
+HCl = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(HCl.keys(), HCl.values())}
 HCl["POTFILE"] = DIATOMIC % (0, HCl["ALPHA_H"], HCl["R"], HCl["ALPHA_Cl"])
 
 HBr = {
     "R": 1.408,
-    "ALPHA_H": 3.31,
-    "ALPHA_Br": 0.071,
+    "ALPHA_H": 0.071,
+    "ALPHA_Br": 3.31,
     "ALPHA_ISO": 3.61,
     "ALPHA_PAR": 4.22,
     "ALPHA_ORT": 3.31,
     }
+HBr = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(HBr.keys(), HBr.values())}
 HBr["POTFILE"] = DIATOMIC % (0, HBr["ALPHA_H"], HBr["R"], HBr["ALPHA_Br"])
 
 HI = {
     "R": 1.609,
-    "ALPHA_H": 4.89,
-    "ALPHA_I": 0.129,
+    "ALPHA_H": 0.129,
+    "ALPHA_I": 4.89,
     "ALPHA_ISO": 5.45,
     "ALPHA_PAR": 6.58,
     "ALPHA_ORT": 4.89,
     }
+HI = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(HI.keys(),
+    HI.values())}
 HI["POTFILE"] = DIATOMIC % (0, HI["ALPHA_H"], HI["R"], HI["ALPHA_I"])
 
 CO = {
@@ -82,6 +96,8 @@ CO = {
     "ALPHA_PAR": 2.60,
     "ALPHA_ORT": 1.625,
     }
+CO = { key:(val*ANGSTROM3 if 'ALPHA' in key else val) for key, val in zip(CO.keys(),
+    CO.values())}
 CO["POTFILE"] = DIATOMIC % (0, CO["ALPHA_C"], CO["R"], CO["ALPHA_O"])
 
 CH4 = {

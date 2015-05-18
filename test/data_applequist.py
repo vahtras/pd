@@ -1,8 +1,8 @@
-ANGSTROM = 0.52917721092 #Bohr
-ANGSTROM3 = 1/ANGSTROM**3  # a.u.
+ANGSTROM = 1/0.52917721092 #Bohr
+ANGSTROM3 = ANGSTROM**3  # a.u.
 
 #The AU tag is only concerned with coordinates, as in dalton,
-#So only convert all properties to AU to make legacy tests pass
+#convert all coordinates and properties to AU if the pot is in AA to make tests pass
 DIATOMIC = """AA
 2 0 1 1
 1  0.000  0.000  %f 0.000 %f

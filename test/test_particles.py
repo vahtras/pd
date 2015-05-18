@@ -110,7 +110,7 @@ class PointDipoleListTest(unittest.TestCase):
         self.h2.set_charges((1.0, 1.0))
         self.h2.set_groups((1, 2))
         V_local = self.h2.evaluate_potential_at_atoms()
-        np.testing.assert_almost_equal(V_local, [1.0*ANGSTROM/H2['R'], 1.0*ANGSTROM/H2['R']])
+        np.testing.assert_almost_equal(V_local, [1/(H2['R'] * ANGSTROM), 1/(H2['R']*ANGSTROM)])
 
     def test_evaluate_dipole_potential_at_atoms(self):
         V_external = random_vector()

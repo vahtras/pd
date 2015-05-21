@@ -63,12 +63,13 @@ class TholeList( GaussianQuadrupoleList ):
                 fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
                 fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
                 ft = fe - (v**3 * np.exp( -v ) / 6)
-                E_at_p[ i ] += pdj.monopole_field_at( pdi.r ) + ft*pdj.dipole_field_at( pdi.r ) + pdj.quadrupole_field_at( pdi.r )
-                #E_at_p[ i ] += pdj.field_at( pdi.r )
+                #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
 
         if external is not None:
             E_at_p += external
         return E_at_p
+
     def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
         E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
@@ -77,6 +78,7 @@ class TholeList( GaussianQuadrupoleList ):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
+            print residual
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p
@@ -169,6 +171,24 @@ class Thole( GaussianQuadrupole ):
     @property
     def r(self):
         return self._r
+
+#    def field_at(self, r, damp_1 = 1 , damp_2 = 1 ):
+#        return self.monopole_field_at(r, damp = damp_1) + self.dipole_field_at(r, damp_1 = damp_1, damp_2 = damp_2)
+#
+    def monopole_field_at(self, r, damp = 1):
+        dr = r - self._r
+        dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
+        return damp*self._q*dr/dr2**1.5
+
+    def dipole_field_at(self, r, damp_1 = 1, damp_2 = 1):
+        dr = r - self._r
+        dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
+        p = self.dipole_moment()
+        return (3*dr*dot(dr, p)*damp_2 - damp_1*dr2*p)/dr2**2.5
+
+
 
 
 if __name__ == "__main__":

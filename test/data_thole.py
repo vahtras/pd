@@ -24,12 +24,12 @@ H2 = {
     }
 H2["POTFILE"] = DIATOMIC % (0, H2["ALPHA_H"], H2["R"], H2["ALPHA_H"])
 
-#N2 = {
-#    "R": 2.07416,
-#    "ALPHA_N": N_A,
-#    "ALPHA_ISO": 11.88,
-#    }
-#N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
+N2 = {
+    "R": 2.07416,
+    "ALPHA_N": N_A,
+    "ALPHA_ISO": 11.88,
+    }
+N2["POTFILE"] = DIATOMIC % (0, N2["ALPHA_N"], N2["R"], N2["ALPHA_N"])
 #
 #O2 = {
 #    "R": 2.28165,

@@ -54,22 +54,22 @@ class TholeList( GaussianQuadrupoleList ):
         E_at_p = np.zeros( (len(self), 3))
         for i, pdi in enumerate( self ):
             for j, pdj in enumerate( self ):
-                if pdi.in_group_of( pdj):
+                if pdj.in_group_of( pdi):
                     continue
                 rij = pdi.r - pdj.r
-                r = np.sqrt( norm( rij ))
-                u = r * ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(-1/6)
+                r = np.sqrt( norm( rij ) )
+                u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
                 v = a * u
-                fv = 1 - ( 0.5 * v + 1) * np.exp(-v)
-                fe = fv - ( 0.5 * v**2 + 0.5 * v) * np.exp(-v)
-                ft = fe - v**3 * np.exp( -v ) / 6
-                print pdj.field_at( pdi.r )
-                E_at_p[ i ] += -fe * pdj.monopole_field_at( pdi.r ) + ft*pdj.dipole_field_at( pdi.r )
-                #E_at_p[ i ] += pdj.field_at( pdi.r )
+                fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                ft = fe - (v**3 * np.exp( -v ) / 6)
+                #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
 
         if external is not None:
             E_at_p += external
         return E_at_p
+
     def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
         E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
@@ -78,57 +78,62 @@ class TholeList( GaussianQuadrupoleList ):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
+            print residual
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p
         raise SCFNotConverged(residual, threshold)
 
     def dipole_coupling_tensor(self, a = 2.1304 ):
-        """Calculates the dipole coupling, tensor using
-        the exponential damping scheme by Thole.
-
-        a is the reference adjusted parameter used in the paper
-
-
-        -------------------
-        REFERENCE:
-
-        Molecular Simulation
-        , Vol. 32, No. 6, 15 May 2006, 471–48
-        Appendix A.
-        -------------------
-
-
-        """
         n = len(self)
         _T = zeros((n, 3, n,  3))
-        for i, pdi in enumerate( self ):
+        for i in range(n):
             ri = self[i]._r
-            for j, pdj in enumerate( self ):
+            for j in range(i):
                 if self[i].in_group_of( self[j] ):
                     continue
-
-# For constants.
                 rj = self[j]._r
-                _rij = ri - rj
-                r = rij = np.sqrt( dot( _rij, _rij ))
-                u = r * ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(-1/6)
+                rij = ri - rj
+                rij2 = dot(rij, rij)
+                r = np.sqrt( rij2 )
+# For damping
+                u = r / (( self[i]._a0.trace() * self[j]._a0.trace() / 9 ) ** (1.0/6))
                 v = a * u
-# For the dyadic tensor
-                fv = 1 - ( 0.5 * v + 1) * np.exp(-v)
-                fe = fv - ( 0.5 * v**2 + 0.5 * v) * np.exp(-v)
-                ft = fe - v**3 * np.exp( -v ) / 6
-
-
-                #first_sum = 3 * r**-5 * np.outer( ri, rj ) * (1 - (a**3*r**3/6 + a**2 * r**2/2 + a*r + 1 ) * np.exp(-a* r)) 
-
-                #second_sum = r**-3 * (1 - (0.5*a**2*r**2 + a*r + 1) * np.exp(-a*r) )
-
-                _Tij = (3 * np.einsum('i,j->ij', pdi.r, pdj.r ) * ft - I_3 * r**2*fe)/r**5
-                _T[ i, :, j, : ] = _Tij
-                _T[ j, :, i, : ] = _Tij
+                fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                ft = fe - ( v**3 * np.exp( -v ) / 6 )
+# end of damping
+                Tij = (3*outer(rij, rij)*ft  - fe*rij2*I_3)/rij2**2.5
+                _T[i, :, j, :] = Tij
+                _T[j, :, i, :] = Tij
         return _T
 
+    def solve_Applequist_equation(self):
+        # Solve the linear response equaitons
+        n = len(self)
+        try:
+            self.solve_scf_for_external(ZERO_VECTOR)
+        except SCFNotConverged as e:
+            print "SCF Not converged: residual=%f, threshold=%f"% (
+                float(e.residual), float(e.threshold)
+                )
+            raise
+
+        dE = self.form_Applequist_rhs()
+        L = self.form_Applequist_coefficient_matrix()
+        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
+        return dpdE
+
+    def form_Applequist_coefficient_matrix(self):
+        n = len(self)
+        aT = self.dipole_coupling_tensor().reshape((n, 3, 3*n))
+        # evaluate alphai*Tij
+        alphas = [pd.a for pd in self]
+        for i, a in enumerate(alphas):
+            aT[i, :, :] = dot(a, aT[i, :, :])
+        #matrix (1 - alpha*T)
+        L = np.identity(3*n) - aT.reshape((3*n, 3*n))
+        return L
 
 class Thole( GaussianQuadrupole ):
     """ 
@@ -166,6 +171,24 @@ class Thole( GaussianQuadrupole ):
     @property
     def r(self):
         return self._r
+
+#    def field_at(self, r, damp_1 = 1 , damp_2 = 1 ):
+#        return self.monopole_field_at(r, damp = damp_1) + self.dipole_field_at(r, damp_1 = damp_1, damp_2 = damp_2)
+#
+    def monopole_field_at(self, r, damp = 1):
+        dr = r - self._r
+        dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
+        return damp*self._q*dr/dr2**1.5
+
+    def dipole_field_at(self, r, damp_1 = 1, damp_2 = 1):
+        dr = r - self._r
+        dr2 = dot(dr, dr)
+        if dr2 < .1: raise Exception("Nuclei too close")
+        p = self.dipole_moment()
+        return (3*dr*dot(dr, p)*damp_2 - damp_1*dr2*p)/dr2**2.5
+
+
 
 
 if __name__ == "__main__":

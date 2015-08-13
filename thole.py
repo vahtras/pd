@@ -78,7 +78,6 @@ class TholeList( GaussianQuadrupoleList ):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
-            print residual
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p

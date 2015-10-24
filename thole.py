@@ -107,33 +107,6 @@ class TholeList( GaussianQuadrupoleList ):
                 _T[j, :, i, :] = Tij
         return _T
 
-    def solve_Applequist_equation(self):
-        # Solve the linear response equaitons
-        n = len(self)
-        try:
-            self.solve_scf_for_external(ZERO_VECTOR)
-        except SCFNotConverged as e:
-            print "SCF Not converged: residual=%f, threshold=%f"% (
-                float(e.residual), float(e.threshold)
-                )
-            raise
-
-        dE = self.form_Applequist_rhs()
-        L = self.form_Applequist_coefficient_matrix()
-        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
-        return dpdE
-
-    def form_Applequist_coefficient_matrix(self):
-        n = len(self)
-        aT = self.dipole_coupling_tensor().reshape((n, 3, 3*n))
-        # evaluate alphai*Tij
-        alphas = [pd.a for pd in self]
-        for i, a in enumerate(alphas):
-            aT[i, :, :] = dot(a, aT[i, :, :])
-        #matrix (1 - alpha*T)
-        L = np.identity(3*n) - aT.reshape((3*n, 3*n))
-        return L
-
 class Thole( GaussianQuadrupole ):
     """ 
     Inherits GaussianQuadrupole

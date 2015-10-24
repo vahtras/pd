@@ -109,25 +109,25 @@ class PointDipoleList(list):
 
         return np.trace(self.alpha())/3
 
-    def alpha(self):
+    def alpha(self, threshold = 1e-8):
         try:
-            dpdF = self.solve_Applequist_equation()
+            dpdF = self.solve_Applequist_equation( threshold = threshold )
         except SCFNotConverged:
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
-    def beta(self):
+    def beta(self, threshold = 1e-8 ):
         try:
-            d2p_dF2 = self.solve_second_Applequist_equation()
+            d2p_dF2 = self.solve_second_Applequist_equation( threshold = threshold )
         except SCFNotConverged:
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
-    def solve_Applequist_equation(self):
+    def solve_Applequist_equation(self, threshold = 1e-8):
         # Solve the linear response equaitons
         n = len(self)
         try:
-            self.solve_scf_for_external(ZERO_VECTOR)
+            self.solve_scf_for_external(ZERO_VECTOR, threshold = threshold )
         except SCFNotConverged as e:
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
@@ -139,11 +139,11 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
-    def solve_second_Applequist_equation(self):
+    def solve_second_Applequist_equation(self, threshold = 1e-8):
         # Solve the quadratic response equaitons
         n = len(self)
-        self.solve_scf_for_external(ZERO_VECTOR)
-        dF2 = self.form_second_Applequist_rhs()
+        self.solve_scf_for_external(ZERO_VECTOR, threshold = threshold )
+        dF2 = self.form_second_Applequist_rhs( threshold = threshold )
         L = self.form_Applequist_coefficient_matrix()
         d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
         return d2p_dF2
@@ -154,10 +154,10 @@ class PointDipoleList(list):
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
-    def form_second_Applequist_rhs(self):
+    def form_second_Applequist_rhs(self, threshold = 1e-8 ):
         n = len(self)
         betas = [pd._b0 for pd in self]  #(n, 3, 3, 3)
-        C = self._dEi_dF()                 #(n, 3; 3)
+        C = self._dEi_dF( threshold = threshold )                 #(n, 3; 3)
         dF2 = [np.einsum('ijk,jl,km', b, c, c) for b, c in zip(betas, C)]   # b( i, j, k) c(k; l) -> b(i, j, l) 
         return array(dF2).reshape((n*3, 9))
 
@@ -213,17 +213,17 @@ class PointDipoleList(list):
         return V_at_p
 
 
-    def _dEi_dF(self):
+    def _dEi_dF(self, threshold = 1e-8 ):
         """Represents change of local field due to change in external"""
         n = len(self)
-        TR = self._dEi_dF_indirect()
+        TR = self._dEi_dF_indirect( threshold = threshold )
         return np.array([I_3 + tr for tr in TR])
             
-    def _dEi_dF_indirect(self):
+    def _dEi_dF_indirect(self, threshold = 1e-8 ):
         """Change in local field due to change from other dipoles"""
         n = len(self)
         T = self.dipole_coupling_tensor().reshape(n, 3, n*3)
-        R = self.solve_Applequist_equation().reshape(n*3, 3)
+        R = self.solve_Applequist_equation( threshold = threshold ).reshape(n*3, 3)
         TR = dot(T, R)
         return TR
 

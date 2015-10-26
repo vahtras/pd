@@ -66,7 +66,7 @@ class Cell( np.ndarray ):
             return
 
     @staticmethod
-    def from_PointDipoleList( pdl, co = 25 ):
+    def from_PointDipoleList( pdl, co = 25.0 ):
         """By default, the cutoff box is 25 Angstroms"""
 
         co /= a0

@@ -41,6 +41,9 @@ class CellTest( unittest.TestCase ):
         assert ce.shape == (2, 2, 2)
         assert isinstance( ce, cell.Cell )
 
+        pdl = particles.PointDipoleList.cell_from_string( _str )
+        assert isinstance( pdl, particles.PointDipoleList )
+        assert isinstance( pdl._Cell, cell.Cell )
 
 
 if __name__ == '__main__':

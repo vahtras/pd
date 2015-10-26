@@ -38,7 +38,7 @@ class PointDipoleList(list):
         return cls(iter(potential.split("\n")))
 
     @classmethod
-    def cell_from_string(cls, potential, co = 25 ):
+    def cell_from_string(cls, potential, co = 25.0 ):
         """Used to build the ``PointDipoleList`` object when the
            potential file is given as a triple quoted string with newlines
 

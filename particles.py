@@ -45,7 +45,7 @@ class PointDipoleList(list):
            For very large clusters usage of co will create a 3d cell structure with particles within cutoff = co interacting via the dipole coupling tensor, default is 25 {\AA}
         """
         from cell import Cell
-        assert type(co) == float
+        co = float( co )
         pdl = cls(iter(potential.split("\n")))
         pdl._Cell = cell.Cell.from_PointDipoleList( pdl, co = co )
         return pdl

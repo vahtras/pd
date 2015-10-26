@@ -7,6 +7,7 @@ from numpy.linalg import norm
 from numpy import outer, dot, array, zeros
 import ut
 from constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
+import cell
 
 
 class PointDipoleList(list):
@@ -17,6 +18,7 @@ class PointDipoleList(list):
         pf: potential file object (or iterator)
         """
         a0 = 0.52917721092
+        self._Cell = None
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict(pf.next())
@@ -34,6 +36,19 @@ class PointDipoleList(list):
            potential file is given as a triple quoted string with newlines
         """
         return cls(iter(potential.split("\n")))
+
+    @classmethod
+    def cell_from_string(cls, potential, co = 25 ):
+        """Used to build the ``PointDipoleList`` object when the
+           potential file is given as a triple quoted string with newlines
+
+           For very large clusters usage of co will create a 3d cell structure with particles within cutoff = co interacting via the dipole coupling tensor, default is 25 {\AA}
+        """
+        from cell import Cell
+        assert type(co) == float
+        pdl = cls(iter(potential.split("\n")))
+        pdl._Cell = cell.Cell.from_PointDipoleList( pdl, co = co )
+        return pdl
         
     def __str__(self):
         """String representation of class - delgated to list members"""
@@ -183,18 +198,29 @@ class PointDipoleList(list):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
+            print residual, threshold
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p
         raise SCFNotConverged(residual, threshold)
 
     def evaluate_field_at_atoms(self, external=None):
-        E_at_p =  [
-            array(
-                [o.field_at(p._r) for o in self if not o.in_group_of(p)]
-                ).sum(axis=0) 
-            for p in self
-            ]
+
+        if self._Cell:
+            E_at_p =  [
+                array(
+                    [o.field_at(p._r) for o in self if not o.in_group_of(p)]
+                    ).sum(axis=0) 
+                for p in self.cell.get_closest( o )
+                ]
+        else:
+            E_at_p =  [
+                array(
+                    [o.field_at(p._r) for o in self if not o.in_group_of(p)]
+                    ).sum(axis=0) 
+                for p in self
+                ]
+
         if external is not None:
             E_at_p = [external + p for p in E_at_p]
 

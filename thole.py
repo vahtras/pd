@@ -30,7 +30,7 @@ class TholeList( GaussianQuadrupoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
-        super( QuadrupoleList, self).__init__()
+        super( TholeList, self).__init__()
         a0 = 0.52917721092
         if pf is not None:
             units = pf.next()

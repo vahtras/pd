@@ -52,19 +52,34 @@ class TholeList( GaussianQuadrupoleList ):
 
     def evaluate_field_at_atoms(self, a = 2.1304, external=None):
         E_at_p = np.zeros( (len(self), 3))
-        for i, pdi in enumerate( self ):
-            for j, pdj in enumerate( self ):
-                if pdj.in_group_of( pdi):
-                    continue
-                rij = pdi.r - pdj.r
-                r = np.sqrt( norm( rij ) )
-                u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
-                v = a * u
-                fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
-                fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
-                ft = fe - (v**3 * np.exp( -v ) / 6)
-                #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
-                E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+        if self._Cell is not None:
+            for i, pdi in enumerate( self ):
+                for j, pdj in enumerate( self._Cell.get_closest( pdi ) ):
+                    if pdj.in_group_of( pdi):
+                        continue
+                    rij = pdi.r - pdj.r
+                    r = np.sqrt( norm( rij ) )
+                    u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
+                    v = a * u
+                    fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                    fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                    ft = fe - (v**3 * np.exp( -v ) / 6)
+                    #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                    E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+        else:
+            for i, pdi in enumerate( self ):
+                for j, pdj in enumerate( self ):
+                    if pdj.in_group_of( pdi):
+                        continue
+                    rij = pdi.r - pdj.r
+                    r = np.sqrt( norm( rij ) )
+                    u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
+                    v = a * u
+                    fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                    fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                    ft = fe - (v**3 * np.exp( -v ) / 6)
+                    #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                    E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
 
         if external is not None:
             E_at_p += external

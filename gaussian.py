@@ -29,7 +29,7 @@ class GaussianQuadrupoleList( PointDipoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
-
+        super( GaussianQuadrupoleList, self).__init__()
         a0 = 0.52917721092
         if pf is not None:
             units = pf.next()

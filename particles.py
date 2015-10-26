@@ -206,12 +206,12 @@ class PointDipoleList(list):
 
     def evaluate_field_at_atoms(self, external=None):
 
-        if self._Cell:
+        if self._Cell is not None:
             E_at_p =  [
                 array(
-                    [o.field_at(p._r) for o in self if not o.in_group_of(p)]
+                    [o.field_at(p._r) for o in self._Cell.get_closest(p) if not o.in_group_of(p)]
                     ).sum(axis=0) 
-                for p in self.cell.get_closest( o )
+                for p in self
                 ]
         else:
             E_at_p =  [

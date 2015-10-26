@@ -30,7 +30,7 @@ class TholeList( GaussianQuadrupoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
-
+        super( QuadrupoleList, self).__init__()
         a0 = 0.52917721092
         if pf is not None:
             units = pf.next()
@@ -78,6 +78,7 @@ class TholeList( GaussianQuadrupoleList ):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
+            print residual, threshold
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p

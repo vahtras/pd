@@ -24,6 +24,7 @@ class QuadrupoleList( PointDipoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
+        super( QuadrupoleList, self).__init__()
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict( pf.next() )

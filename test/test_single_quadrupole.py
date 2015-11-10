@@ -3,9 +3,11 @@ import numpy as np
 from ..particles import line_to_dict, header_to_dict
 from ..quadrupole import Quadrupole
 from util import field_gradient
-
 from ..particles import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class QuadrupoleTest(unittest.TestCase):
     """Test basic particle properties"""
 

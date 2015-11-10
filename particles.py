@@ -9,21 +9,6 @@ import ut
 from constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
 import cell
 
-def solve_scf_for_external_cython( obj, E, max_it = 100, threshold = 1e-8 ):
-    assert isinstance( obj, PointDipoleList )
-    for i in range(max_it):
-        E_at_p = self.evaluate_field_at_atoms(external=E)
-        #print i, E_at_p
-        for p, Ep in zip(obj, E_at_p):
-            p.set_local_field(Ep)
-        residual = norm(E_p0 - E_at_p)
-        print residual, threshold
-        if residual < threshold:
-            return i, residual
-        E_p0[:, :] = E_at_p
-    raise SCFNotConverged(residual, threshold)
-
-
 
 class PointDipoleList(list):
     """A list class of ``PointDipole`` objects"""
@@ -216,10 +201,29 @@ class PointDipoleList(list):
         E_p0 = np.zeros((len(self), 3))
 
         if cython:
-            self = solve_scf_for_external_cython( self, E, max_it, threshold = threshold )
+            import pyximport
+            pyximport.install()
+            import optimized_func 
+
+            E_at_p, i, residual = optimized_func.solve_scf_for_external_cython(
+                    particles = array([p.group for p in self], ) ,
+                    E = E,
+                    _r = array([p._r for p in self]),
+                    _q = array([p._q for p in self]),
+                    _p0 = array([p._p0 for p in self]),
+                    _a0 = array([p._a0 for p in self]),
+                    _b0 = array([p._b0 for p in self]),
+                    _field = array([p._field for p in self]),
+                    max_it = max_it ,
+                    threshold = threshold )
+            for p, Ep in zip(self, E_at_p):
+                p.set_local_field( Ep )
+            return i, residual
         else:
             for i in range(max_it):
-                E_at_p = self.evaluate_field_at_atoms(external=E)
+                E_at_p = self.evaluate_field_at_atoms(
+                        external=E
+                        )
                 #print i, E_at_p
                 for p, Ep in zip(self, E_at_p):
                     p.set_local_field(Ep)

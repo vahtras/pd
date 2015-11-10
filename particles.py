@@ -9,6 +9,21 @@ import ut
 from constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
 import cell
 
+def solve_scf_for_external_cython( obj, E, max_it = 100, threshold = 1e-8 ):
+    assert isinstance( obj, PointDipoleList )
+    for i in range(max_it):
+        E_at_p = self.evaluate_field_at_atoms(external=E)
+        #print i, E_at_p
+        for p, Ep in zip(obj, E_at_p):
+            p.set_local_field(Ep)
+        residual = norm(E_p0 - E_at_p)
+        print residual, threshold
+        if residual < threshold:
+            return i, residual
+        E_p0[:, :] = E_at_p
+    raise SCFNotConverged(residual, threshold)
+
+
 
 class PointDipoleList(list):
     """A list class of ``PointDipole`` objects"""
@@ -123,25 +138,29 @@ class PointDipoleList(list):
 
         return np.trace(self.alpha())/3
 
-    def alpha(self, threshold = 1e-8):
+    def alpha(self, cython = False, threshold = 1e-8):
         try:
-            dpdF = self.solve_Applequist_equation( threshold = threshold )
+            dpdF = self.solve_Applequist_equation( 
+                    threshold = threshold,
+                    cython=cython)
         except SCFNotConverged:
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
-    def beta(self, threshold = 1e-8 ):
+    def beta(self, cython = False, threshold = 1e-8 ):
         try:
             d2p_dF2 = self.solve_second_Applequist_equation( threshold = threshold )
         except SCFNotConverged:
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
-    def solve_Applequist_equation(self, threshold = 1e-8):
+    def solve_Applequist_equation(self, cython = False, threshold = 1e-8):
         # Solve the linear response equaitons
         n = len(self)
         try:
-            self.solve_scf_for_external(ZERO_VECTOR, threshold = threshold )
+            self.solve_scf_for_external(ZERO_VECTOR,
+                    cython = cython,
+                    threshold = threshold )
         except SCFNotConverged as e:
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
@@ -153,10 +172,12 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
-    def solve_second_Applequist_equation(self, threshold = 1e-8):
+    def solve_second_Applequist_equation(self, cython = False, threshold = 1e-8):
         # Solve the quadratic response equaitons
         n = len(self)
-        self.solve_scf_for_external(ZERO_VECTOR, threshold = threshold )
+        self.solve_scf_for_external(ZERO_VECTOR,
+                cython = cython, 
+                threshold = threshold )
         dF2 = self.form_second_Applequist_rhs( threshold = threshold )
         L = self.form_Applequist_coefficient_matrix()
         d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
@@ -186,21 +207,28 @@ class PointDipoleList(list):
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
 
-    def solve_scf(self, max_it=100, threshold=1e-6):
-        self.solve_scf_for_external(ZERO_VECTOR, max_it, threshold)
+    def solve_scf(self, max_it=100, cython = False, threshold=1e-6):
+        self.solve_scf_for_external(ZERO_VECTOR, max_it = max_it,
+                cython = cython,
+                threshold = threshold )
 
-    def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
+    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8):
         E_p0 = np.zeros((len(self), 3))
-        for i in range(max_it):
-            E_at_p = self.evaluate_field_at_atoms(external=E)
-            #print i, E_at_p
-            for p, Ep in zip(self, E_at_p):
-                p.set_local_field(Ep)
-            residual = norm(E_p0 - E_at_p)
-            print residual, threshold
-            if residual < threshold:
-                return i, residual
-            E_p0[:, :] = E_at_p
+
+        if cython:
+            self = solve_scf_for_external_cython( self, E, max_it, threshold = threshold )
+        else:
+            for i in range(max_it):
+                E_at_p = self.evaluate_field_at_atoms(external=E)
+                #print i, E_at_p
+                for p, Ep in zip(self, E_at_p):
+                    p.set_local_field(Ep)
+                residual = norm(E_p0 - E_at_p)
+                print residual, threshold
+                if residual < threshold:
+                    return i, residual
+                E_p0[:, :] = E_at_p
+
         raise SCFNotConverged(residual, threshold)
 
     def evaluate_field_at_atoms(self, external=None):

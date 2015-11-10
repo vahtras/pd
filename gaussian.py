@@ -52,23 +52,6 @@ class GaussianQuadrupoleList( PointDipoleList ):
             raise TypeError
         super(GaussianQuadrupoleList, self).append(arg)
 
-    def solve_scf(self, max_it=100, threshold=1e-6):
-        self.solve_scf_for_external(ZERO_VECTOR, max_it, threshold)
-
-    def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
-        E_p0 = np.zeros((len(self), 3))
-        for i in range(max_it):
-            E_at_p =  self.evaluate_field_at_atoms(external=E)
-            #print i, E_at_p
-            for p, Ep in zip(self, E_at_p):
-                p.set_local_field(Ep)
-            residual = norm(E_p0 - E_at_p)
-            if residual < threshold:
-                return i, residual
-            E_p0[:, :] = E_at_p
-        raise SCFNotConverged(residual, threshold)
-
-
     def evaluate_field_at_atoms(self, external=None):
         E_at_p =  [
             array(

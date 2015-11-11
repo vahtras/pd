@@ -3526,6 +3526,7 @@ class TestSpeedTest( unittest.TestCase ):
         g = GaussianQuadrupoleList.from_string( string_2 )
         np.testing.assert_allclose( g[0]._p0, [0.00000, 0.00000, 0.34276] )
 
+    @attr(speed='slow')
     def test_cython_alpha(self):
         g1 = PointDipoleList.from_string( string_2 )
         g2 = PointDipoleList.from_string( string_2 )
@@ -3534,6 +3535,7 @@ class TestSpeedTest( unittest.TestCase ):
         a_cython = g2.alpha( cython = True )
         np.testing.assert_allclose( a, a_cython )
 
+    @attr(speed='slow')
     def test_cython_alpha_threaded(self):
         g1 = PointDipoleList.from_string( string_2 )
         g2 = PointDipoleList.from_string( string_2 )
@@ -3542,6 +3544,7 @@ class TestSpeedTest( unittest.TestCase ):
         a_cython = g2.alpha( cython = True, num_threads = 4 )
         np.testing.assert_allclose( a, a_cython )
 
+    @attr(speed='slow')
     def test_cython_beta(self):
         g1 = PointDipoleList.from_string( string_2 )
         g2 = PointDipoleList.from_string( string_2 )
@@ -3551,18 +3554,22 @@ class TestSpeedTest( unittest.TestCase ):
         np.testing.assert_allclose( b, b_cython )
 
     @attr(speed='slow')
-    def test_cython_optimization_2(self):
-        g = PointDipoleList.from_string( string_2 )
-        a = g.alpha( cython = True )
-    @attr(speed='slow')
     def test_cython_optimization_10(self):
+        g1 = PointDipoleList.from_string( string_50 )
+        g2 = PointDipoleList.from_string( string_50 )
+
         g = PointDipoleList.from_string( string_10 )
         a = g.alpha( cython = True, num_threads=4 )
-    @attr(speed='slow')
-    def test_cython_optimization_50(self):
-        g = PointDipoleList.from_string( string_50 )
-        a = g.alpha( cython = True, num_threads = 4 )
-    @attr(speed='slow')
+
+    @attr(speed='superslow')
+    def test_cython_optimization_50_threads(self):
+        g1 = PointDipoleList.from_string( string_50 )
+        g2 = PointDipoleList.from_string( string_50 )
+
+        a1 = g1.alpha( )
+        a2 = g2.alpha( cython = True, num_threads = 4 )
+
+    @attr(speed='superslow')
     def test_cython_optimization_100(self):
         g = PointDipoleList.from_string( string_100 )
         a = g.alpha( cython = True, num_threads = 1 )
@@ -3570,22 +3577,22 @@ class TestSpeedTest( unittest.TestCase ):
     #def test_cython_optimization_1000(self):
     #    g = PointDipoleList.from_string( string_1000 )
     #    a = g.alpha( cython = True, threshold = 1e-2, num_threads = 4 )
-    @attr(speed='superslow2')
-    def test_no_optimization_2(self):
-        g = PointDipoleList.from_string( string_2 )
-        a = g.alpha( cython = False, num_threads = 4 )
-    @attr(speed='superslow10')
-    def test_no_optimization_10(self):
-        g = PointDipoleList.from_string( string_10 )
-        a = g.alpha( cython = False, )
-    @attr(speed='superslow50')
-    def test_no_optimization_50(self):
-        g = PointDipoleList.from_string( string_50 )
-        a = g.alpha( cython = False )
-    @attr(speed='superslow100')
-    def test_no_optimization_100(self):
-        g = PointDipoleList.from_string( string_100 )
-        a = g.alpha( cython = False )
+    #@attr(speed='superslow2')
+    #def test_no_optimization_2(self):
+    #    g = PointDipoleList.from_string( string_2 )
+    #    a = g.alpha( cython = False, num_threads = 4 )
+    #@attr(speed='superslow10')
+    #def test_no_optimization_10(self):
+    #    g = PointDipoleList.from_string( string_10 )
+    #    a = g.alpha( cython = False, )
+    #@attr(speed='superslow50')
+    #def test_no_optimization_50(self):
+    #    g = PointDipoleList.from_string( string_50 )
+    #    a = g.alpha( cython = False )
+    #@attr(speed='superslow100')
+    #def test_no_optimization_100(self):
+    #    g = PointDipoleList.from_string( string_100 )
+    #    a = g.alpha( cython = False )
 
 
 

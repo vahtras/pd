@@ -7,7 +7,10 @@ from cython.parallel import prange
 cimport cython
 cimport openmp
 
-
+class SCFNotConverged(Exception):
+    def __init__(self, residual, threshold):
+        self.residual = residual
+        self.threshold = threshold
 
 @cython.boundscheck( False )
 def solve_scf_for_external_cython(

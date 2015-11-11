@@ -139,7 +139,7 @@ class PointDipoleList(list):
         try:
             d2p_dF2 = self.solve_second_Applequist_equation( cython = cython,
                     threshold = threshold,
-                    num_threads = 1 )
+                    num_threads = num_threads )
         except SCFNotConverged:
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)

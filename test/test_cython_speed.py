@@ -3532,8 +3532,15 @@ class TestSpeedTest( unittest.TestCase ):
 
         a = g1.alpha( cython = False )
         a_cython = g2.alpha( cython = True )
-        np.testing.assert_allclose( a, a_cython, atol=1e-4 )
+        np.testing.assert_allclose( a, a_cython )
 
+    def test_cython_alpha_threaded(self):
+        g1 = PointDipoleList.from_string( string_2 )
+        g2 = PointDipoleList.from_string( string_2 )
+
+        a = g1.alpha( cython = False )
+        a_cython = g2.alpha( cython = True, num_threads = 4 )
+        np.testing.assert_allclose( a, a_cython )
 
     def test_cython_beta(self):
         g1 = PointDipoleList.from_string( string_2 )

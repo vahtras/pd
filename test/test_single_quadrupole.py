@@ -89,7 +89,7 @@ class QuadrupoleTest(unittest.TestCase):
             beta=self.beta
             )
             
-        self.assertEqual(self.particle.total_energy(), -1.41)
+        np.testing.assert_allclose(self.particle.total_energy(), -1.41)
 
     def test_monopole_energy(self):
         charge_in_potential = Quadrupole(charge=1.2, local_potential=0.12)

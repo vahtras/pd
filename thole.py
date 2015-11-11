@@ -85,7 +85,8 @@ class TholeList( GaussianQuadrupoleList ):
             E_at_p += external
         return E_at_p
 
-    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8):
+    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8,
+            num_threads = 1 ):
         E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
             E_at_p =  self.evaluate_field_at_atoms(external=E)

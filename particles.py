@@ -123,11 +123,13 @@ class PointDipoleList(list):
 
         return np.trace(self.alpha())/3
 
-    def alpha(self, cython = False, threshold = 1e-8):
+    def alpha(self, cython = False, threshold = 1e-8, num_threads = 1):
         try:
             dpdF = self.solve_Applequist_equation( 
                     threshold = threshold,
-                    cython=cython)
+                    cython=cython,
+                    num_threads = num_threads,
+                    )
         except SCFNotConverged:
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
@@ -139,13 +141,15 @@ class PointDipoleList(list):
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
-    def solve_Applequist_equation(self, cython = False, threshold = 1e-8):
+    def solve_Applequist_equation(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         # Solve the linear response equaitons
         n = len(self)
         try:
             self.solve_scf_for_external(ZERO_VECTOR,
                     cython = cython,
-                    threshold = threshold )
+                    threshold = threshold,
+                    num_threads = num_threads )
         except SCFNotConverged as e:
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
@@ -157,12 +161,14 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
-    def solve_second_Applequist_equation(self, cython = False, threshold = 1e-8):
+    def solve_second_Applequist_equation(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         # Solve the quadratic response equaitons
         n = len(self)
         self.solve_scf_for_external(ZERO_VECTOR,
                 cython = cython, 
-                threshold = threshold )
+                threshold = threshold,
+                num_threads = num_threads )
         dF2 = self.form_second_Applequist_rhs( threshold = threshold )
         L = self.form_Applequist_coefficient_matrix()
         d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
@@ -192,21 +198,25 @@ class PointDipoleList(list):
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
 
-    def solve_scf(self, max_it=100, cython = False, threshold=1e-6):
+    def solve_scf(self, max_it=100, cython = False, threshold=1e-6,
+            num_threads = 1):
         self.solve_scf_for_external(ZERO_VECTOR, max_it = max_it,
                 cython = cython,
-                threshold = threshold )
+                threshold = threshold,
+                num_threads = num_threads, )
 
-    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8):
+    def solve_scf_for_external(self, E, max_it=100, cython = False,
+            threshold=1e-8,
+            num_threads = 1 ):
+
         E_p0 = np.zeros((len(self), 3))
-
         if cython:
-            import pyximport
-            pyximport.install()
+            #import pyximport
+            #pyximport.install()
             import optimized_func 
 
             E_at_p, i, residual = optimized_func.solve_scf_for_external_cython(
-                    particles = array([p.group for p in self], ) ,
+                    particles = array([p.group for p in self]) ,
                     E = E,
                     _r = array([p._r for p in self]),
                     _q = array([p._q for p in self]),
@@ -215,7 +225,8 @@ class PointDipoleList(list):
                     _b0 = array([p._b0 for p in self]),
                     _field = array([p._field for p in self]),
                     max_it = max_it ,
-                    threshold = threshold )
+                    threshold = threshold,
+                    num_threads = num_threads )
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field( Ep )
             return i, residual

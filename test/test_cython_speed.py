@@ -9,7 +9,7 @@ from numpy.linalg import norm
 from ..gaussian import *
 
 string_2 = """AU
-6 1 2 1
+6 1 22 1
 1      0.000000   0.000000   0.000000 -0.66229 0.00000 0.00000 0.34276 4.10574 0.00000 0.00000 4.79229 0.00000 4.01912 0.00000 0.00000 -3.33162 0.00000 0.00000 0.00000 0.00000 -0.32216 0.00000 0.79137 
 1      1.430429   0.000000   1.107157 0.33114 -0.16617 0.00000 -0.11629 1.53802 0.00000 1.19765 0.90661 0.00000 1.37138 -4.52137 0.00000 -5.08061 -1.35494 0.00000 -4.83365 0.00000 -0.46317 0.00000 -3.47921 
 1     -1.430429   0.000000   1.107157 0.33114 0.16617 0.00000 -0.11629 1.53802 0.00000 -1.19765 0.90661 0.00000 1.37138 4.52137 0.00000 -5.08061 1.35494 0.00000 4.83365 0.00000 -0.46317 0.00000 -3.47921 
@@ -3543,26 +3543,26 @@ class TestSpeedTest( unittest.TestCase ):
         b_cython = g2.beta( cython = True )
         np.testing.assert_allclose( b, b_cython )
 
-    @attr(speed='slow2')
+    @attr(speed='slow')
     def test_cython_optimization_2(self):
         g = PointDipoleList.from_string( string_2 )
         a = g.alpha( cython = True )
-    @attr(speed='slow10')
+    @attr(speed='slow')
     def test_cython_optimization_10(self):
         g = PointDipoleList.from_string( string_10 )
         a = g.alpha( cython = True, num_threads=4 )
-    @attr(speed='slow50')
+    @attr(speed='slow')
     def test_cython_optimization_50(self):
         g = PointDipoleList.from_string( string_50 )
         a = g.alpha( cython = True, num_threads = 4 )
-    @attr(speed='slow100')
+    @attr(speed='slow')
     def test_cython_optimization_100(self):
         g = PointDipoleList.from_string( string_100 )
-        a = g.alpha( cython = True, num_threads = 4 )
-    @attr(speed='slow1000')
-    def test_cython_optimization_1000(self):
-        g = PointDipoleList.from_string( string_1000 )
-        a = g.alpha( cython = True, threshold = 1e-2, num_threads = 4 )
+        a = g.alpha( cython = True, num_threads = 1 )
+    #@attr(speed='slow')
+    #def test_cython_optimization_1000(self):
+    #    g = PointDipoleList.from_string( string_1000 )
+    #    a = g.alpha( cython = True, threshold = 1e-2, num_threads = 4 )
     @attr(speed='superslow2')
     def test_no_optimization_2(self):
         g = PointDipoleList.from_string( string_2 )

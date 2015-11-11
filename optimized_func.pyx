@@ -7,44 +7,6 @@ from cython.parallel import prange
 cimport cython
 cimport openmp
 
-#DTYPE = np.int
-#ctypedef np.int_t DTYPE_t
-
-cdef double c_norm( np.ndarray[double]a,
-        np.ndarray[double]b):
-    cdef Py_ssize_t i
-    cdef double c = 0
-    for i in range( a.shape[0] ):
-        c += a[i] * b[i]
-    return sqrt(c)
-
-
-class SCFNotConverged( Exception ):
-    def __init__(self, residual, threshold):
-        self.residual = residual
-        self.threshold = threshold
-
-def field_at( np.ndarray[double,ndim=1] r,
-        np.ndarray[double,ndim=1] r0,
-        double q,
-        np.ndarray[double,ndim=1] p):
-    return monopole_field_at(r, r0, q) + dipole_field_at(r, r0, p)
-
-def monopole_field_at( np.ndarray[double,ndim=1]r,
-        np.ndarray[double,ndim=1]r0,
-        double q):
-    dr = r - r0
-    dr2 = np.dot(dr, dr)
-    if dr2 < .1: raise Exception("Nuclei too close")
-    return q*dr/dr2**1.5
-
-def dipole_field_at( np.ndarray[double,ndim=1]r,
-        np.ndarray[double,ndim=1]r0,
-        np.ndarray[double,ndim=1]p):
-    dr = r - r0
-    dr2 = np.dot(dr, dr)
-    if dr2 < .1: raise Exception("Nuclei too close")
-    return (3*dr*np.dot(dr, p) - dr2*p)/dr2**2.5
 
 
 @cython.boundscheck( False )
@@ -69,6 +31,7 @@ def solve_scf_for_external_cython(
 
     cdef np.ndarray[double, ndim=2] E_p0 = np.zeros( (Nmax, 3))
     cdef np.ndarray[double, ndim=2] E_at_p = np.zeros( (Nmax, 3 ))
+    cdef double[:,:] para_field = _field
     E_at_p[:, :] = _field
 
     cdef int i, o, p, k, j, l
@@ -114,8 +77,8 @@ def solve_scf_for_external_cython(
                         by = by + 0.5*(_b0[o, 1, k, j ] * E_at_p[o, k]* E_at_p[o, j])
                         bz = bz + 0.5*(_b0[o, 2, k, j ] * E_at_p[o, k]* E_at_p[o, j])
                 p_o_x = _p0[o, 0] + ax + bx
-                p_o_y = _p0[o, 1] + ax + bx
-                p_o_z = _p0[o, 2] + ax + bx
+                p_o_y = _p0[o, 1] + ay + by
+                p_o_z = _p0[o, 2] + az + bz
 
                 #printf( "p at o: %f, %f, %f\n", p_o_x, p_o_y , p_o_z ) 
                 # + adot[ :] \
@@ -134,7 +97,7 @@ def solve_scf_for_external_cython(
                 proj_o = rx*p_o_x + ry*p_o_y + rz*p_o_z
 
                 dx = (3*rx*proj_o - dr2 * p_o_x)/pow( dr2, 2.5 )
-                dy = (3*rz*proj_o - dr2 * p_o_z)/pow( dr2, 2.5 )
+                dy = (3*ry*proj_o - dr2 * p_o_y)/pow( dr2, 2.5 )
                 dz = (3*rz*proj_o - dr2 * p_o_z)/pow( dr2, 2.5 )
 
                 tmp_E_x = tmp_E_x + mx + dx
@@ -151,21 +114,6 @@ def solve_scf_for_external_cython(
             _field[p, 2] += E[2]
 
         E_at_p[:, :] = _field
-        #E_at_p = evaluate_field_at_atoms_cython(
-        #        N,
-        #        particles,
-        #        E,
-        #        _r,
-        #        _q,
-        #        _p0,
-        #        _a0,
-        #        _b0,
-        #        _field,
-        #        external=E,
-        #        num_threads = num_threads
-        #        )
-# end of evaluate_field at atoms_cython
-        #print i, E_at_p
         residual = np.linalg.norm( E_p0 - E_at_p)
         print residual, threshold
         if residual < threshold:

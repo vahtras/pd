@@ -134,9 +134,12 @@ class PointDipoleList(list):
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
-    def beta(self, cython = False, threshold = 1e-8 ):
+    def beta(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         try:
-            d2p_dF2 = self.solve_second_Applequist_equation( threshold = threshold )
+            d2p_dF2 = self.solve_second_Applequist_equation( cython = cython,
+                    threshold = threshold,
+                    num_threads = 1 )
         except SCFNotConverged:
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)

@@ -6,7 +6,9 @@ from ..particles import *
 from ..quadrupole import *
 from ..gaussian import *
 from .util import *
+from nose.plugins.attrib import attr
 
+@attr(speed='fast')
 class RandomDipole(PointDipole):
     def __init__(self):
         PointDipole.__init__(self,
@@ -18,6 +20,7 @@ class RandomDipole(PointDipole):
             local_field=random_vector()
             )
 
+@attr(speed='fast')
 class PointDipoleFiniteFieldTests(unittest.TestCase):
 
     def setUp(self):
@@ -75,6 +78,7 @@ class PointDipoleFiniteFieldTests(unittest.TestCase):
         hess_p = field_hessian(self.particle.dipole_moment)
         np.testing.assert_almost_equal(hess_p, self.particle._b0)
 
+@attr(speed='fast')
 class PointDipoleListFiniteFieldTests(unittest.TestCase):
     
     def setUp(self):

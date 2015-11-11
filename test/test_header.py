@@ -1,6 +1,11 @@
 import unittest
 from ..particles import *
+from nose.plugins.attrib import attr
 
+
+
+
+@attr(speed='fast')
 class  TestHeader(unittest.TestCase):
     def test_header_number_of_atoms(self):
         header_dict = header_to_dict("2 0 0")

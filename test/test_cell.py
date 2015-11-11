@@ -2,6 +2,7 @@ import unittest, os
 import numpy as np
 import particles 
 import cell
+from nose.plugins.attrib import attr
 
 #Two water molecules, one in origo, one at r = [15, 15, 15]
 POTSTRING1 = """AU
@@ -13,6 +14,7 @@ POTSTRING1 = """AU
 2     16.430429  15.000000  16.107157 0.33114 -0.16617 0.00000 -0.11629 1.53802 0.00000 1.19765 0.90661 0.00000 1.37138 -4.52137 0.00000 -5.08061 -1.35494 0.00000 -4.83365 0.00000 -0.46317 0.00000 -3.47921
 2     13.569571  15.000000  16.107157 0.33114 0.16617 0.00000 -0.11629 1.53802 0.00000 -1.19765 0.90661 0.00000 1.37138 4.52137 0.00000 -5.08061 1.35494 0.00000 4.83365 0.00000 -0.46317 0.00000 -3.47921"""
 
+@attr(speed='fast')
 class CellTest( unittest.TestCase ):
     def setUp(self):
         pass

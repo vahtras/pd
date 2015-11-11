@@ -1,6 +1,8 @@
 import unittest
 from util import iterize
+from nose.plugins.attrib import attr
 
+@attr(speed='fast')
 class TestUtil(unittest.TestCase):
     def setUp(self):
         pass

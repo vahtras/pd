@@ -87,7 +87,7 @@ class PointDipoleTest(unittest.TestCase):
 
     def test_monopole_energy(self):
         charge_in_potential = PointDipole(charge=1.2, local_potential=0.12)
-        np.testing.assert_almost_equal(
+        np.testing.assert_allclose(
             charge_in_potential.charge_energy(),
             0.144
             )

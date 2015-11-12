@@ -3554,12 +3554,24 @@ class TestSpeedTest( unittest.TestCase ):
         np.testing.assert_allclose( b, b_cython )
 
     @attr(speed='slow')
-    def test_cython_optimization_10(self):
-        g1 = PointDipoleList.from_string( string_50 )
-        g2 = PointDipoleList.from_string( string_50 )
+    def test_cython_optimization_10_alpha(self):
+        g1 = PointDipoleList.from_string( string_10 )
+        g2 = PointDipoleList.from_string( string_10 )
 
-        g = PointDipoleList.from_string( string_10 )
-        a = g.alpha( cython = True, num_threads=4 )
+        a = g1.alpha( cython = False, num_threads=1 )
+        a_cython = g2.alpha( cython = True, num_threads=4 )
+        np.testing.assert_allclose( a, a_cython, 1e-14 )
+
+    @attr(speed='slow')
+    def test_cython_optimization_10_beta(self):
+        g1 = PointDipoleList.from_string( string_10 )
+        g2 = PointDipoleList.from_string( string_10 )
+
+        a = g1.beta( cython = False, num_threads=1 )
+        a_cython = g2.beta( cython = True, num_threads=4 )
+        np.testing.assert_allclose( a, a_cython, 1e-14 )
+
+
 
     @attr(speed='superslow')
     def test_cython_optimization_50_threads(self):

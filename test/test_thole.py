@@ -1,12 +1,13 @@
 import unittest
 import numpy as np
-
 from ..thole import TholeList
 from data_thole import *
+from nose.plugins.attrib import attr
 
 
 DECIMALS=1
 
+@attr(speed='fast')
 class TholeTest(unittest.TestCase):
 
     def setUp(self):

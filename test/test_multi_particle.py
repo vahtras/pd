@@ -3,7 +3,10 @@ import numpy as np
 from ..particles import PointDipole, PointDipoleList
 from .test_particles import H2
 from .util import iterize
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class MultiDipoleTest(unittest.TestCase):
 
     def setUp(self):

@@ -30,7 +30,7 @@ class TholeList( GaussianQuadrupoleList ):
         """Class constructor 
         pf: potential file object (or iterator)
         """
-
+        super( TholeList, self).__init__()
         a0 = 0.52917721092
         if pf is not None:
             units = pf.next()
@@ -52,25 +52,41 @@ class TholeList( GaussianQuadrupoleList ):
 
     def evaluate_field_at_atoms(self, a = 2.1304, external=None):
         E_at_p = np.zeros( (len(self), 3))
-        for i, pdi in enumerate( self ):
-            for j, pdj in enumerate( self ):
-                if pdj.in_group_of( pdi):
-                    continue
-                rij = pdi.r - pdj.r
-                r = np.sqrt( norm( rij ) )
-                u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
-                v = a * u
-                fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
-                fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
-                ft = fe - (v**3 * np.exp( -v ) / 6)
-                #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
-                E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+        if self._Cell is not None:
+            for i, pdi in enumerate( self ):
+                for j, pdj in enumerate( self._Cell.get_closest( pdi ) ):
+                    if pdj.in_group_of( pdi):
+                        continue
+                    rij = pdi.r - pdj.r
+                    r = np.sqrt( norm( rij ) )
+                    u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
+                    v = a * u
+                    fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                    fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                    ft = fe - (v**3 * np.exp( -v ) / 6)
+                    #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                    E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+        else:
+            for i, pdi in enumerate( self ):
+                for j, pdj in enumerate( self ):
+                    if pdj.in_group_of( pdi):
+                        continue
+                    rij = pdi.r - pdj.r
+                    r = np.sqrt( norm( rij ) )
+                    u = r / ( pdi._a0.trace() * pdj._a0.trace() / 9 )**(1/6)
+                    v = a * u
+                    fv = 1 - (( 0.5 * v + 1) * np.exp(-v))
+                    fe = fv - (( 0.5 * v**2 + 0.5 * v) * np.exp(-v))
+                    ft = fe - (v**3 * np.exp( -v ) / 6)
+                    #E_at_p[ i ] += pdj.field_at( pdi.r, damp_1 = fe, damp_2 = ft )
+                    E_at_p[ i ] += pdj.monopole_field_at( pdi.r, damp = fe ) - pdj.dipole_field_at( pdi.r, damp_1 = fe, damp_2 = ft )
 
         if external is not None:
             E_at_p += external
         return E_at_p
 
-    def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
+    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8,
+            num_threads = 1 ):
         E_p0 = np.zeros((len(self), 3))
         for i in range(max_it):
             E_at_p =  self.evaluate_field_at_atoms(external=E)
@@ -78,7 +94,7 @@ class TholeList( GaussianQuadrupoleList ):
             for p, Ep in zip(self, E_at_p):
                 p.set_local_field(Ep)
             residual = norm(E_p0 - E_at_p)
-            print residual
+            print residual, threshold
             if residual < threshold:
                 return i, residual
             E_p0[:, :] = E_at_p
@@ -107,33 +123,6 @@ class TholeList( GaussianQuadrupoleList ):
                 _T[i, :, j, :] = Tij
                 _T[j, :, i, :] = Tij
         return _T
-
-    def solve_Applequist_equation(self):
-        # Solve the linear response equaitons
-        n = len(self)
-        try:
-            self.solve_scf_for_external(ZERO_VECTOR)
-        except SCFNotConverged as e:
-            print "SCF Not converged: residual=%f, threshold=%f"% (
-                float(e.residual), float(e.threshold)
-                )
-            raise
-
-        dE = self.form_Applequist_rhs()
-        L = self.form_Applequist_coefficient_matrix()
-        dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
-        return dpdE
-
-    def form_Applequist_coefficient_matrix(self):
-        n = len(self)
-        aT = self.dipole_coupling_tensor().reshape((n, 3, 3*n))
-        # evaluate alphai*Tij
-        alphas = [pd.a for pd in self]
-        for i, a in enumerate(alphas):
-            aT[i, :, :] = dot(a, aT[i, :, :])
-        #matrix (1 - alpha*T)
-        L = np.identity(3*n) - aT.reshape((3*n, 3*n))
-        return L
 
 class Thole( GaussianQuadrupole ):
     """ 

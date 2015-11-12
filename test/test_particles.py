@@ -5,6 +5,8 @@ from ..particles import PointDipole, PointDipoleList
 from .util import iterize, random_scalar, random_vector
 from ..constants import *
 from test_applequist import H2, ANGSTROM, ANGSTROM3
+from nose.plugins.attrib import attr
+
 
 # Other model systems
 
@@ -26,6 +28,7 @@ H2O_DIMER_UNIT = """AU
 1 0 0  0.7750941070  0   0 0 0.814576406    7.21103625278 0 0 3.03446384360 0 5.22710462524    0 0 -18.48299798 0 0 0 0 -2.33649400 0 -11.17349291
 """
         
+@attr(speed='fast')
 class PointDipoleListTest(unittest.TestCase):
 
     def setUp(self):

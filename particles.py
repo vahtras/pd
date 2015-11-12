@@ -7,6 +7,7 @@ from numpy.linalg import norm
 from numpy import outer, dot, array, zeros
 import ut
 from constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
+import cell
 
 
 class PointDipoleList(list):
@@ -17,6 +18,7 @@ class PointDipoleList(list):
         pf: potential file object (or iterator)
         """
         a0 = 0.52917721092
+        self._Cell = None
         if pf is not None:
             units = pf.next()
             self.header_dict = header_to_dict(pf.next())
@@ -34,6 +36,18 @@ class PointDipoleList(list):
            potential file is given as a triple quoted string with newlines
         """
         return cls(iter(potential.split("\n")))
+
+    @classmethod
+    def cell_from_string(cls, potential, co = 25.0 ):
+        """Used to build the ``PointDipoleList`` object when the
+           potential file is given as a triple quoted string with newlines
+
+           For very large clusters usage of co will create a 3d cell structure with particles within cutoff = co interacting via the dipole coupling tensor, default is 25 {\AA}
+        """
+        co = float( co )
+        pdl = cls(iter(potential.split("\n")))
+        pdl._Cell = cell.Cell.from_PointDipoleList( pdl, co = co )
+        return pdl
         
     def __str__(self):
         """String representation of class - delgated to list members"""
@@ -109,25 +123,36 @@ class PointDipoleList(list):
 
         return np.trace(self.alpha())/3
 
-    def alpha(self):
+    def alpha(self, cython = False, threshold = 1e-8, num_threads = 1):
         try:
-            dpdF = self.solve_Applequist_equation()
+            dpdF = self.solve_Applequist_equation( 
+                    threshold = threshold,
+                    cython=cython,
+                    num_threads = num_threads,
+                    )
         except SCFNotConverged:
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
-    def beta(self):
+    def beta(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         try:
-            d2p_dF2 = self.solve_second_Applequist_equation()
+            d2p_dF2 = self.solve_second_Applequist_equation( cython = cython,
+                    threshold = threshold,
+                    num_threads = num_threads )
         except SCFNotConverged:
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
-    def solve_Applequist_equation(self):
+    def solve_Applequist_equation(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         # Solve the linear response equaitons
         n = len(self)
         try:
-            self.solve_scf_for_external(ZERO_VECTOR)
+            self.solve_scf_for_external(ZERO_VECTOR,
+                    cython = cython,
+                    threshold = threshold,
+                    num_threads = num_threads )
         except SCFNotConverged as e:
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
@@ -139,11 +164,15 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
-    def solve_second_Applequist_equation(self):
+    def solve_second_Applequist_equation(self, cython = False, threshold = 1e-8,
+            num_threads = 1):
         # Solve the quadratic response equaitons
         n = len(self)
-        self.solve_scf_for_external(ZERO_VECTOR)
-        dF2 = self.form_second_Applequist_rhs()
+        self.solve_scf_for_external(ZERO_VECTOR,
+                cython = cython, 
+                threshold = threshold,
+                num_threads = num_threads )
+        dF2 = self.form_second_Applequist_rhs( threshold = threshold )
         L = self.form_Applequist_coefficient_matrix()
         d2p_dF2 = np.linalg.solve(L, dF2).reshape((n, 3, 3, 3))
         return d2p_dF2
@@ -154,10 +183,10 @@ class PointDipoleList(list):
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
-    def form_second_Applequist_rhs(self):
+    def form_second_Applequist_rhs(self, threshold = 1e-8 ):
         n = len(self)
         betas = [pd._b0 for pd in self]  #(n, 3, 3, 3)
-        C = self._dEi_dF()                 #(n, 3; 3)
+        C = self._dEi_dF( threshold = threshold )                 #(n, 3; 3)
         dF2 = [np.einsum('ijk,jl,km', b, c, c) for b, c in zip(betas, C)]   # b( i, j, k) c(k; l) -> b(i, j, l) 
         return array(dF2).reshape((n*3, 9))
 
@@ -172,29 +201,71 @@ class PointDipoleList(list):
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
 
-    def solve_scf(self, max_it=100, threshold=1e-6):
-        self.solve_scf_for_external(ZERO_VECTOR, max_it, threshold)
+    def solve_scf(self, max_it=100, cython = False, threshold=1e-6,
+            num_threads = 1):
+        self.solve_scf_for_external(ZERO_VECTOR, max_it = max_it,
+                cython = cython,
+                threshold = threshold,
+                num_threads = num_threads, )
 
-    def solve_scf_for_external(self, E, max_it=100, threshold=1e-8):
+    def solve_scf_for_external(self, E, max_it=100, cython = False,
+            threshold=1e-8,
+            num_threads = 1 ):
+
         E_p0 = np.zeros((len(self), 3))
-        for i in range(max_it):
-            E_at_p =  self.evaluate_field_at_atoms(external=E)
-            #print i, E_at_p
+        if cython:
+            #import pyximport
+            #pyximport.install()
+            import optimized_func 
+
+            E_at_p, i, residual = optimized_func.solve_scf_for_external_cython(
+                    particles = array([p.group for p in self]) ,
+                    E = E,
+                    _r = array([p._r for p in self]),
+                    _q = array([p._q for p in self]),
+                    _p0 = array([p._p0 for p in self]),
+                    _a0 = array([p._a0 for p in self]),
+                    _b0 = array([p._b0 for p in self]),
+                    _field = array([p._field for p in self]),
+                    max_it = max_it ,
+                    threshold = threshold,
+                    num_threads = num_threads )
             for p, Ep in zip(self, E_at_p):
-                p.set_local_field(Ep)
-            residual = norm(E_p0 - E_at_p)
-            if residual < threshold:
-                return i, residual
-            E_p0[:, :] = E_at_p
+                p.set_local_field( Ep )
+            return i, residual
+        else:
+            for i in range(max_it):
+                E_at_p = self.evaluate_field_at_atoms(
+                        external=E
+                        )
+                #print i, E_at_p
+                for p, Ep in zip(self, E_at_p):
+                    p.set_local_field(Ep)
+                residual = norm(E_p0 - E_at_p)
+                print residual, threshold
+                if residual < threshold:
+                    return i, residual
+                E_p0[:, :] = E_at_p
+
         raise SCFNotConverged(residual, threshold)
 
     def evaluate_field_at_atoms(self, external=None):
-        E_at_p =  [
-            array(
-                [o.field_at(p._r) for o in self if not o.in_group_of(p)]
-                ).sum(axis=0) 
-            for p in self
-            ]
+
+        if self._Cell is not None:
+            E_at_p =  [
+                array(
+                    [o.field_at(p._r) for o in self._Cell.get_closest(p) if not o.in_group_of(p)]
+                    ).sum(axis=0) 
+                for p in self
+                ]
+        else:
+            E_at_p =  [
+                array(
+                    [o.field_at(p._r) for o in self if not o.in_group_of(p)]
+                    ).sum(axis=0) 
+                for p in self
+                ]
+
         if external is not None:
             E_at_p = [external + p for p in E_at_p]
 
@@ -213,17 +284,17 @@ class PointDipoleList(list):
         return V_at_p
 
 
-    def _dEi_dF(self):
+    def _dEi_dF(self, threshold = 1e-8 ):
         """Represents change of local field due to change in external"""
         n = len(self)
-        TR = self._dEi_dF_indirect()
+        TR = self._dEi_dF_indirect( threshold = threshold )
         return np.array([I_3 + tr for tr in TR])
             
-    def _dEi_dF_indirect(self):
+    def _dEi_dF_indirect(self, threshold = 1e-8 ):
         """Change in local field due to change from other dipoles"""
         n = len(self)
         T = self.dipole_coupling_tensor().reshape(n, 3, n*3)
-        R = self.solve_Applequist_equation().reshape(n*3, 3)
+        R = self.solve_Applequist_equation( threshold = threshold ).reshape(n*3, 3)
         TR = dot(T, R)
         return TR
 

@@ -3,10 +3,12 @@ import numpy as np
 from ..particles import PointDipoleList
 from ..constants import *
 from data_applequist import *
+from nose.plugins.attrib import attr
 
 DECIMALS = 1
 
 
+@attr(speed='fast')
 class ApplequistTest(unittest.TestCase):
 
     def setUp(self):

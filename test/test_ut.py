@@ -1,6 +1,9 @@
 from unittest import TestCase
 from ..ut import *
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class TestTriangular(TestCase):
     def test_setUp(self):
         pass

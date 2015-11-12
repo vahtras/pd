@@ -3,3 +3,9 @@
 
 Water\ dimer.ipynb
 .ipynb_checkpoints/
+
+
+build
+*.so
+*.c
+*.html

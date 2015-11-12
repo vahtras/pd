@@ -6,7 +6,10 @@ import unittest
 from math import erf
 import numpy as np
 from numpy.linalg import norm
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class GaussianTest( unittest.TestCase ):
 
     """

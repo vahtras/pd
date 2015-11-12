@@ -2,9 +2,11 @@ import unittest
 import numpy as np
 from ..particles import PointDipole, line_to_dict, header_to_dict
 from util import field_gradient
-
 from ..constants import I_3, ZERO_VECTOR, ZERO_TENSOR, ZERO_RANK_3_TENSOR
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class PointDipoleTest(unittest.TestCase):
     """Test basic particle properties"""
 
@@ -81,11 +83,11 @@ class PointDipoleTest(unittest.TestCase):
             beta=self.beta
             )
             
-        self.assertEqual(self.particle.total_energy(), -1.41)
+        np.testing.assert_allclose(self.particle.total_energy(), -1.41)
 
     def test_monopole_energy(self):
         charge_in_potential = PointDipole(charge=1.2, local_potential=0.12)
-        np.testing.assert_almost_equal(
+        np.testing.assert_allclose(
             charge_in_potential.charge_energy(),
             0.144
             )

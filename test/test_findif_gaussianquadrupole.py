@@ -6,7 +6,10 @@ from ..particles import *
 from ..quadrupole import *
 from ..gaussian import *
 from .util import *
+from nose.plugins.attrib import attr
 
+
+@attr(speed='fast')
 class RandomGaussianQuadrupole(GaussianQuadrupole):
     def __init__(self):
         GaussianQuadrupole.__init__(self,
@@ -19,6 +22,7 @@ class RandomGaussianQuadrupole(GaussianQuadrupole):
             local_field=random_vector()
             )
         
+@attr(speed='fast')
 class GaussianQuadrupoleFiniteFieldTests(unittest.TestCase):
 
     def setUp(self):
@@ -46,6 +50,7 @@ class GaussianQuadrupoleFiniteFieldTests(unittest.TestCase):
         hess_p = field_hessian(self.particle.dipole_moment)
         np.testing.assert_almost_equal(hess_p, self.particle._b0)
 
+@attr(speed='fast')
 class GaussianQuadrupoleListFiniteFieldTests(unittest.TestCase):
     
     def setUp(self):

@@ -13,6 +13,70 @@ class SCFNotConverged(Exception):
         self.threshold = threshold
 
 @cython.boundscheck( False )
+def dipole_coupling_tensor_pointdipole_cython(
+        np.ndarray[long,ndim=1]particles,
+        np.ndarray[double,ndim=2]_r,
+        int num_threads = 1
+        ):
+    cdef int i, j
+    cdef int n = particles.shape[0]
+    cdef np.ndarray[double, ndim = 4] _T = np.zeros((n, 3, n,  3))
+    cdef double rx, ry, rz
+    cdef double dr2, term
+    cdef double t_xx, t_xy, t_xz, t_yx, t_yy, t_yz, t_zx, t_zy, t_zz
+
+    for i in prange( n, nogil = True, num_threads = num_threads ):
+        for j in range(i):
+            if particles[i] == particles[j]:
+                continue
+            rx = _r[j, 0] - _r[i, 0]
+            ry = _r[j, 1] - _r[i, 1]
+            rz = _r[j, 2] - _r[i, 2]
+
+            dr2 = rx*rx + ry*ry + rz*rz 
+
+            t_xx = ( 3*rx*rx - dr2)/ pow(dr2, 2.5 )
+            t_xy = ( 3*rx*ry )/ pow(dr2, 2.5 )
+            t_xz = ( 3*rx*rz )/ pow(dr2, 2.5 )
+
+            t_yx = ( 3*ry*rx )/ pow(dr2, 2.5 )
+            t_yy = ( 3*ry*ry - dr2)/ pow(dr2, 2.5 )
+            t_yz = ( 3*ry*rz )/ pow(dr2, 2.5 )
+
+            t_zx = ( 3*rz*rx )/ pow(dr2, 2.5 )
+            t_zy = ( 3*rz*ry )/ pow(dr2, 2.5 )
+            t_zz = ( 3*rz*rz - dr2)/ pow(dr2, 2.5 )
+
+            _T[ i, 0, j, 0 ] = t_xx
+            _T[ i, 0, j, 1 ] = t_xy
+            _T[ i, 0, j, 2 ] = t_xz
+
+            _T[ i, 1, j, 0 ] = t_yx
+            _T[ i, 1, j, 1 ] = t_yy
+            _T[ i, 1, j, 2 ] = t_yz
+
+            _T[ i, 2, j, 0 ] = t_zx
+            _T[ i, 2, j, 1 ] = t_zy
+            _T[ i, 2, j, 2 ] = t_zz
+
+#permute i and j
+            _T[ j, 0, i, 0 ] = t_xx
+            _T[ j, 0, i, 1 ] = t_xy
+            _T[ j, 0, i, 2 ] = t_xz
+
+            _T[ j, 1, i, 0 ] = t_yx
+            _T[ j, 1, i, 1 ] = t_yy
+            _T[ j, 1, i, 2 ] = t_yz
+
+            _T[ j, 2, i, 0 ] = t_zx
+            _T[ j, 2, i, 1 ] = t_zy
+            _T[ j, 2, i, 2 ] = t_zz
+    return _T
+
+
+ 
+
+@cython.boundscheck( False )
 def solve_scf_for_external_cython(
         np.ndarray[long,ndim=1]particles,
         np.ndarray[double,ndim=1]E,

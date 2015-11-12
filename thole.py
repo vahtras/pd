@@ -100,7 +100,7 @@ class TholeList( GaussianQuadrupoleList ):
             E_p0[:, :] = E_at_p
         raise SCFNotConverged(residual, threshold)
 
-    def dipole_coupling_tensor(self, a = 2.1304 ):
+    def dipole_coupling_tensor(self, a = 2.1304, cython = False, num_threads = 1 ):
         n = len(self)
         _T = zeros((n, 3, n,  3))
         for i in range(n):

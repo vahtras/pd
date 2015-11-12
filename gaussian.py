@@ -64,7 +64,7 @@ class GaussianQuadrupoleList( PointDipoleList ):
 
         return array(E_at_p)
 
-    def dipole_coupling_tensor(self):
+    def dipole_coupling_tensor(self, cython = False, num_threads = 1):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to
         another electric dipole distribution:

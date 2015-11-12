@@ -253,6 +253,24 @@ class TestSpeedTest( unittest.TestCase ):
         np.testing.assert_allclose( g[0]._p0, [0.00000, 0.00000, 0.34276] )
 
     @attr(speed='slow')
+    def test_cython_dpc(self):
+        g1 = PointDipoleList.from_string( string_2 )
+        g2 = PointDipoleList.from_string( string_2 )
+
+        t = g1.dipole_coupling_tensor( cython = False, num_threads = 1)
+        t_cython = g2.dipole_coupling_tensor( cython = True, num_threads = 1)
+        np.testing.assert_allclose( t, t_cython )
+
+    @attr(speed='slow')
+    def test_cython_dpc_threaded(self):
+        g1 = PointDipoleList.from_string( string_2 )
+        g2 = PointDipoleList.from_string( string_2 )
+
+        t = g1.dipole_coupling_tensor( cython = False, num_threads = 1)
+        t_cython = g2.dipole_coupling_tensor( cython = True, num_threads = 4)
+        np.testing.assert_allclose( t, t_cython )
+
+    @attr(speed='slow')
     def test_cython_alpha(self):
         g1 = PointDipoleList.from_string( string_2 )
         g2 = PointDipoleList.from_string( string_2 )
@@ -307,10 +325,10 @@ class TestSpeedTest( unittest.TestCase ):
 
         np.testing.assert_allclose( a, a_cython, 1e-14 )
 
-    @attr(speed='superslow')
-    def test_cython_optimization_100(self):
-        g = PointDipoleList.from_string( string_100 )
-        a = g.alpha( cython = True, num_threads = 1 )
+    #@attr(speed='superslow')
+    #def test_cython_optimization_100(self):
+    #    g = PointDipoleList.from_string( string_100 )
+    #    a = g.alpha( cython = True, num_threads = 1 )
     #@attr(speed='slow')
     #def test_cython_optimization_1000(self):
     #    g = PointDipoleList.from_string( string_1000 )

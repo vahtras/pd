@@ -180,7 +180,10 @@ class PointDipoleList(list):
                 cython = cython, 
                 threshold = threshold,
                 num_threads = num_threads )
-        dF2 = self.form_second_Applequist_rhs( threshold = threshold)
+        dF2 = self.form_second_Applequist_rhs( cython = cython,
+                threshold = threshold,
+                num_threads = num_threads
+                )
         L = self.form_Applequist_coefficient_matrix( cython = cython,
                 num_threads = num_threads,
                 )
@@ -193,10 +196,16 @@ class PointDipoleList(list):
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
-    def form_second_Applequist_rhs(self, threshold = 1e-8 ):
+    def form_second_Applequist_rhs(self, cython = False,
+            threshold = 1e-8,
+            num_threads = 1):
         n = len(self)
         betas = [pd._b0 for pd in self]  #(n, 3, 3, 3)
-        C = self._dEi_dF( threshold = threshold )                 #(n, 3; 3)
+        C = self._dEi_dF( cython = cython,
+                threshold = threshold,
+                num_threads = num_threads
+                )                 #(n, 3; 3)
+
         dF2 = [np.einsum('ijk,jl,km', b, c, c) for b, c in zip(betas, C)]   # b( i, j, k) c(k; l) -> b(i, j, l) 
         return array(dF2).reshape((n*3, 9))
 
@@ -299,10 +308,13 @@ class PointDipoleList(list):
         return V_at_p
 
 
-    def _dEi_dF(self, threshold = 1e-8 ):
+    def _dEi_dF(self, cython = False, threshold = 1e-8, num_threads = 1 ):
         """Represents change of local field due to change in external"""
         n = len(self)
-        TR = self._dEi_dF_indirect( threshold = threshold )
+        TR = self._dEi_dF_indirect( cython = cython, 
+                threshold = threshold,
+                num_threads = num_threads
+                )
         return np.array([I_3 + tr for tr in TR])
             
     def _dEi_dF_indirect(self, cython = False, num_threads = 1, threshold = 1e-8 ):
@@ -311,7 +323,10 @@ class PointDipoleList(list):
         T = self.dipole_coupling_tensor( cython = cython, 
                 num_threads = num_threads
                 ).reshape(n, 3, n*3)
-        R = self.solve_Applequist_equation( threshold = threshold ).reshape(n*3, 3)
+        R = self.solve_Applequist_equation( cython = cython,
+                threshold = threshold,
+                num_threads = num_threads
+                ).reshape(n*3, 3)
         TR = dot(T, R)
         return TR
 

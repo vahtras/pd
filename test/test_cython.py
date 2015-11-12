@@ -304,7 +304,7 @@ class TestSpeedTest( unittest.TestCase ):
 
         a = g1.alpha( cython = False, num_threads=1 )
         a_cython = g2.alpha( cython = True, num_threads=4 )
-        np.testing.assert_allclose( a, a_cython, 1e-14 )
+        np.testing.assert_allclose( a, a_cython, )
 
     @attr(speed='slow')
     def test_cython_optimization_10_beta(self):
@@ -313,7 +313,7 @@ class TestSpeedTest( unittest.TestCase ):
 
         a = g1.beta( cython = False, num_threads=1 )
         a_cython = g2.beta( cython = True, num_threads=4 )
-        np.testing.assert_allclose( a, a_cython, 1e-14 )
+        np.testing.assert_allclose( a, a_cython, )
 
     @attr(speed='slow')
     def test_cython_optimization_10_real_alpha(self):
@@ -323,7 +323,7 @@ class TestSpeedTest( unittest.TestCase ):
         a = g1.alpha( )
         a_cython = g2.alpha( cython = True, num_threads = 4 )
 
-        np.testing.assert_allclose( a, a_cython, 1e-14 )
+        np.testing.assert_allclose( a, a_cython, )
 
     #@attr(speed='superslow')
     #def test_cython_optimization_100(self):

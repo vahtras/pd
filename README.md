@@ -1,3 +1,14 @@
+### Installation
+
+Export pythonpath to point to the root directory of pd.
+
+Assuming it lies in the home directory:
+
+```sh
+$ export PYTHONPATH=/home/$USER/pd":$PYTHONPATH
+```
+
+
 ### Cython dependency
 
 To use cython for speedup, run the following command in the root directory:

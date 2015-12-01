@@ -85,8 +85,10 @@ class PointDipoleList(list):
     def total_induced_dipole_moment(self):
        return sum([p.induced_dipole_moment() for p in self])
 
-    def total_dipole_moment(self, dist = False):
-        return sum([ (p.dipole_moment() + p._r * p._q) for p in self] )
+    def total_dipole_moment(self, cython = False, coc = [0, 0, 0] ):
+        self.solve_scf( cython = cython )
+        coc = np.array( coc )
+        return sum([ (p.dipole_moment() + (p._r - coc ) * p._q) for p in self] )
         
     def dipole_coupling_tensor(self, cython = False, num_threads = 1):
         """Calculates the dipole coupling, tensor, describing the
@@ -569,7 +571,7 @@ class PointDipole(object):
 
 
     def dipole_moment(self):
-        return self.permanent_dipole_moment() + self.induced_dipole_moment()
+        return self.permanent_dipole_moment() + self.induced_dipole_moment( )
 
     def permanent_dipole_moment(self):
         return self._p0

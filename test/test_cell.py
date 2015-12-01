@@ -1,7 +1,7 @@
 import unittest, os
 import numpy as np
-import particles 
-import cell
+from ..particles import *
+from ..cell import *
 from nose.plugins.attrib import attr
 
 #Two water molecules, one in origo, one at r = [15, 15, 15]
@@ -20,31 +20,31 @@ class CellTest( unittest.TestCase ):
         pass
         
     def test_init(self):
-        c = cell.Cell( my_min = map(float, [0, 0, 0]),
+        c = Cell( my_min = map(float, [0, 0, 0]),
                     my_max = map(float, [1, 1, 1] ),
                     my_cutoff = 0.4)
         assert len(c) == 3
 
-        c = cell.Cell( my_min = map(float, [-10, 0, 0]),
+        c = Cell( my_min = map(float, [-10, 0, 0]),
                     my_max = map(float, [0, 1, 1] ),
                     my_cutoff = 12)
         assert len(c) == 1
 
-        c = cell.Cell( my_min = map(float, [-5, 0, 0]),
+        c = Cell( my_min = map(float, [-5, 0, 0]),
                     my_max = map(float, [10, 1, 1] ),
                     my_cutoff = 4.9)
         assert len(c) == 4
 
     def test_from_PointDipoleList(self, ):
         _str = POTSTRING1
-        pdl = particles.PointDipoleList.from_string( _str )
-        ce = cell.Cell.from_PointDipoleList( pdl, co = 5 )
+        pdl = PointDipoleList.from_string( _str )
+        ce = Cell.from_PointDipoleList( pdl, co = 5 )
 
         assert ce.shape == (2, 2, 2)
-        assert isinstance( ce, cell.Cell )
+        assert isinstance( ce, Cell )
 
-        pdl = particles.PointDipoleList.cell_from_string( _str )
-        assert isinstance( pdl, particles.PointDipoleList )
+        pdl = PointDipoleList.cell_from_string( _str )
+        assert isinstance( pdl, PointDipoleList )
         assert isinstance( pdl._Cell, cell.Cell )
 
 

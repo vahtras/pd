@@ -85,19 +85,38 @@ class TholeList( GaussianQuadrupoleList ):
             E_at_p += external
         return E_at_p
 
-    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-8,
+    def solve_scf_for_external(self, E, max_it=100, cython = False, threshold=1e-6,
             num_threads = 1 ):
         E_p0 = np.zeros((len(self), 3))
-        for i in range(max_it):
-            E_at_p =  self.evaluate_field_at_atoms(external=E)
-            #print i, E_at_p
+        if cython:
+            import optimized_func
+
+            E_at_p, i, residual = optimized_func.solve_scf_for_external_cython(
+                    particles = array([p.group for p in self]) ,
+                    E = E,
+                    _r = array([p._r for p in self]),
+                    _q = array([p._q for p in self]),
+                    _p0 = array([p._p0 for p in self]),
+                    _a0 = array([p._a0 for p in self]),
+                    _b0 = array([p._b0 for p in self]),
+                    _field = array([p._field for p in self]),
+                    max_it = max_it ,
+                    threshold = threshold,
+                    num_threads = num_threads )
             for p, Ep in zip(self, E_at_p):
-                p.set_local_field(Ep)
-            residual = norm(E_p0 - E_at_p)
-            print residual, threshold
-            if residual < threshold:
-                return i, residual
-            E_p0[:, :] = E_at_p
+                p.set_local_field( Ep )
+            return i, residual
+        else:
+            for i in range(max_it):
+                E_at_p =  self.evaluate_field_at_atoms(external=E)
+                #print i, E_at_p
+                for p, Ep in zip(self, E_at_p):
+                    p.set_local_field(Ep)
+                residual = norm(E_p0 - E_at_p)
+                print residual, threshold
+                if residual < threshold:
+                    return i, residual
+                E_p0[:, :] = E_at_p
         raise SCFNotConverged(residual, threshold)
 
     def dipole_coupling_tensor(self, a = 2.1304, cython = False, num_threads = 1 ):

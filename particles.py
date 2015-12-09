@@ -762,8 +762,11 @@ def line_to_dict(header_dict, line):
 
     valid = False
     for val in backup.values():
-        if not np.allclose( np.zeros( np.array((val,)).shape ), np.array((val,)) , atol = 1e-14):
+        if np.allclose( np.zeros( np.array((val,)).shape ), np.array((val,)) , atol = 1e-14):
 #Temporary hack since one test has zero charge only see test_particles.py line 176, due to DIMER_TEMPLATE
+            if len(backup) == 1:
+                valid = True
+        else:
             valid = True
     if valid:
         return line_dict

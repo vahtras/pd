@@ -244,7 +244,7 @@ class PointDipoleList(list):
             #pyximport.install()
             import optimized_func 
 
-            E_at_p, i, residual = optimized_func.solve_scf_for_external_cython(
+            E_at_p, i, residual = optimized_func.solve_scf_for_external_pointdipole_cython(
                     particles = array([p.group for p in self]) ,
                     E = E,
                     _r = array([p._r for p in self]),

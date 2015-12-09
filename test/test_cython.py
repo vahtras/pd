@@ -6,7 +6,7 @@ import numpy as np
 
 from nose.plugins.attrib import attr
 from numpy.linalg import norm
-from ..gaussian import *
+from ..thole import *
 
 string_2 = """AU
 6 1 22 1
@@ -296,6 +296,15 @@ class TestSpeedTest( unittest.TestCase ):
         b = g1.beta( cython = False )
         b_cython = g2.beta( cython = True )
         np.testing.assert_allclose( b, b_cython )
+
+    @attr(type='cython')
+    def test_cython_beta_thole(self):
+        g1 = TholeList.from_string( string_2 )
+        g2 = TholeList.from_string( string_2 )
+
+        b = g1.beta( cython = False )
+        b_cython = g2.beta( cython = True )
+        np.testing.assert_allclose( b[0, 0, :], b_cython[0, 0, :] )
 
     @attr(type='cython')
     def test_cython_optimization_10_alpha(self):

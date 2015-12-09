@@ -37,8 +37,9 @@ class TholeList( GaussianQuadrupoleList ):
             self.header_dict = header_to_dict( pf.next() )
             for i, line in enumerate(pf):
                 if i == self.header_dict["#atoms"]: break
-                line_dict = line_to_dict( self.header_dict, line)
-                self.append( Thole(**line_dict) )
+                line_dict = line_to_dict(self.header_dict, line)
+                if line_dict:
+                    self.append( Thole(**line_dict ) )
             if units == 'AA':
                 for p in self:
                     p._r /= a0

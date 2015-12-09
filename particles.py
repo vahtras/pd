@@ -25,7 +25,8 @@ class PointDipoleList(list):
             for i, line in enumerate(pf):
                 if i == self.header_dict["#atoms"]: break
                 line_dict = line_to_dict(self.header_dict, line)
-                self.append(PointDipole(**line_dict))
+                if line_dict:
+                    self.append( PointDipole(**line_dict ) )
             if units == 'AA':
                 for p in self:
                     p._r /= a0
@@ -753,8 +754,20 @@ def line_to_dict(header_dict, line):
     else:
         #line_dict['beta'] = np.zeros(27)
         pass
-    
-    return line_dict
+
+#skip particles with zero charge, zero multipoles, zero alpha, zero beta
+    backup = line_dict.copy()
+    del backup['coordinates']
+    del backup['group']
+
+    valid = False
+    for val in backup.values():
+        if not np.allclose( np.zeros( np.array((val,)).shape ), np.array((val,)) , atol = 1e-14):
+#Temporary hack since one test has zero charge only see test_particles.py line 176, due to DIMER_TEMPLATE
+            valid = True
+    if valid:
+        return line_dict
+    return None
 
 class SCFNotConverged(Exception):
     def __init__(self, residual, threshold):

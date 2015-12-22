@@ -3,11 +3,14 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
+import numpy
+
 ext_module = Extension(
         "optimized_func",
         ["optimized_func.pyx"],
         extra_compile_args = ["-O3", "-ffast-math", "-march=native",'-fopenmp', ],
         extra_link_args = ['-fopenmp'], 
+        include_dirs = [ numpy.get_include()],
         )
 
 setup(

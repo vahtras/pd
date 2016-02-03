@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/19666/fishstamp82/pd.svg)](https://zenodo.org/badge/latestdoi/19666/fishstamp82/pd)
+
 ### Pre-requisites:
 
 numpy  

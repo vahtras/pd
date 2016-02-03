@@ -3,6 +3,9 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
+
+from setuptools import setup, Command
+
 import numpy
 
 ext_module = Extension(
@@ -14,7 +17,10 @@ ext_module = Extension(
         )
 
 setup(
-    name = "optimized_func",
-    cmdclass = { 'build_ext' : build_ext },
+    version = "0.1",
+    name = "pd",
     ext_modules = [ext_module],
+    cmdclass = { 'build_ext' : build_ext },
+    setup_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],
+    install_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],
 )

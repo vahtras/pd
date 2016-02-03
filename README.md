@@ -1,25 +1,15 @@
 ### Installation
 
-Export pythonpath to point to the root directory of pd.
-
-Assuming it lies in the home directory:
-
-```sh
-$ export PYTHONPATH=/home/$USER/pd":$PYTHONPATH
-```
+From source on Linux:
 
 
-### Cython dependency
-
-To use cython for speedup, run the following command in the root directory:
 
 
 ```sh
-$ python setup.py build_ext --inplace
+$> git clone https://github.org/vahtras/pd.git
+$> cd pd
+$> python setup.py install
 ```
-
-This will leave a .so object file which is imported under the hood.
-
 
 ### Running tests
 

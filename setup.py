@@ -15,10 +15,9 @@ ext_module = Extension(
         include_dirs = [ numpy.get_include()],
         )
 
-setup(
-    name = "pd",
+setup(name = "pd",
     version = "0.1",
-    packages = ['pd'],
+    packages = [ 'pd',],
     ext_modules = [ext_module],
     cmdclass = { 'build_ext' : build_ext },
     setup_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],

@@ -22,4 +22,5 @@ setup(name = "pd",
     cmdclass = { 'build_ext' : build_ext },
     #setup_requires = [ 'numpy>=1.9.2', 'cython>=0.20.1' ],
     install_requires = [ 'numpy>=1.9.2', 'cython>=0.20.1' ],
+    license = 'GPL',
 )

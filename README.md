@@ -1,6 +1,6 @@
 ### Pre-requisites:
 
-numpy
+numpy  
 cython
 
 ### Installation

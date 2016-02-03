@@ -10,7 +10,7 @@ cython
 From source on Linux:
 
 ```sh
-$> git clone https://github.org/vahtras/pd.git
+$> git clone https://github.com/vahtras/pd.git
 $> cd pd
 $> python setup.py install
 ```

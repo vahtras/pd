@@ -1,9 +1,11 @@
+### Pre-requisites:
+
+numpy
+cython
+
 ### Installation
 
 From source on Linux:
-
-
-
 
 ```sh
 $> git clone https://github.org/vahtras/pd.git

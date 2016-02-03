@@ -1,6 +1,8 @@
 #from distutils.core import setup
 #from distutils.extension import Extension
+
 from Cython.Distutils import build_ext
+
 from setuptools import setup, Extension
 
 import numpy
@@ -18,6 +20,6 @@ setup(name = "pd",
     packages = [ 'pd',],
     ext_modules = [ext_module],
     cmdclass = { 'build_ext' : build_ext },
-    setup_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],
-    install_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],
+    #setup_requires = [ 'numpy>=1.9.2', 'cython>=0.20.1' ],
+    install_requires = [ 'numpy>=1.9.2', 'cython>=0.20.1' ],
 )

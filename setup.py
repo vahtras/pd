@@ -19,6 +19,7 @@ ext_module = Extension(
 setup(
     version = "0.1",
     name = "pd",
+    packages = ['.'],
     ext_modules = [ext_module],
     cmdclass = { 'build_ext' : build_ext },
     setup_requires = [ 'numpy==1.9.2', 'cython==0.20.1' ],

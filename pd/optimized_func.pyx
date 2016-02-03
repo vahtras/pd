@@ -217,7 +217,7 @@ def solve_scf_for_external_thole_cython(
 
         E_at_p[:, :] = _field
         residual = np.linalg.norm( E_p0 - E_at_p)
-        print residual, threshold
+        #print residual, threshold
         if residual < threshold:
             return E_at_p, i, residual
         E_p0[:, :] = E_at_p
@@ -394,7 +394,7 @@ def solve_scf_for_external_pointdipole_cython(
 
         E_at_p[:, :] = _field
         residual = np.linalg.norm( E_p0 - E_at_p)
-        print residual, threshold
+        #print residual, threshold
         if residual < threshold:
             return E_at_p, i, residual
         E_p0[:, :] = E_at_p

@@ -206,14 +206,13 @@ def solve_scf_for_external_thole_cython(
                 tmp_E_y = tmp_E_y + my + dy
                 tmp_E_z = tmp_E_z + mz + dz
 
-            _field[p,0] = tmp_E_x
-            _field[p,1] = tmp_E_y
-            _field[p,2] = tmp_E_z
+            _field[ p, 0] = tmp_E_x
+            _field[ p, 1] = tmp_E_y
+            _field[ p, 2] = tmp_E_z
 
-        if E is not None:
-            _field[p, 0] += E[0]
-            _field[p, 1] += E[1]
-            _field[p, 2] += E[2]
+            _field[ p, 0] = _field[ p, 0] + E[0]
+            _field[ p, 1] = _field[ p, 1] + E[1]
+            _field[ p, 2] = _field[ p, 2] + E[2]
 
         E_at_p[:, :] = _field
         residual = np.linalg.norm( E_p0 - E_at_p)
@@ -383,14 +382,9 @@ def solve_scf_for_external_pointdipole_cython(
                 tmp_E_y = tmp_E_y + my + dy
                 tmp_E_z = tmp_E_z + mz + dz
 
-            _field[p,0] = tmp_E_x
-            _field[p,1] = tmp_E_y
-            _field[p,2] = tmp_E_z
-
-        if E is not None:
-            _field[p, 0] += E[0]
-            _field[p, 1] += E[1]
-            _field[p, 2] += E[2]
+            _field[ p, 0] = tmp_E_x + E[0]
+            _field[ p, 1] = tmp_E_y + E[1]
+            _field[ p, 2] = tmp_E_z + E[2]
 
         E_at_p[:, :] = _field
         residual = np.linalg.norm( E_p0 - E_at_p)
@@ -399,5 +393,3 @@ def solve_scf_for_external_pointdipole_cython(
             return E_at_p, i, residual
         E_p0[:, :] = E_at_p
     raise SCFNotConverged(residual, threshold)
-
-

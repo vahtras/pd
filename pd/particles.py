@@ -86,12 +86,12 @@ class PointDipoleList(list):
     def total_induced_dipole_moment(self):
        return sum([p.induced_dipole_moment() for p in self])
 
-    def total_dipole_moment(self, cython = False, coc = [0, 0, 0] ):
+    def total_dipole_moment(self, cython = True, coc = [0, 0, 0] ):
         self.solve_scf( cython = cython )
         coc = np.array( coc )
         return sum([ (p.dipole_moment() + (p._r - coc ) * p._q) for p in self] )
         
-    def dipole_coupling_tensor(self, cython = False, num_threads = 1):
+    def dipole_coupling_tensor(self, cython = True, num_threads = 1):
         """Calculates the dipole coupling, tensor, describing the
         electric field strength at a given particle due to
         another electric dipole:
@@ -105,8 +105,8 @@ class PointDipoleList(list):
         if cython:
             import optimized_func
             _T = optimized_func.dipole_coupling_tensor_pointdipole_cython( 
-                    particles = array([p.group for p in self]) ,
-                    _r = array([p._r for p in self]),
+                    particles = array([p.group for p in self], dtype = long) ,
+                    _r = array([p._r for p in self], dtype = float),
                     num_threads = num_threads  )
         else:
             _T = zeros((n, 3, n,  3))
@@ -133,7 +133,7 @@ class PointDipoleList(list):
 
         return np.trace(self.alpha())/3
 
-    def alpha(self, cython = False, threshold = 1e-8, num_threads = 1):
+    def alpha(self, cython = True, threshold = 1e-8, num_threads = 1):
         try:
             dpdF = self.solve_Applequist_equation( 
                     threshold = threshold,
@@ -144,7 +144,7 @@ class PointDipoleList(list):
             return np.zeros((3, 3))
         return dpdF.sum(axis=0)
 
-    def beta(self, cython = False, threshold = 1e-8,
+    def beta(self, cython = True, threshold = 1e-8,
             num_threads = 1):
         try:
             d2p_dF2 = self.solve_second_Applequist_equation( cython = cython,
@@ -154,7 +154,7 @@ class PointDipoleList(list):
             return np.zeros((3, 3, 3))
         return d2p_dF2.sum(axis=0)
 
-    def solve_Applequist_equation(self, cython = False, threshold = 1e-8,
+    def solve_Applequist_equation(self, cython = True, threshold = 1e-8,
             num_threads = 1):
         # Solve the linear response equaitons
         n = len(self)
@@ -167,7 +167,7 @@ class PointDipoleList(list):
             print "SCF Not converged: residual=%f, threshold=%f"% (
                 float(e.residual), float(e.threshold)
                 )
-            raise
+            raise SystemExit
             
         dE = self.form_Applequist_rhs()
         L = self.form_Applequist_coefficient_matrix( cython = cython,
@@ -175,7 +175,7 @@ class PointDipoleList(list):
         dpdE = np.linalg.solve(L, dE).reshape((n, 3, 3))
         return dpdE
 
-    def solve_second_Applequist_equation(self, cython = False, threshold = 1e-8,
+    def solve_second_Applequist_equation(self, cython = True, threshold = 1e-8,
             num_threads = 1):
         # Solve the quadratic response equaitons
         n = len(self)
@@ -199,7 +199,7 @@ class PointDipoleList(list):
         dE = array(alphas).reshape((n*3, 3))
         return dE
 
-    def form_second_Applequist_rhs(self, cython = False,
+    def form_second_Applequist_rhs(self, cython = True,
             threshold = 1e-8,
             num_threads = 1):
         n = len(self)
@@ -212,7 +212,7 @@ class PointDipoleList(list):
         dF2 = [np.einsum('ijk,jl,km', b, c, c) for b, c in zip(betas, C)]   # b( i, j, k) c(k; l) -> b(i, j, l) 
         return array(dF2).reshape((n*3, 9))
 
-    def form_Applequist_coefficient_matrix(self, cython = False,
+    def form_Applequist_coefficient_matrix(self, cython = True,
             num_threads = 1 ):
         n = len(self)
 
@@ -228,14 +228,14 @@ class PointDipoleList(list):
         L = np.identity(3*n) - aT.reshape((3*n, 3*n))
         return L
 
-    def solve_scf(self, max_it=100, cython = False, threshold=1e-6,
+    def solve_scf(self, E = ZERO_VECTOR, max_it=100, cython = True, threshold=1e-6,
             num_threads = 1):
-        self.solve_scf_for_external(ZERO_VECTOR, max_it = max_it,
+        self.solve_scf_for_external( E = E, max_it = max_it,
                 cython = cython,
                 threshold = threshold,
                 num_threads = num_threads, )
 
-    def solve_scf_for_external(self, E, max_it=100, cython = False,
+    def solve_scf_for_external(self, E, max_it=100, cython = True,
             threshold=1e-8,
             num_threads = 1 ):
 
@@ -247,13 +247,13 @@ class PointDipoleList(list):
 
             E_at_p, i, residual = optimized_func.solve_scf_for_external_pointdipole_cython(
                     particles = array([p.group for p in self]) ,
-                    E = E,
-                    _r = array([p._r for p in self]),
-                    _q = array([p._q for p in self]),
-                    _p0 = array([p._p0 for p in self]),
-                    _a0 = array([p._a0 for p in self]),
-                    _b0 = array([p._b0 for p in self]),
-                    _field = array([p._field for p in self]),
+                    E = array(E),
+                    _r = array([p._r for p in self], dtype = float ),
+                    _q = array([p._q for p in self], dtype = float ),
+                    _p0 = array([p._p0 for p in self], dtype = float ),
+                    _a0 = array([p._a0 for p in self], dtype = float ),
+                    _b0 = array([p._b0 for p in self], dtype = float ),
+                    _field = array([p._field for p in self], dtype = float ),
                     max_it = max_it ,
                     threshold = threshold,
                     num_threads = num_threads )

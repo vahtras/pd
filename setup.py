@@ -8,7 +8,7 @@ from setuptools import setup, Command, Extension
 import numpy
 
 ext_module = Extension(
-        "pd/optimized_func",
+        "pd.optimized_func",
         ["pd/optimized_func.pyx"],
         extra_compile_args = ["-O3", "-ffast-math", "-march=native",'-fopenmp', ],
         extra_link_args = ['-fopenmp'], 

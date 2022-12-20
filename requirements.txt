@@ -1,3 +1,4 @@
 flask-bootstrap==3.3.7.1
 frozen-flask==0.18
 pytest==7.2.0
+seaborn==0.12.1
